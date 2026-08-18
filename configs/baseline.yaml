@@ -1,0 +1,23 @@
+# Baseline radar configuration.
+# Mirrors the RadarConfig defaults in src/radar/config.py
+# (docs/training/04-python-discipline.md §3, §5). Load with:
+#   uv run radar simulate --config configs/baseline.yaml
+#
+# Note: values are written without bare scientific notation (e.g. 2.45e9)
+# because PyYAML only parses exponents with an explicit sign as floats.
+
+fc_hz: 2450000000.0
+bandwidth_hz: 5000000.0
+pulse_width_s: 2.0e-05
+pri_s: 0.001
+fs_hz: 20000000.0
+n_pulses: 64
+pulse_type: lfm
+target_range_m: 1000.0
+target_velocity_mps: 40.0
+snr_db: 20.0
+seed: 42
+n_elements: 4
+array_spacing_lambda: 0.5
+target_angle_deg: 20.0
+interferer_angle_deg: -30.0

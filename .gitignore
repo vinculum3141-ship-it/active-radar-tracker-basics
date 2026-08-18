@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated artifacts - out/ is tracked only via .gitkeep
+out/*
+!out/.gitkeep

@@ -19,7 +19,9 @@ Legend: **✓ = must-have** · **◇ = stretch**
 - **Objective:** generate the transmit waveform — rectangular pulse, then LFM chirp.
 - **Physics:** `01-physics.md` §1, §3 (pulse parameters, chirp, range resolution).
 - **Code task:** `signal_gen.py` (`rectangular_pulse`, `lfm_chirp`,
-  `transmit_waveform`), `config.py`.
+  `transmit_waveform`). `config.py` is provided: the `RadarConfig`
+  dataclass, `load_config`, `config_summary` and the `configs/` folder
+  are skeleton (04-python-discipline.md §5).
 - **Verification:** `test_signal_gen` green; chirp frequency sweep
   `f0→f1` spans `B`; plot of `pulse` shows `τ = 20 us` at `fs = 20 MHz`.
 - **◇** Plot the matched-filter-compressed chirp; measure the main-lobe width.

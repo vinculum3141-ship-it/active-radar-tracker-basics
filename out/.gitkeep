@@ -1,0 +1,3 @@
+# This file keeps the empty `out/` directory in git. Generated plots land
+# here (out/<stage>/<name>.png, 04-python-discipline.md §5) but are
+# gitignored - only this placeholder is tracked.

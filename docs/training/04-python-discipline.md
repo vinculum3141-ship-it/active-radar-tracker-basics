@@ -13,14 +13,15 @@ fixed here.
   - Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh` (or your package
     manager, e.g. `apt install uv` on Debian/Ubuntu)
 - Python **3.11+**.
-- Dependencies: `numpy`, `scipy`, `matplotlib`, `pytest`, `ruff`, `pyproject.toml`.
+- Dependencies: `numpy`, `scipy`, `matplotlib`, `pyyaml`, `pytest`, `ruff`,
+  `pyproject.toml`.
 
 ```toml
 [project]
 name = "radar"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["numpy", "scipy", "matplotlib"]
+dependencies = ["numpy", "scipy", "matplotlib", "pyyaml"]
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
@@ -56,6 +57,9 @@ tests/
   test_tracker.py
   test_array.py
   test_beamformer.py
+configs/     # *.yaml experiment configs (see §5)
+out/         # generated plots (gitignored, folder tracked via .gitkeep)
+notebooks/   # optional exploration notebooks (never the shipped pipeline)
 ```
 
 Commands:
@@ -108,8 +112,10 @@ class RadarConfig:
     array_spacing_lambda: float = 0.5
     target_angle_deg: float = 20.0
     interferer_angle_deg: float = -30.0   # stages 8+
+    out_dir: str = "out"              # plots land in <out_dir>/<stage>/ (§5)
 
 def load_config(path: str | None = None) -> RadarConfig: ...
+def config_summary(cfg: RadarConfig) -> str: ...  # diffable banner, printed by CLI (§5)
 ```
 
 ### `signal_gen.py`
@@ -235,9 +241,22 @@ Test hygiene:
 
 ## 5. Reproducibility & documentation
 
-- Every script/CLI run prints the `RadarConfig` used (hashable, diffable).
-- Plots are saved to `out/<stage>/<name>.png` when `--plot` is given.
-- Config lives in `configs/*.yaml` for experiments; defaults in code stay
-  aligned with `config.py`.
-- A `README.md` change note per stage, plus a `notebooks/` (optional) for
-  exploration — never for the shipped pipeline.
+This discipline is **wired into the skeleton** — you inherit it, you don't
+remember it. Each rule lives in one place; edit there, not in habits.
+Line numbers are as of the skeleton commit (they may shift as you implement
+stage bodies).
+
+| Rule | Where it lives |
+|---|---|
+| Every CLI run prints the `RadarConfig` used (hashable, diffable) | `cli.py::main()` (`src/radar/cli.py:43`) prints `config_summary(cfg)` (`src/radar/config.py:47`) before dispatching |
+| Plots are saved to `out/<stage>/<name>.png` when `--plot` is given | `viz.py::save_plot` (`src/radar/viz.py:13`); subcommand handlers call it |
+| Config lives in `configs/*.yaml` for experiments; defaults in code stay aligned with `config.py` | `config.py::load_config` (`src/radar/config.py:32`); `configs/baseline.yaml` mirrors the defaults |
+| A `README.md` change note per stage, plus `notebooks/` (optional) for exploration — never for the shipped pipeline | `notebooks/README.md` states the rule; append your per-stage note to the repo `README.md` |
+
+**Verify the wiring** (should print the config banner, then stop at the
+stage stub):
+
+```bash
+uv run radar simulate --config configs/baseline.yaml
+uv run radar bench
+```

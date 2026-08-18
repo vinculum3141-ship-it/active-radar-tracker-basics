@@ -1,8 +1,27 @@
 """Visualization: plotting helpers (never plot by default; --plot enabled).
 
 API spec: docs/training/04-python-discipline.md §3.
-Implemented by roadmap stages as each plot is needed.
+Reproducibility: save_plot wired in (see §5); the plot_* functions below
+are the learner's to implement per stage.
 """
+
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+
+
+def save_plot(fig, name: str, stage: str, cfg) -> Path:
+    """Save a figure to `<cfg.out_dir>/<stage>/<name>.png`.
+
+    Makes the directory if needed and closes the figure. Call this from the
+    subcommand handlers (cli.py) whenever `--plot` is given (§5).
+    """
+    out_dir = Path(cfg.out_dir) / stage
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / f"{name}.png"
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return path
 
 
 def plot_pulse(tx, cfg):
