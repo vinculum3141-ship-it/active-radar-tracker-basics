@@ -1,0 +1,615 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: Custom
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: 'Simulated channel + receiver: echo delay, noise, matched filter. Matches 03-hardware.md 2.2.'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: radar_rx_sim
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Radar Receiver (simulated channel + matched filter)
+    window_size: 1280, 720
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [-1, 0]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: 'Sampling rate (RadarConfig.fs_hz)'
+    value: '20e6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 0]
+    rotation: 0
+    state: enabled
+- name: fc
+  id: variable
+  parameters:
+    comment: 'Carrier frequency - baseband 0 (01-physics.md: complex baseband)'
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 40]
+    rotation: 0
+    state: enabled
+- name: bandwidth_hz
+  id: variable
+  parameters:
+    comment: 'Chirp bandwidth'
+    value: '5e6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 80]
+    rotation: 0
+    state: enabled
+- name: pulse_width_s
+  id: variable
+  parameters:
+    comment: 'Pulse width'
+    value: '20e-6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 120]
+    rotation: 0
+    state: enabled
+- name: pri_s
+  id: variable
+  parameters:
+    comment: 'Pulse repetition interval'
+    value: '1e-3'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 160]
+    rotation: 0
+    state: enabled
+- name: n_pulse_samp
+  id: variable
+  parameters:
+    comment: 'Samples per pulse'
+    value: int(pulse_width_s*samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 200]
+    rotation: 0
+    state: enabled
+- name: n_pri_samp
+  id: variable
+  parameters:
+    comment: 'Samples per PRI'
+    value: int(pri_s*samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 240]
+    rotation: 0
+    state: enabled
+- name: c
+  id: variable
+  parameters:
+    comment: 'Speed of light (m/s)'
+    value: '3e8'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 280]
+    rotation: 0
+    state: enabled
+- name: range_m
+  id: variable
+  parameters:
+    comment: 'Target range (m) - the R=1000 m test case'
+    value: '1000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 320]
+    rotation: 0
+    state: enabled
+- name: n_delay
+  id: variable
+  parameters:
+    comment: 'Round-trip delay in samples: round(2R/c * fs) = 133'
+    value: int(round(2*range_m/c*samp_rate))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 360]
+    rotation: 0
+    state: enabled
+- name: noise_amp
+  id: variable
+  parameters:
+    comment: 'Noise amplitude (receiver noise floor, ~20 dB SNR)'
+    value: '0.05'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 400]
+    rotation: 0
+    state: enabled
+- name: radar_taps
+  id: epy_module
+  parameters:
+    source_code: |-
+      """Radar waveform helpers for the GNU Radio flowgraphs.
+
+      LEARNER TASK (05-roadmap.md stage 2 / 03-hardware.md 2.1-2.2):
+      implement chirp(), pulse_vector() and matched() below so the
+      flowgraphs can be generated and run. These mirror
+      src/radar/signal_gen.py. All functions must return numpy complex128
+      arrays; GRC converts them to gr_complex. See
+      docs/training/01-physics.md section 2 (LFM) for the math.
+      """
+
+      import numpy as np
+
+
+      def chirp(samp_rate=20e6, pulse_width_s=20e-6, bandwidth_hz=5e6, fc_hz=0.0):
+          """Complex analytic LFM chirp, one pulse of fast-time samples.
+
+          slope = bandwidth_hz / pulse_width_s
+          return np.exp(1j * 2 * np.pi * (fc_hz * t + 0.5 * slope * t**2))
+          with t = arange(int(pulse_width_s*samp_rate)) / samp_rate.
+          """
+          raise NotImplementedError(
+              'Implement chirp() (05-roadmap.md stage 2)')
+
+
+      def pulse_vector(samp_rate=20e6, pulse_width_s=20e-6, pri_s=1e-3,
+                       bandwidth_hz=5e6, fc_hz=0.0):
+          """One PRI: LFM chirp followed by the quiet window (zeros).
+
+          np.concatenate([chirp(...), np.zeros(n_pri - n_pulse)]).
+          """
+          raise NotImplementedError(
+              'Implement pulse_vector() (05-roadmap.md stage 2)')
+
+
+      def matched(samp_rate=20e6, pulse_width_s=20e-6, bandwidth_hz=5e6):
+          """Matched-filter taps: conjugated, time-reversed chirp.
+
+          np.conj(chirp(...)[::-1]). Convolving with the echo gives the
+          compressed pulse (range resolution c/(2B)).
+          """
+          raise NotImplementedError(
+              'Implement matched() (05-roadmap.md stage 4)')
+    affinity: ''
+    alias: ''
+    comment: 'Radar waveform helpers (pulse_vector, matched)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [360, 40]
+    rotation: 0
+    state: enabled
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'TX waveform copy = pulsed LFM chirp (transmit_waveform)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: complex
+    vector: radar_taps.pulse_vector()
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 480]
+    rotation: 0
+    state: enabled
+- name: blocks_delay_0
+  id: blocks_delay
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Round-trip propagation delay (channel.propagate)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    delay: n_delay
+    type: complex
+    vlen: '1'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 480]
+    rotation: 0
+    state: enabled
+- name: analog_noise_source_x_0
+  id: analog_noise_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Receiver noise (channel noise)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    noise_type: analog.GR_GAUSSIAN
+    amp: noise_amp
+    seed: '42'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 640]
+    rotation: 0
+    state: enabled
+- name: blocks_add_xx_0
+  id: blocks_add_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Echo + noise (simulate_channel)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [680, 560]
+    rotation: 0
+    state: enabled
+- name: filter_fir_filter_xxx_0
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Matched filter: taps = conj(time-reversed chirp) (receiver.matched_filter)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    decim: '1'
+    samp_delay: '0'
+    taps: radar_taps.matched()
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [920, 560]
+    rotation: 0
+    state: enabled
+- name: blocks_complex_to_mag_0
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Envelope for display / peak detection'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1160, 560]
+    rotation: 0
+    state: enabled
+- name: qtgui_time_sink_x_0
+  id: qtgui_time_sink_x
+  parameters:
+    type: complex
+    name: '"Received echo (RX input)"'
+    ylabel: Amplitude
+    yunit: '""'
+    size: '1024'
+    srate: samp_rate
+    grid: 'False'
+    autoscale: 'False'
+    ymin: '-1.5'
+    ymax: '1.5'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'True'
+    gui_hint: '0,0,1,1'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0.0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: 'I'
+    width1: 1
+    color1: blue
+    style1: 1
+    marker1: -1
+    alpha1: 1.0
+    label2: 'Q'
+    width2: 1
+    color2: red
+    style2: 1
+    marker2: -1
+    alpha2: 1.0
+    label3: 'Signal 3'
+    width3: 1
+    color3: green
+    style3: 1
+    marker3: -1
+    alpha3: 1.0
+    label4: 'Signal 4'
+    width4: 1
+    color4: black
+    style4: 1
+    marker4: -1
+    alpha4: 1.0
+    label5: 'Signal 5'
+    width5: 1
+    color5: cyan
+    style5: 1
+    marker5: -1
+    alpha5: 1.0
+    label6: 'Signal 6'
+    width6: 1
+    color6: magenta
+    style6: 1
+    marker6: -1
+    alpha6: 1.0
+    label7: 'Signal 7'
+    width7: 1
+    color7: yellow
+    style7: 1
+    marker7: -1
+    alpha7: 1.0
+    label8: 'Signal 8'
+    width8: 1
+    color8: dark red
+    style8: 1
+    marker8: -1
+    alpha8: 1.0
+    label9: 'Signal 9'
+    width9: 1
+    color9: dark green
+    style9: 1
+    marker9: -1
+    alpha9: 1.0
+    label10: 'Signal 10'
+    width10: 1
+    color10: dark blue
+    style10: 1
+    marker10: -1
+    alpha10: 1.0
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1440, 480]
+    rotation: 0
+    state: enabled
+- name: qtgui_time_sink_x_1
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    name: '"Matched filter output (envelope)"'
+    ylabel: Amplitude
+    yunit: '""'
+    size: '1024'
+    srate: samp_rate
+    grid: 'False'
+    autoscale: 'False'
+    ymin: '-10'
+    ymax: '500'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'True'
+    gui_hint: '1,0,1,1'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0.0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: 'matched'
+    width1: 1
+    color1: blue
+    style1: 1
+    marker1: -1
+    alpha1: 1.0
+    label2: 'Signal 2'
+    width2: 1
+    color2: red
+    style2: 1
+    marker2: -1
+    alpha2: 1.0
+    label3: 'Signal 3'
+    width3: 1
+    color3: green
+    style3: 1
+    marker3: -1
+    alpha3: 1.0
+    label4: 'Signal 4'
+    width4: 1
+    color4: black
+    style4: 1
+    marker4: -1
+    alpha4: 1.0
+    label5: 'Signal 5'
+    width5: 1
+    color5: cyan
+    style5: 1
+    marker5: -1
+    alpha5: 1.0
+    label6: 'Signal 6'
+    width6: 1
+    color6: magenta
+    style6: 1
+    marker6: -1
+    alpha6: 1.0
+    label7: 'Signal 7'
+    width7: 1
+    color7: yellow
+    style7: 1
+    marker7: -1
+    alpha7: 1.0
+    label8: 'Signal 8'
+    width8: 1
+    color8: dark red
+    style8: 1
+    marker8: -1
+    alpha8: 1.0
+    label9: 'Signal 9'
+    width9: 1
+    color9: dark green
+    style9: 1
+    marker9: -1
+    alpha9: 1.0
+    label10: 'Signal 10'
+    width10: 1
+    color10: dark blue
+    style10: 1
+    marker10: -1
+    alpha10: 1.0
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1440, 600]
+    rotation: 0
+    state: enabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    type: float
+    name: '"Matched filter spectrum"'
+    fftsize: '1024'
+    freqhalf: 'True'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    norm_window: 'False'
+    fc: fc
+    bw: samp_rate
+    grid: 'False'
+    autoscale: 'False'
+    average: '1.0'
+    ymin: '-140'
+    ymax: '10'
+    label: Relative Gain
+    units: dB
+    nconnections: '1'
+    update_time: '0.10'
+    showports: 'False'
+    gui_hint: '0,1,1,1'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    label1: ''
+    width1: '1'
+    color1: '"blue"'
+    alpha1: '1.0'
+    label2: "''"
+    width2: '1'
+    color2: '"red"'
+    alpha2: '1.0'
+    label3: "''"
+    width3: '1'
+    color3: '"green"'
+    alpha3: '1.0'
+    label4: "''"
+    width4: '1'
+    color4: '"black"'
+    alpha4: '1.0'
+    label5: "''"
+    width5: '1'
+    color5: '"cyan"'
+    alpha5: '1.0'
+    label6: "''"
+    width6: '1'
+    color6: '"magenta"'
+    alpha6: '1.0'
+    label7: "''"
+    width7: '1'
+    color7: '"yellow"'
+    alpha7: '1.0'
+    label8: "''"
+    width8: '1'
+    color8: '"dark red"'
+    alpha8: '1.0'
+    label9: "''"
+    width9: '1'
+    color9: '"dark green"'
+    alpha9: '1.0'
+    label10: "''"
+    width10: '1'
+    color10: '"dark blue"'
+    alpha10: '1.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1440, 720]
+    rotation: 0
+    state: enabled
+
+connections:
+- [blocks_vector_source_x_0, '0', blocks_delay_0, '0']
+- [blocks_delay_0, '0', blocks_add_xx_0, '0']
+- [analog_noise_source_x_0, '0', blocks_add_xx_0, '1']
+- [blocks_add_xx_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_add_xx_0, '0', filter_fir_filter_xxx_0, '0']
+- [filter_fir_filter_xxx_0, '0', blocks_complex_to_mag_0, '0']
+- [blocks_complex_to_mag_0, '0', qtgui_time_sink_x_1, '0']
+- [blocks_complex_to_mag_0, '0', qtgui_freq_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.10.0

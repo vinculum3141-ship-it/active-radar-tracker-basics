@@ -1,0 +1,689 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: Custom
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: 'Range-Doppler map: slow-time FFT across pulses. Matches 03-hardware.md 2.3.'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: radar_doppler
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Radar Range-Doppler Map
+    window_size: 1280, 720
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [-1, 0]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: 'Sampling rate (RadarConfig.fs_hz)'
+    value: '20e6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 0]
+    rotation: 0
+    state: enabled
+- name: fc
+  id: variable
+  parameters:
+    comment: 'Carrier frequency for display - baseband 0'
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 40]
+    rotation: 0
+    state: enabled
+- name: fc_rf
+  id: variable
+  parameters:
+    comment: 'RF carrier used for Doppler math (2.45 GHz, ISM band)'
+    value: '2.45e9'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 80]
+    rotation: 0
+    state: enabled
+- name: bandwidth_hz
+  id: variable
+  parameters:
+    comment: 'Chirp bandwidth'
+    value: '5e6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 120]
+    rotation: 0
+    state: enabled
+- name: pulse_width_s
+  id: variable
+  parameters:
+    comment: 'Pulse width'
+    value: '20e-6'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 160]
+    rotation: 0
+    state: enabled
+- name: pri_s
+  id: variable
+  parameters:
+    comment: 'Pulse repetition interval'
+    value: '1e-3'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 200]
+    rotation: 0
+    state: enabled
+- name: n_pulse_samp
+  id: variable
+  parameters:
+    comment: 'Samples per pulse'
+    value: int(pulse_width_s*samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 240]
+    rotation: 0
+    state: enabled
+- name: n_pri_samp
+  id: variable
+  parameters:
+    comment: 'Samples per PRI'
+    value: int(pri_s*samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 280]
+    rotation: 0
+    state: enabled
+- name: c
+  id: variable
+  parameters:
+    comment: 'Speed of light (m/s)'
+    value: '3e8'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 320]
+    rotation: 0
+    state: enabled
+- name: range_m
+  id: variable
+  parameters:
+    comment: 'Target range (m) - the R=1000 m test case'
+    value: '1000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 360]
+    rotation: 0
+    state: enabled
+- name: n_delay
+  id: variable
+  parameters:
+    comment: 'Round-trip delay in samples: round(2R/c * fs) = 133'
+    value: int(round(2*range_m/c*samp_rate))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 400]
+    rotation: 0
+    state: enabled
+- name: noise_amp
+  id: variable
+  parameters:
+    comment: 'Noise amplitude (~20 dB SNR)'
+    value: '0.05'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 440]
+    rotation: 0
+    state: enabled
+- name: n_pulses
+  id: variable
+  parameters:
+    comment: 'Pulses per coherent processing interval (RadarConfig.n_pulses)'
+    value: '64'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 480]
+    rotation: 0
+    state: enabled
+- name: n_win
+  id: variable
+  parameters:
+    comment: 'Fast-time listen window per pulse (pulse + echo guard)'
+    value: int(1.5*pulse_width_s*samp_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 520]
+    rotation: 0
+    state: enabled
+- name: target_velocity_mps
+  id: variable
+  parameters:
+    comment: 'Target radial velocity (m/s) - the v=40 m/s test case'
+    value: '40'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 560]
+    rotation: 0
+    state: enabled
+- name: doppler_phase_incr
+  id: variable
+  parameters:
+    comment: 'Per-pulse phase advance = 2*pi*f_d*PRI, f_d = 2v/lambda'
+    value: 2*3.141592653589793*2*target_velocity_mps*fc_rf/c*pri_s
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 600]
+    rotation: 0
+    state: enabled
+- name: radar_taps
+  id: epy_module
+  parameters:
+    source_code: |-
+      """Radar waveform helpers for the GNU Radio flowgraphs.
+
+      LEARNER TASK (05-roadmap.md stage 2 / 03-hardware.md 2.1-2.2):
+      implement chirp(), pulse_vector() and matched() below so the
+      flowgraphs can be generated and run. These mirror
+      src/radar/signal_gen.py. All functions must return numpy complex128
+      arrays; GRC converts them to gr_complex. See
+      docs/training/01-physics.md section 2 (LFM) for the math.
+      """
+
+      import numpy as np
+
+
+      def chirp(samp_rate=20e6, pulse_width_s=20e-6, bandwidth_hz=5e6, fc_hz=0.0):
+          """Complex analytic LFM chirp, one pulse of fast-time samples.
+
+          slope = bandwidth_hz / pulse_width_s
+          return np.exp(1j * 2 * np.pi * (fc_hz * t + 0.5 * slope * t**2))
+          with t = arange(int(pulse_width_s*samp_rate)) / samp_rate.
+          """
+          raise NotImplementedError(
+              'Implement chirp() (05-roadmap.md stage 2)')
+
+
+      def pulse_vector(samp_rate=20e6, pulse_width_s=20e-6, pri_s=1e-3,
+                       bandwidth_hz=5e6, fc_hz=0.0):
+          """One PRI: LFM chirp followed by the quiet window (zeros).
+
+          np.concatenate([chirp(...), np.zeros(n_pri - n_pulse)]).
+          """
+          raise NotImplementedError(
+              'Implement pulse_vector() (05-roadmap.md stage 2)')
+
+
+      def matched(samp_rate=20e6, pulse_width_s=20e-6, bandwidth_hz=5e6):
+          """Matched-filter taps: conjugated, time-reversed chirp.
+
+          np.conj(chirp(...)[::-1]). Convolving with the echo gives the
+          compressed pulse (range resolution c/(2B)).
+          """
+          raise NotImplementedError(
+              'Implement matched() (05-roadmap.md stage 4)')
+    affinity: ''
+    alias: ''
+    comment: 'Radar waveform helpers (pulse_vector, matched)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [360, 40]
+    rotation: 0
+    state: enabled
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'TX waveform copy = pulsed LFM chirp'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: complex
+    vector: radar_taps.pulse_vector()
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 700]
+    rotation: 0
+    state: enabled
+- name: blocks_delay_0
+  id: blocks_delay
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Round-trip propagation delay (channel)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    delay: n_delay
+    type: complex
+    vlen: '1'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 700]
+    rotation: 0
+    state: enabled
+- name: doppler_phase
+  id: epy_block
+  parameters:
+    _source_code: |-
+      """Doppler phase ramp across pulses.
+
+      LEARNER TASK (05-roadmap.md stage 7): implement work().
+
+      Applies a constant per-pulse phase advance to the delayed echo,
+      modelling the target's radial velocity. The phase advances once per
+      pulse: phase_increment_rad = 2*pi*f_d*PRI with f_d = 2*v/lambda.
+      See docs/training/01-physics.md section 4. The leakage path (direct
+      TX-to-RX) is NOT rotated, so it stays at zero Doppler.
+      """
+
+      import numpy as np
+      from gnuradio import gr
+
+
+      class blk(gr.sync_block):
+          """Apply a slow-time phase ramp (once per samples_per_pulse samples)."""
+
+          def __init__(self, samples_per_pulse=20000,
+                       phase_increment_rad=4.1050144006906635):
+              gr.sync_block.__init__(
+                  self,
+                  name='Doppler Phase Ramp',
+                  in_sig=[np.complex64],
+                  out_sig=[np.complex64],
+              )
+              self.samples_per_pulse = int(samples_per_pulse)
+              self.increment = float(phase_increment_rad)
+              self.idx_in_pulse = 0
+              self.phase = 0.0
+
+          def work(self, input_items, output_items):
+              """Rotate every input sample by the current pulse's phase.
+
+              Learner task (05-roadmap.md stage 7 / 03-hardware.md 2.3):
+              apply exp(j*phase) per sample, advancing phase by
+              phase_increment_rad once per samples_per_pulse samples.
+              Return the number of samples written.
+              """
+              raise NotImplementedError(
+                  'Implement work() (05-roadmap.md stage 7)')
+    affinity: ''
+    alias: ''
+    comment: 'Per-pulse Doppler phase (moving target, v=40 m/s)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [680, 700]
+    rotation: 0
+    state: enabled
+- name: analog_noise_source_x_0
+  id: analog_noise_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Receiver noise'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    noise_type: analog.GR_GAUSSIAN
+    amp: noise_amp
+    seed: '42'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [500, 880]
+    rotation: 0
+    state: enabled
+- name: blocks_add_xx_0
+  id: blocks_add_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Leakage (0) + moving echo (1) + noise (2)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '3'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [920, 760]
+    rotation: 0
+    state: enabled
+- name: filter_fir_filter_xxx_0
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Matched filter (receiver.matched_filter)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    decim: '1'
+    samp_delay: '0'
+    taps: radar_taps.matched()
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1160, 760]
+    rotation: 0
+    state: enabled
+- name: blocks_keep_m_in_n_0
+  id: blocks_keep_m_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Extract the n_win-sample fast-time window of each PRI'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    m: n_win
+    n: n_pri_samp
+    offset: '0'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1400, 760]
+    rotation: 0
+    state: enabled
+- name: range_doppler
+  id: epy_block
+  parameters:
+    _source_code: |-
+      """Range-Doppler map: slow-time FFT over the buffered pulse matrix.
+
+      LEARNER TASK (05-roadmap.md stage 7): implement general_work().
+
+      Input is the matched-filter stream for one fast-time window per pulse
+      (blocks_keep_m_in_n makes the pulses back-to-back). Every
+      n_pulses*PULSE samples the block reshapes into a [pulse x range]
+      matrix, FFTs along slow time (pulse axis), shifts the Doppler axis and
+      emits the magnitude map row by row (doppler x range) for the raster
+      sink. Mirrors doppler.range_doppler_map in the Python sim.
+      """
+
+      import numpy as np
+      from gnuradio import gr
+
+
+      class blk(gr.block):
+          """2-D range-Doppler map from the matched-filter stream."""
+
+          def __init__(self, n_pulses=64, samples_per_pulse=600):
+              gr.block.__init__(
+                  self,
+                  name='Range-Doppler Map',
+                  in_sig=[np.complex64],
+                  out_sig=[np.float32],
+              )
+              self.n_pulses = int(n_pulses)
+              self.samples_per_pulse = int(samples_per_pulse)
+              self.frame = self.n_pulses * self.samples_per_pulse
+              self.norm = float(self.frame)
+              self.buffer = np.zeros(0, dtype=np.complex64)
+              self.pending = np.zeros(0, dtype=np.float32)
+
+          def general_work(self, input_items, output_items):
+              """Buffer, FFT over slow time per frame, emit magnitude rows.
+
+              Learner task (05-roadmap.md stage 7 / 03-hardware.md 2.3):
+              append the input to self.buffer; while len(buffer) >= frame,
+              reshape into [pulses x ranges], FFT along the pulse axis,
+              fftshift the Doppler axis, take |.|, normalise by self.norm
+              and emit rows (doppler x range) for the raster sink.
+              Return the number of samples written. The __init__ above
+              already sets up in/out sigs, the frame size and buffers.
+              """
+              raise NotImplementedError(
+                  'Implement general_work() (05-roadmap.md stage 7)')
+    affinity: ''
+    alias: ''
+    comment: '2-D range-Doppler map (doppler.range_doppler_map)'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1640, 760]
+    rotation: 0
+    state: enabled
+- name: qtgui_time_raster_sink_x_0
+  id: qtgui_time_raster_sink_x
+  parameters:
+    type: float
+    name: '"Range-Doppler map"'
+    samp_rate: samp_rate
+    nrows: n_pulses
+    ncols: n_win
+    x_label: 'Range bin'
+    x_start_value: '0'
+    x_end_value: n_win
+    y_label: 'Doppler bin'
+    y_start_value: '0'
+    y_end_value: n_pulses
+    grid: 'True'
+    zmin: '0'
+    zmax: '1'
+    mult: '[]'
+    offset: '[]'
+    nconnections: '1'
+    update_time: '0.10'
+    gui_hint: '0,0,1,1'
+    axislabels: 'True'
+    label1: ''
+    color1: '0'
+    alpha1: '1.0'
+    label2: ''
+    color2: '1'
+    alpha2: '1.0'
+    label3: ''
+    color3: '2'
+    alpha3: '1.0'
+    label4: ''
+    color4: '3'
+    alpha4: '1.0'
+    label5: ''
+    color5: '5'
+    alpha5: '1.0'
+    label6: ''
+    color6: '6'
+    alpha6: '1.0'
+    label7: ''
+    color7: '0'
+    alpha7: '1.0'
+    label8: ''
+    color8: '1'
+    alpha8: '1.0'
+    label9: ''
+    color9: '2'
+    alpha9: '1.0'
+    label10: ''
+    color10: '3'
+    alpha10: '1.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1920, 720]
+    rotation: 0
+    state: enabled
+- name: qtgui_time_sink_x_0
+  id: qtgui_time_sink_x
+  parameters:
+    type: complex
+    name: '"Matched filter output"'
+    ylabel: Amplitude
+    yunit: '""'
+    size: '1024'
+    srate: samp_rate
+    grid: 'False'
+    autoscale: 'False'
+    ymin: '-10'
+    ymax: '500'
+    nconnections: '1'
+    update_time: '0.10'
+    entags: 'True'
+    gui_hint: '1,0,1,1'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_level: '0.0'
+    tr_delay: '0'
+    tr_chan: '0'
+    tr_tag: '""'
+    ctrlpanel: 'False'
+    legend: 'True'
+    axislabels: 'True'
+    stemplot: 'False'
+    label1: 'I'
+    width1: 1
+    color1: blue
+    style1: 1
+    marker1: -1
+    alpha1: 1.0
+    label2: 'Q'
+    width2: 1
+    color2: red
+    style2: 1
+    marker2: -1
+    alpha2: 1.0
+    label3: 'Signal 3'
+    width3: 1
+    color3: green
+    style3: 1
+    marker3: -1
+    alpha3: 1.0
+    label4: 'Signal 4'
+    width4: 1
+    color4: black
+    style4: 1
+    marker4: -1
+    alpha4: 1.0
+    label5: 'Signal 5'
+    width5: 1
+    color5: cyan
+    style5: 1
+    marker5: -1
+    alpha5: 1.0
+    label6: 'Signal 6'
+    width6: 1
+    color6: magenta
+    style6: 1
+    marker6: -1
+    alpha6: 1.0
+    label7: 'Signal 7'
+    width7: 1
+    color7: yellow
+    style7: 1
+    marker7: -1
+    alpha7: 1.0
+    label8: 'Signal 8'
+    width8: 1
+    color8: dark red
+    style8: 1
+    marker8: -1
+    alpha8: 1.0
+    label9: 'Signal 9'
+    width9: 1
+    color9: dark green
+    style9: 1
+    marker9: -1
+    alpha9: 1.0
+    label10: 'Signal 10'
+    width10: 1
+    color10: dark blue
+    style10: 1
+    marker10: -1
+    alpha10: 1.0
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1440, 960]
+    rotation: 0
+    state: enabled
+
+connections:
+- [blocks_vector_source_x_0, '0', blocks_delay_0, '0']
+- [blocks_vector_source_x_0, '0', blocks_add_xx_0, '0']
+- [blocks_delay_0, '0', doppler_phase, '0']
+- [doppler_phase, '0', blocks_add_xx_0, '1']
+- [analog_noise_source_x_0, '0', blocks_add_xx_0, '2']
+- [blocks_add_xx_0, '0', filter_fir_filter_xxx_0, '0']
+- [filter_fir_filter_xxx_0, '0', blocks_keep_m_in_n_0, '0']
+- [filter_fir_filter_xxx_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_keep_m_in_n_0, '0', range_doppler, '0']
+- [range_doppler, '0', qtgui_time_raster_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.10.0
