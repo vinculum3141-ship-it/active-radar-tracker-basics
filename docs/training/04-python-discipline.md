@@ -125,16 +125,17 @@ class RadarConfig:
     pri_s: float = 1e-3
     fs_hz: float = 20e6
     n_pulses: int = 64
-    pulse_type: str = "lfm"          # "rect" | "lfm"
+    pulse_type: str = "lfm"  # "rect" | "lfm"
     target_range_m: float = 1000.0
     target_velocity_mps: float = 40.0
     snr_db: float = 20.0
     seed: int = 42
-    n_elements: int = 4              # stages 6+
+    n_elements: int = 4  # stages 6+
     array_spacing_lambda: float = 0.5
     target_angle_deg: float = 20.0
-    interferer_angle_deg: float = -30.0   # stages 8+
-    out_dir: str = "out"              # plots land in <out_dir>/<stage>/ (§5)
+    interferer_angle_deg: float = -30.0  # stages 8+
+    out_dir: str = "out"  # plots land in <out_dir>/<stage>/ (§5)
+
 
 def load_config(path: str | None = None) -> RadarConfig: ...
 def config_summary(cfg: RadarConfig) -> str: ...  # diffable banner, printed by CLI (§5)
@@ -144,8 +145,8 @@ def config_summary(cfg: RadarConfig) -> str: ...  # diffable banner, printed by 
 
 ```python
 def rectangular_pulse(cfg: RadarConfig) -> np.ndarray: ...
-def lfm_chirp(cfg: RadarConfig) -> np.ndarray: ...          # complex analytic
-def pulse_train(cfg: RadarConfig) -> np.ndarray: ...        # [n_pulses, samples]
+def lfm_chirp(cfg: RadarConfig) -> np.ndarray: ...  # complex analytic
+def pulse_train(cfg: RadarConfig) -> np.ndarray: ...  # [n_pulses, samples]
 def transmit_waveform(cfg: RadarConfig) -> np.ndarray: ...
 ```
 
@@ -159,7 +160,10 @@ class Target:
     angle_deg: float | None = None
     snr_db: float = 20.0
 
-def propagate(pulse: np.ndarray, target: Target, cfg: RadarConfig, rng) -> np.ndarray: ...
+
+def propagate(
+    pulse: np.ndarray, target: Target, cfg: RadarConfig, rng
+) -> np.ndarray: ...
 def simulate_channel(tx: np.ndarray, targets: list[Target], cfg, rng) -> np.ndarray: ...
 ```
 
@@ -168,7 +172,9 @@ def simulate_channel(tx: np.ndarray, targets: list[Target], cfg, rng) -> np.ndar
 ```python
 def matched_filter(rx: np.ndarray, tx_pulse: np.ndarray) -> np.ndarray: ...
 def range_from_delay(delay_samples: int, cfg: RadarConfig) -> float: ...
-def detect_peaks(matched: np.ndarray, cfg, threshold_db: float = 10.0) -> list[Detection]: ...
+def detect_peaks(
+    matched: np.ndarray, cfg, threshold_db: float = 10.0
+) -> list[Detection]: ...
 ```
 
 ### `doppler.py`
@@ -183,7 +189,10 @@ def velocity_axis(cfg) -> np.ndarray: ...
 
 ```python
 @dataclass
-class State: range_m: float; velocity_mps: float
+class State:
+    range_m: float
+    velocity_mps: float
+
 
 class KalmanTracker:
     def __init__(self, dt_s: float, q: float, r: float): ...
@@ -196,7 +205,9 @@ class KalmanTracker:
 ### `array.py` (stages 6+)
 
 ```python
-def steering_vector(theta_deg: float, n_elements: int, spacing_lambda: float) -> np.ndarray: ...
+def steering_vector(
+    theta_deg: float, n_elements: int, spacing_lambda: float
+) -> np.ndarray: ...
 def array_response(x: np.ndarray, theta_deg: float, cfg) -> np.ndarray: ...
 def beam_pattern(weights: np.ndarray, thetas_deg: np.ndarray, cfg) -> np.ndarray: ...
 ```
@@ -204,9 +215,13 @@ def beam_pattern(weights: np.ndarray, thetas_deg: np.ndarray, cfg) -> np.ndarray
 ### `beamformer.py` (stages 7+)
 
 ```python
-def bartlett_scan(array_data: np.ndarray, thetas_deg: np.ndarray, cfg) -> np.ndarray: ...
+def bartlett_scan(
+    array_data: np.ndarray, thetas_deg: np.ndarray, cfg
+) -> np.ndarray: ...
 def capon_weights(array_data: np.ndarray, theta_deg: float, cfg) -> np.ndarray: ...
-def lcmv_weights(array_data: np.ndarray, target_deg: float, interferer_deg: float, cfg) -> np.ndarray: ...
+def lcmv_weights(
+    array_data: np.ndarray, target_deg: float, interferer_deg: float, cfg
+) -> np.ndarray: ...
 def apply_weights(array_data: np.ndarray, weights: np.ndarray) -> np.ndarray: ...
 ```
 
@@ -226,6 +241,8 @@ def plot_array_geometry(cfg): ...
 
 ```python
 def main() -> None: ...
+
+
 # subcommands: simulate, bench, plot, track
 ```
 

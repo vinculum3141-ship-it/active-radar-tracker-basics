@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Sync environment (lockfile)
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format
+        run: uv run ruff format --check .
+      - name: CLI smoke
+        run: uv run radar --help
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Sync environment (lockfile)
+        run: uv sync --frozen
+      # Intentionally red at first: the skeleton's tests/test_*.py files are
+      # empty, so pytest exits 5 ("no tests ran"). This job flips green as the
+      # learner writes the test bodies (04-python-discipline.md section 4) and
+      # implements the NotImplementedError stubs - the visible build progress.
+      - name: Test
+        run: uv run pytest
