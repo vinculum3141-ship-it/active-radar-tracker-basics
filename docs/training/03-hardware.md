@@ -35,8 +35,27 @@ gnuradio-companion
 
 ```bash
 gnuradio-companion --version
+```
+
+```bash
+# Import test. The Python that GNU Radio binds to is the Homebrew formula's
+# Python, which may differ from your default `python3`.
+# macOS (Homebrew):
+python3.14 -c "import gnuradio; print(gnuradio.gr.version())"
+# Linux (system Python):
 python3 -c "import gnuradio; print(gnuradio.gr.version())"
 ```
+
+**Troubleshooting `ModuleNotFoundError: No module named 'gnuradio'`**
+
+GNU Radio's Python bindings are compiled against the Python it was built
+with, and compiled extension modules do not import across Python versions.
+On macOS, `brew install gnuradio` builds against Homebrew's `python@3.14`,
+so `import gnuradio` works under `python3.14` (or whatever `brew info
+gnuradio` lists under *Dependencies*) but *not* under a 3.12 venv or the
+system Python. Check which interpreter to use with `brew info gnuradio`.
+The flowgraph tooling is unaffected: `gnuradio-companion` and `grcc` always
+use the correct Python themselves.
 
 Python blocks are defined with **GRC (GNU Radio Companion)** generated
 out-of-tree modules or plain Python blocks inside a flowgraph.

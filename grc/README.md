@@ -55,8 +55,10 @@ Regenerate/check them with:
 - `.grc` files are YAML: `options` / `blocks` / `connections` / `metadata`.
 - Embedded Python is stored as a plain YAML literal block (`|-`) in
   `epy_module.source_code` and `epy_block._source_code`.
-- Custom `epy_block` parameters come from the class `__init__` defaults —
-  do not add them by hand to the YAML; GRC derives them on load.
+- Custom `epy_block` parameters (from the class `__init__` defaults) are
+  serialized in the YAML with their values — GRC needs them present to
+  generate the block's constructor call. Keep them in sync with the
+  `__init__` defaults in `_source_code`.
 - `epy_module` generated module names are `{flowgraph_id}_{name}`
   (e.g. `radar_tx_radar_taps`), imported as `{name}`.
 

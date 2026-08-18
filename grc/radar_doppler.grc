@@ -368,6 +368,8 @@ blocks:
               """
               raise NotImplementedError(
                   'Implement work() (05-roadmap.md stage 7)')
+    samples_per_pulse: '20000'
+    phase_increment_rad: '4.1050144006906635'
     affinity: ''
     alias: ''
     comment: 'Per-pulse Doppler phase (moving target, v=40 m/s)'
@@ -461,7 +463,7 @@ blocks:
     _source_code: |-
       """Range-Doppler map: slow-time FFT over the buffered pulse matrix.
 
-      LEARNER TASK (05-roadmap.md stage 7): implement general_work().
+      LEARNER TASK (05-roadmap.md stage 7): implement work().
 
       Input is the matched-filter stream for one fast-time window per pulse
       (blocks_keep_m_in_n makes the pulses back-to-back). Every
@@ -475,11 +477,15 @@ blocks:
       from gnuradio import gr
 
 
-      class blk(gr.block):
-          """2-D range-Doppler map from the matched-filter stream."""
+      class blk(gr.sync_block):
+          """2-D range-Doppler map from the matched-filter stream.
+
+          Must be a gr.sync_block (a gateway class) for GRC to use it as an
+          epy_block; gr.block is not accepted.
+          """
 
           def __init__(self, n_pulses=64, samples_per_pulse=600):
-              gr.block.__init__(
+              gr.sync_block.__init__(
                   self,
                   name='Range-Doppler Map',
                   in_sig=[np.complex64],
@@ -492,7 +498,7 @@ blocks:
               self.buffer = np.zeros(0, dtype=np.complex64)
               self.pending = np.zeros(0, dtype=np.float32)
 
-          def general_work(self, input_items, output_items):
+          def work(self, input_items, output_items):
               """Buffer, FFT over slow time per frame, emit magnitude rows.
 
               Learner task (05-roadmap.md stage 7 / 03-hardware.md 2.3):
@@ -504,7 +510,9 @@ blocks:
               already sets up in/out sigs, the frame size and buffers.
               """
               raise NotImplementedError(
-                  'Implement general_work() (05-roadmap.md stage 7)')
+                  'Implement work() (05-roadmap.md stage 7)')
+    n_pulses: '64'
+    samples_per_pulse: '600'
     affinity: ''
     alias: ''
     comment: '2-D range-Doppler map (doppler.range_doppler_map)'

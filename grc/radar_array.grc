@@ -216,7 +216,7 @@ blocks:
 - name: theta_rad
   id: variable
   parameters:
-    comment: 'Target angle in radians'
+    comment: 'Target angle in radians (used by gen_weights.py; the phases below are precomputed for GRC)'
     value: theta_deg*3.141592653589793/180
   states:
     bus_sink: false
@@ -240,8 +240,8 @@ blocks:
 - name: phi_m1
   id: variable
   parameters:
-    comment: 'Arrival phase element 1 = 2*pi*d/lambda*sin(theta)'
-    value: 2*3.141592653589793*d_over_lambda*sin(theta_rad)
+    comment: 'Arrival phase element 1 = 2*pi*d/lambda*sin(theta) = 1.0745 rad (grcc cannot evaluate sin(); see grc/gen_weights.py)'
+    value: '1.07448797'
   states:
     bus_sink: false
     bus_source: false
@@ -252,8 +252,8 @@ blocks:
 - name: phi_m2
   id: variable
   parameters:
-    comment: 'Arrival phase element 2'
-    value: 2*3.141592653589793*d_over_lambda*2*sin(theta_rad)
+    comment: 'Arrival phase element 2 = 2.14897594 rad'
+    value: '2.14897594'
   states:
     bus_sink: false
     bus_source: false
@@ -264,8 +264,8 @@ blocks:
 - name: phi_m3
   id: variable
   parameters:
-    comment: 'Arrival phase element 3'
-    value: 2*3.141592653589793*d_over_lambda*3*sin(theta_rad)
+    comment: 'Arrival phase element 3 = 3.22346391 rad'
+    value: '3.22346391'
   states:
     bus_sink: false
     bus_source: false
