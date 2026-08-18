@@ -214,7 +214,29 @@ For each, keep: the plot, the config that produced it, and a 3–5 line caption
 
 ---
 
-## 9. Suggested study references
+## 9. Definition of done
+
+The single place that states when the whole course is complete. You're done
+when **all** of the following hold:
+
+- **Roadmap** — every stage in `05-roadmap.md` is complete: all five weekly
+  milestones met, every per-stage verification green.
+- **Code** — the full suite passes with no stubs left:
+  `uv run pytest` green and `uv run ruff check .` clean
+  (`04-python-discipline.md` §4); no `NotImplementedError` remains in
+  `src/radar/`. Running
+  `uv run radar simulate --config configs/baseline.yaml` produces detections
+  and plots instead of "not implemented yet".
+- **GNU Radio** — the `03-hardware.md` §5 validation checklist is fully
+  ticked; the three flowgraphs reproduce the Python pipeline numbers.
+- **Artifacts** — the four portfolio artifacts from §8 exist, each with its
+  config and caption.
+- **Self-assessment** — quizzes §5 and labs §6 complete; the §7 rubrics are
+  self-graded and consistent.
+
+---
+
+## 10. Suggested study references
 
 - Richards, *Fundamentals of Radar Signal Processing*
 - Skolnik, *Introduction to Radar Systems*

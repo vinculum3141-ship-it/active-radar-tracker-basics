@@ -8,6 +8,9 @@ on. Stages build on each other; each week ends in a demonstrable milestone.
 > Pace yourself: if a week's verification is green, that week is done — even
 > if the "stretch" items are skipped. Come back later; the stages are
 > deliberately order-independent once complete.
+>
+> Overall completion (the point where the whole course is done) is defined
+> once, in `06-training.md` §9 "Definition of done".
 
 Legend: **✓ = must-have** · **◇ = stretch**
 

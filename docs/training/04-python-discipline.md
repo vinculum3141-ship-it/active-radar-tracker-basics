@@ -4,6 +4,28 @@ The code spec the roadmap (`05-roadmap.md`) implements. Written so the code
 pass is mechanical: every module, its API, the conventions, and the tests are
 fixed here.
 
+### Your job — the skeleton contract
+
+This repo is a teaching skeleton, not a finished program:
+
+- `src/radar/` provides all plumbing — config, CLI, `save_plot`, module
+  wiring. The stage bodies are `NotImplementedError` stubs; you replace them
+  by following `05-roadmap.md`.
+- `tests/test_*.py` exist but are **empty** — you write the test bodies from
+  the §4 table.
+- A stage is done only when its roadmap verification is green **and** the
+  full suite passes:
+
+  ```bash
+  uv run pytest
+  uv run ruff check .
+  ```
+
+- Run the CLI and you'll get a clean "not implemented yet" message (exit 1)
+  — expected until you implement that subcommand's stages.
+- Overall completion criteria live in `06-training.md` §9 "Definition of
+  done".
+
 ---
 
 ## 1. Environment & tooling
