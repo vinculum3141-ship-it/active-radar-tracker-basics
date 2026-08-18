@@ -6,6 +6,7 @@ every run (§5); the subcommand handlers are the learner's to implement.
 """
 
 import argparse
+import sys
 
 from radar.config import RadarConfig, config_summary, load_config
 
@@ -55,4 +56,13 @@ def main() -> None:
     args = parser.parse_args()
     cfg = load_config(args.config)
     print(config_summary(cfg))  # reproducibility: banner on every run (§5)
-    args.handler(cfg, args)
+    try:
+        args.handler(cfg, args)
+    except NotImplementedError as e:
+        detail = f" ({e})" if str(e) else ""
+        print(
+            f"radar: '{args.command}' is not implemented yet{detail} - "
+            "see docs/training/05-roadmap.md",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from e

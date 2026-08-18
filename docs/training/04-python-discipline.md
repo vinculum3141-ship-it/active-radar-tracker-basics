@@ -253,8 +253,8 @@ stage bodies).
 | Config lives in `configs/*.yaml` for experiments; defaults in code stay aligned with `config.py` | `config.py::load_config` (`src/radar/config.py:32`); `configs/baseline.yaml` mirrors the defaults |
 | A `README.md` change note per stage, plus `notebooks/` (optional) for exploration — never for the shipped pipeline | `notebooks/README.md` states the rule; append your per-stage note to the repo `README.md` |
 
-**Verify the wiring** (should print the config banner, then stop at the
-stage stub):
+**Verify the wiring** (should print the config banner, then a clean
+"not implemented yet" message with exit code 1 — **no traceback**):
 
 ```bash
 uv run radar simulate --config configs/baseline.yaml
