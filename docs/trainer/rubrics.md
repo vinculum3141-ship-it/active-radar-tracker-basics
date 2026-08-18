@@ -48,11 +48,17 @@ gain 4 (`sum(w*a_t) = 4`), sidelobes ≤ −13.3 dB (uniform window,
 Truth: `radar_doppler.grc` with implemented epy blocks gives the same
 target cell as the Python sim for (1000 m, 40 m/s).
 
+> The learner-facing gate for this milestone is the **`03-hardware.md` §5
+> validation checklist** — it must be fully ticked. The criteria below are
+> the grading view of that same checklist; `06-training.md` §7 (GNU Radio)
+> is the learner's self-check.
+
 | Criterion | P | P- | R |
 |---|---|---|---|
 | Target cell matches Python sim (≤1 bin per axis) | yes | 1 bin on one axis | mismatch unexplained |
 | All three flowgraphs run end-to-end sim-only | 3/3 | 2/3 | < 2 |
 | Learner can map each block to its Python equivalent | all mapped | most | few/none |
+| `03-hardware.md` §5 checklist fully ticked | all boxes | one unticked, explained | >1 unticked |
 
 ## Portfolio artifacts (06-training.md §8)
 
