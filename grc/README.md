@@ -62,12 +62,18 @@ Regenerate/check them with:
 - `epy_module` generated module names are `{flowgraph_id}_{name}`
   (e.g. `radar_tx_radar_taps`), imported as `{name}`.
 
-## Validation checklist (03-hardware.md section 5)
+## Validation checklist (03-hardware.md §5)
 
-- [ ] `radar_tx`: time sink shows a 20 us chirp every 1 ms PRI.
-- [ ] `radar_rx_sim`: compressed pulse peak at ~133 samples after the PRI
-      start; range resolution ~30 m.
-- [ ] `radar_doppler`: raster shows the echo at range bin ~133 and a
+`03-hardware.md` §5 is the single source of truth for "done". The lines
+below are the per-flowgraph "how to see it" view, each keyed to a numbered
+§5 item; if they ever disagree, the numbered item wins.
+
+- [ ] **§5.1** — `radar_tx`: time sink shows the same 20 us chirp every 1 ms
+      PRI that the Python sim (`signal_gen`) generates.
+- [ ] **§5.2** — `radar_rx_sim`: compressed pulse peak at ~133 samples after
+      the PRI start; range resolution ~30 m.
+- [ ] **§5.3** — `radar_doppler`: raster shows the echo at range bin ~133 and a
       Doppler peak (aliased because v > v_max); leakage stays at bin 0.
-- [ ] `radar_array`: beamformer envelope ~4x a single element (~6 dB
-      SNR gain over per-element noise).
+- [ ] **§5.4** — `radar_array`: beamformer envelope ~4x a single element
+      (~6 dB SNR gain over per-element noise) when steered at the target
+      angle.

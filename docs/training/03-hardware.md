@@ -178,10 +178,16 @@ fine for single-antenna TX/RX but cannot receive 4 phase-coherent channels.
 
 ## 5. Sim-vs-hardware validation checklist
 
-- [ ] Sim flowgraph produces the same range/velocity as the Python sim for a
-      known target.
-- [ ] Matched filter output peak appears at the expected delay.
-- [ ] Range-Doppler map shows the expected target cell for `R=1000 m, v=40 m/s`.
-- [ ] Array pattern shows main lobe at target angle, null at interferer angle.
-- [ ] (Optional) hardware path: same DSP blocks, with TX/RX swapped to
+The single source of truth for "Week 5 done". The per-flowgraph how-to in
+`grc/README.md` maps its checkboxes to the numbered items below; if the two
+ever disagree, the numbered item here wins.
+
+- [ ] **5.1** Sim flowgraph produces the same range/velocity as the Python sim
+      for a known target.
+- [ ] **5.2** Matched filter output peak appears at the expected delay.
+- [ ] **5.3** Range-Doppler map shows the expected target cell for
+      `R=1000 m, v=40 m/s`.
+- [ ] **5.4** Array pattern shows main lobe at target angle, null at
+      interferer angle.
+- [ ] **5.5** (Optional) hardware path: same DSP blocks, with TX/RX swapped to
       `osmocom` sinks/sources — re-run the above checks over the air.
