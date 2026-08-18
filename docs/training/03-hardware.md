@@ -4,6 +4,12 @@ The project runs **fully simulated** — no hardware is required. This document
 covers how to install GNU Radio, how to build the flowgraphs, and how each
 block would swap to real SDR hardware if you ever add it.
 
+> **Your finish line for this section is §5.** The last section — the
+> *Sim-vs-hardware validation checklist* — is the gate for this document and
+> for Week 5 on the roadmap. **Skim it now** before reading §2, so you know
+> what "done" looks like; every flowgraph in §2 is designed to satisfy those
+> items. `05-roadmap.md` Week 5 marks it complete when all boxes are ticked.
+
 ---
 
 ## 1. Installing GNU Radio

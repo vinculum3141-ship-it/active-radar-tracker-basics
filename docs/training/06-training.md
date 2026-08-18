@@ -195,6 +195,9 @@ Use these to self-grade each milestone artifact.
 - [ ] Same target cell as Python sim
 - [ ] All three flowgraphs run end-to-end sim-only
 
+> This rubric is the same gate as the `03-hardware.md` §5 validation
+> checklist — complete and tick that one too.
+
 ---
 
 ## 8. Portfolio artifacts
