@@ -9,21 +9,21 @@
 | Deliverable | Spec | Status |
 |---|---|---|
 | Docs tree | this repo | done |
-| Python package `src/radar/` | `04-python-discipline.md` | pending |
-| GNU Radio flowgraphs | `03-hardware.md` §2 | pending |
-| Training resources (quizzes/labs/rubrics) | `06-training.md` | pending |
+| Python package `src/radar/` | `training/04-python-discipline.md` | pending |
+| GNU Radio flowgraphs | `training/03-hardware.md` §2 | pending |
+| Training resources (quizzes/labs/rubrics) | `training/06-training.md` | pending |
 
 ## Package parts (what "done" means)
 
-1. **Docs** — `docs/` tree (00–07 + README index). Complete.
+1. **Docs** — `training/` tree (00–08 + README index). Complete.
 2. **Python package** — `src/radar/` modules, CLI, pytest suite. Done when all
-   test files in `04-python-discipline.md` §4 pass and every roadmap stage's
-   verification is green.
+   test files in `training/04-python-discipline.md` §4 pass and every roadmap
+   stage's verification is green.
 3. **GNU Radio flowgraphs** — `radar_tx.grc`, `radar_rx_sim.grc`,
-   `radar_doppler.grc` (+ array variant). Done when the `03-hardware.md` §5
-   validation checklist passes.
+   `radar_doppler.grc` (+ array variant). Done when the
+   `training/03-hardware.md` §5 validation checklist passes.
 4. **Training resources** — quiz answers, lab solutions, rubrics. Done when
-   `06-training.md` §3–§5 can be graded.
+   `training/06-training.md` §3–§5 can be graded.
 
 ## Remove this file when
 
