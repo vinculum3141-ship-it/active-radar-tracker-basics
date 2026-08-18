@@ -207,11 +207,25 @@ def main() -> None: ...
 # subcommands: simulate, bench, plot, track
 ```
 
+CLI reference (skeleton-provided common options; run
+`uv run radar <subcommand> --help` for the live list):
+
+```bash
+uv run radar {simulate,bench,plot,track} [--config CONFIG] [--plot]
+  --config CONFIG   configs/*.yaml to load (default: RadarConfig defaults)
+  --plot            save plots to out/<stage>/ via viz.save_plot
+```
+
+Example runs:
+
 ```bash
 uv run radar simulate --config configs/baseline.yaml --plot
-uv run radar track --n-targets 2 --plot
-uv run radar bench            # timing + numerical checks
+uv run radar bench                       # timing + numerical checks
 ```
+
+> Subcommand-specific flags (e.g. `--n-targets` for `track`) are **not** in
+> the skeleton — you add them in the stage that owns the subcommand
+> (`05-roadmap.md`), keeping the two `--config`/`--plot` options common.
 
 ---
 
