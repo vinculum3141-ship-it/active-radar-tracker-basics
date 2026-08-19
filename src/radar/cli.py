@@ -34,7 +34,13 @@ def bench(cfg: RadarConfig, args: argparse.Namespace) -> None:
 
 
 def plot(cfg: RadarConfig, args: argparse.Namespace) -> None:
-    raise NotImplementedError("roadmap stages 1-6 viz")
+    """Stage 1: plot the transmit pulse (extended by later stages)."""
+    from radar import signal_gen, viz
+
+    tx = signal_gen.transmit_waveform(cfg)
+    fig = viz.plot_pulse(tx, cfg)
+    path = viz.save_plot(fig, "pulse", "stage1", cfg)
+    print(f"wrote {path}")
 
 
 def track(cfg: RadarConfig, args: argparse.Namespace) -> None:

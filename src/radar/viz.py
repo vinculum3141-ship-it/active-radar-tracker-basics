@@ -8,6 +8,7 @@ are the learner's to implement per stage.
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def save_plot(fig, name: str, stage: str, cfg) -> Path:
@@ -25,7 +26,21 @@ def save_plot(fig, name: str, stage: str, cfg) -> Path:
 
 
 def plot_pulse(tx, cfg):
-    raise NotImplementedError("roadmap stage 1")
+    """Plot the transmit pulse magnitude over time in microseconds.
+
+    Uses the first pulse of the train. For the baseline config the pulse
+    spans 20 us (400 samples at 20 MHz).
+    """
+    pulse = tx[0] if tx.ndim == 2 else tx
+    t_us = np.arange(pulse.size) / cfg.fs_hz * 1e6
+    fig, ax = plt.subplots()
+    ax.plot(t_us, np.abs(pulse))
+    ax.set_xlabel("time (us)")
+    ax.set_ylabel("magnitude")
+    ax.set_title(f"Transmit pulse ({cfg.pulse_type}, tau = {cfg.pulse_width_s * 1e6:.0f} us)")
+    ax.set_xlim(0, t_us[-1])
+    fig.tight_layout()
+    return fig
 
 
 def plot_echo(rx, matched, cfg):
