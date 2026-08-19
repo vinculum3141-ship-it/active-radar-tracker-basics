@@ -37,7 +37,9 @@ def plot_pulse(tx, cfg):
     ax.plot(t_us, np.abs(pulse))
     ax.set_xlabel("time (us)")
     ax.set_ylabel("magnitude")
-    ax.set_title(f"Transmit pulse ({cfg.pulse_type}, tau = {cfg.pulse_width_s * 1e6:.0f} us)")
+    ax.set_title(
+        f"Transmit pulse ({cfg.pulse_type}, tau = {cfg.pulse_width_s * 1e6:.0f} us)"
+    )
     ax.set_xlim(0, t_us[-1])
     fig.tight_layout()
     return fig

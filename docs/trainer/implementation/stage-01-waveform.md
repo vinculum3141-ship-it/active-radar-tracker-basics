@@ -127,8 +127,12 @@ The whole module is four tiny functions built on the two integer helpers from
 algorithm step 1:
 
 ```python
-def _n_pulse_samples(cfg):  return round(cfg.pulse_width_s * cfg.fs_hz)   # 400
-def _samples_per_pulse(cfg): return round(cfg.pri_s * cfg.fs_hz)          # 20000
+def _n_pulse_samples(cfg):
+    return round(cfg.pulse_width_s * cfg.fs_hz)  # 400
+
+
+def _samples_per_pulse(cfg):
+    return round(cfg.pri_s * cfg.fs_hz)  # 20000
 ```
 
 **Step 2a — rectangular pulse** — a unit complex envelope of length 400:
@@ -145,8 +149,8 @@ phase `π·k·t²` is exactly the "frequency ramps linearly" of the algorithm:
 ```python
 def lfm_chirp(cfg):
     n = _n_pulse_samples(cfg)
-    t = np.arange(n) / cfg.fs_hz                       # 0..20 us
-    k = cfg.bandwidth_hz / cfg.pulse_width_s           # B/tau = 2.5e11 Hz/s
+    t = np.arange(n) / cfg.fs_hz  # 0..20 us
+    k = cfg.bandwidth_hz / cfg.pulse_width_s  # B/tau = 2.5e11 Hz/s
     return np.exp(1j * np.pi * k * t**2)
 ```
 
