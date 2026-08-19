@@ -25,7 +25,50 @@ jobs:
       - name: CLI smoke
         run: uv run radar --help
 
-  tests:
+  # One job per roadmap phase (05-roadmap.md). Each phase's job runs only the
+  # test files that belong to that week's stages, so learners watch each phase
+  # flip green in the Actions UI as they implement it.
+  #
+  # Phase -> stages -> test files:
+  #   week1: stages 1-3  -> test_signal_gen, test_channel, test_receiver
+  #   week2: stages 4-5  -> test_doppler, test_tracker
+  #   week3: stages 6-8  -> test_array, test_beamformer (+ test_channel: stage 8
+  #                         extends channel.py with an interferer target)
+  #   week4: stages 9-11 -> test_beamformer (steering + LCMV) + test_channel
+  #                         (stage 11 may add an end-to-end test file later)
+  #   week5: stage 12    -> no pytest (GNU Radio); see the grc-check job below.
+  #
+  # Intentionally red at first: the skeleton's tests/test_*.py files are empty,
+  # so each phase job exits 5 ("no tests ran") until that phase's test bodies
+  # and stubs are written (04-python-discipline.md §4) - the visible build
+  # progress.
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - phase: week1
+            files: tests/test_signal_gen.py tests/test_channel.py tests/test_receiver.py
+          - phase: week2
+            files: tests/test_doppler.py tests/test_tracker.py
+          - phase: week3
+            files: tests/test_array.py tests/test_beamformer.py tests/test_channel.py
+          - phase: week4
+            files: tests/test_beamformer.py tests/test_channel.py
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Sync environment (lockfile)
+        run: uv sync --frozen
+      - name: Test (${{ matrix.phase }})
+        run: uv run pytest ${{ matrix.files }} -q
+
+  # Week 5 (stage 12) is the GNU Radio port: no pytest files, but the grc/
+  # artifacts and the array-math constants are re-generated headlessly.
+  grc-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +77,7 @@ jobs:
           python-version: "3.12"
       - name: Sync environment (lockfile)
         run: uv sync --frozen
-      # Intentionally red at first: the skeleton's tests/test_*.py files are
-      # empty, so pytest exits 5 ("no tests ran"). This job flips green as the
-      # learner writes the test bodies (04-python-discipline.md section 4) and
-      # implements the NotImplementedError stubs - the visible build progress.
-      - name: Test
-        run: uv run pytest
+      - name: Flowgraphs present
+        run: test -f grc/radar_tx.grc && test -f grc/radar_rx_sim.grc && test -f grc/radar_doppler.grc
+      - name: Regenerate array weights (headless smoke)
+        run: uv run python grc/gen_weights.py
