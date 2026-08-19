@@ -261,9 +261,18 @@ is why tolerances (`rel=0.05`) are explicit.
   shows the modulation.
 - The `f_inst[-1]` sample reads 4.98 MHz, not 5.0 — the discrete chirp stops
   one sample short of `t = τ`; within the 5% tolerance the test allows.
-- **Stretch (roadmap ◇)**: plot the *matched-filter-compressed* chirp and
-  measure the main-lobe width (expected ~`1/B`). This previews Stage 3; we'll
-  return to it when the receiver exists.
+- **Stretch (roadmap ◇)** — pulse-compression preview, self-contained (no
+  Stage 3 needed): autocorrelate the chirp (`scipy.signal.correlate`,
+  `mode="same"`), plot the magnitude, and measure (a) the peak-to-first-null
+  half-width ≈ `1/B` = 0.2 us = 4 samples, and (b) the compression ratio
+  (pulse samples ÷ half-width) = `τ·B` = 100. The compressed peak ≈ `N` = 400
+  (coherent sum of all pulse samples). When Stage 3 lands we re-derive the
+  same spike through the real `matched_filter`.
+- **Gotcha that carries into Stage 3**: `scipy.signal.correlate` already
+  *conjugates its kernel*, so the matched filter for the chirp is the
+  autocorrelation (`correlate(pulse, pulse)`) — passing `conj(pulse[::-1])`
+  double-flips and fails to compress. We hit exactly this bug while writing
+  the notebook preview; `receiver.matched_filter` must get it right.
 - **Alternative sweep**: `−B/2 → +B/2` is equally valid and some texts prefer
   it; it only changes the constant phase of the waveform.
 
