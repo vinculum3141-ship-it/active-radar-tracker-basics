@@ -11,6 +11,8 @@ a branch or strip it for the learner checkout).
 | `quiz-answers.md` | 06-training.md §5 weekly self-check quizzes (17 questions) |
 | `lab-solutions.md` | 06-training.md §6 hands-on labs L1–L5 + common failure modes |
 | `rubrics.md` | 06-training.md §7 verification rubrics with pass criteria and analytic truth |
+| `implementation/` | Stage-by-stage implementation narrative for slides/lessons (see its README) |
+| `../notebooks/week01-solutions.ipynb` | Week 1 quiz + lab answers as a live, runnable notebook (trainer-only; on the implementation branch) |
 
 The numeric answers are locked to the constants baked into the teaching
 skeleton: `n_delay = 133` samples, `f_d = 653.3 Hz`, `v_max = 30.6 m/s`,

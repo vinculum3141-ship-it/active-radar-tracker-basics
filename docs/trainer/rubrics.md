@@ -9,6 +9,21 @@ milestone.
 Use the numbers below as the analytic truth (all from
 `docs/training/01-physics.md` and the flowgraph constants).
 
+## Milestone 1 — Range profile (Week 1)
+
+Truth for the R=1000 m, SNR 20 dB case: echo peak at sample
+`round(2R/c·fs) = 133`, measured range within one range bin of 1000 m
+(one bin = `c/(2fs) = 7.5 m`), matched-filter peak visibly sharper than the
+echo (compressed chirp main lobe ~`1/B`).
+
+| Criterion | P | P- | R |
+|---|---|---|---|
+| Echo peak lands at `2R/c·fs` (bin 133) | within ±1 bin | within ±2 bins | off / missing |
+| Measured range within one range bin of 1000 m | yes | within `ΔR = 30 m` | beyond |
+| Matched-filter peak visibly sharper than the echo | clearly | marginal | not distinguishable |
+| Plots labeled (time/range on the correct axes) | both correct | one correct | neither |
+| Week 1 tests green: signal_gen + channel + receiver | 3/3 | 2/3 | < 2 |
+
 ## Milestone 1 — Range-Doppler map (Week 2)
 
 Truth for the R=1000 m, v=40 m/s case: peak at range bin **~133**
