@@ -40,7 +40,7 @@ def plot_pulse(tx, cfg):
     ax.set_title(
         f"Transmit pulse ({cfg.pulse_type}, tau = {cfg.pulse_width_s * 1e6:.0f} us)"
     )
-    ax.set_xlim(0, t_us[-1])
+    ax.set_xlim(0, cfg.pulse_width_s * 1e6)
     fig.tight_layout()
     return fig
 
