@@ -27,3 +27,7 @@ packages = ["src/radar"]
 # misleading. Excluded from both ruff lint and format; verified by execution.
 [tool.ruff]
 extend-exclude = ["*.ipynb"]
+
+# Show every test by name on every run (local and CI) - 04-python-discipline.md §4.
+[tool.pytest.ini_options]
+addopts = "-v"

@@ -70,7 +70,8 @@ jobs:
       - name: Sync environment (lockfile)
         run: uv sync --frozen
       - name: Test (${{ matrix.name }})
-        run: uv run pytest tests/${{ matrix.file }} -q
+        # no -q: pyproject.toml sets addopts="-v" so each test is listed by name
+        run: uv run pytest tests/${{ matrix.file }}
 
   # Week 5 (stage 12) is the GNU Radio port: no pytest files, but the grc/
   # artifacts and the array-math constants are re-generated headlessly.
