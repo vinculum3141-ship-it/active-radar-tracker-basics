@@ -130,7 +130,8 @@ decision:
   def stationary(cls, range_m, snr_db=20.0):
       return cls(range_m=range_m, velocity_mps=0.0, snr_db=snr_db)
 
-  Target.stationary(1000.0)   # -> Target(range_m=1000.0, velocity_mps=0.0, ...)
+
+  Target.stationary(1000.0)  # -> Target(range_m=1000.0, velocity_mps=0.0, ...)
   ```
 
   Using `cls` (not the literal class name) keeps the factory
