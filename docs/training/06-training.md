@@ -165,7 +165,7 @@ Each lab is a mini-investigation on top of a stage's code.
 
 | Lab | Task | Success looks like |
 |---|---|---|
-| L1 (wk1) | Sweep `SNR` from 30→0 dB; at what SNR does `detect_peaks` fail? | plot of detection error vs SNR |
+| L1 (wk1) | Sweep `SNR` from 30 dB down until `detect_peaks` fails (surprise: it survives far below 0 dB — the matched filter adds ~26 dB of processing gain) | plot of detection error vs SNR, showing the dropout point |
 | L2 (wk2) | Double `PRF` and re-run Doppler; does the ambiguous target unwrap? | consistent velocity across runs |
 | L3 (wk3) | Two targets 10° apart; Bartlett then Capon; measure peak separation | Capon resolves, Bartlett doesn't |
 | L4 (wk4) | Drift the interferer `-30°→-20°`; recompute weights each CPI | null tracks interferer; target stays |

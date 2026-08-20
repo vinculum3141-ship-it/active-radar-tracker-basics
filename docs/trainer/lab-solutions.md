@@ -11,16 +11,22 @@ and helpers from `04-python-discipline.md` §4.
 
 ## L1 — SNR sweep (Week 1)
 
-**Task:** sweep SNR 30→0 dB, find where `detect_peaks` fails.
+**Task:** sweep SNR 30→-24 dB, run the full pipeline at each level, and
+measure range accuracy + false alarms.
 
-**Expected result:** failure (missed or extra detection) somewhere in the
-~10–15 dB band for a fixed false-alarm threshold. The exact crossover moves
-with the detection threshold — that's the point: detection SNR depends on
-the threshold policy (`P_fa`), which is the CFAR idea previewed in
-`08-extensions.md`.
+**Expected result:** the target survives far below the "eyeball" level because
+the matched filter adds ~26 dB of processing gain (`N = τ·fs = 400`). The
+measured range stays within one 7.5 m bin (2.5 m error for the baseline) until
+SNR_in ≈ -16 dB, then the target is *missed* — the crossover where
+`SNR_in + 26 < threshold` (10 dB). False alarms (detections far from the
+target) creep in as SNR falls and the threshold becomes less effective. The
+exact crossover moves with the detection threshold — that's the point:
+detection SNR depends on the threshold policy (`P_fa`), which is the CFAR idea
+previewed in `08-extensions.md`.
 
-**Method check:** one target, one config at a time; noise seed fixed; count
-missed/false peaks across ≥ 20 trials per SNR; plot detection error vs SNR.
+**Method check:** one target, one config at a time; noise seed fixed (vary
+seed *with* SNR to decorrelate draws); count missed/false peaks and range
+error per SNR; plot range error vs SNR.
 
 ## L2 — PRF doubling (Week 2)
 

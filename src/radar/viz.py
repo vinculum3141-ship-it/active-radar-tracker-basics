@@ -46,11 +46,47 @@ def plot_pulse(tx, cfg):
 
 
 def plot_echo(rx, matched, cfg):
-    raise NotImplementedError("roadmap stage 3")
+    """Two-panel plot: |rx| echo and |matched| filter output over time.
+
+    The echo panel shows the 400-sample pulse buried in noise; the matched
+    panel shows the compressed spike (~6 samples wide) at the same delay,
+    making the range-estimation job obvious. Uses the first pulse row.
+    """
+    if rx.ndim == 2:
+        rx = rx[0]
+    if matched.ndim == 2:
+        matched = matched[0]
+    t_us = np.arange(len(rx)) / cfg.fs_hz * 1e6
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(9, 5))
+    axes[0].plot(t_us, np.abs(rx))
+    axes[0].set_ylabel("|echo|")
+    axes[0].set_title("Received echo (pulse buried in noise)")
+    axes[1].plot(t_us, np.abs(matched))
+    axes[1].set_ylabel("|matched|")
+    axes[1].set_xlabel("time (us)")
+    axes[1].set_title("Matched-filter output (compressed spike at the delay)")
+    fig.tight_layout()
+    return fig
 
 
 def plot_range_profile(matched, cfg):
-    raise NotImplementedError("roadmap stage 3")
+    """Plot the matched-filter magnitude versus range in meters.
+
+    The range axis is the sample index minus the correlation offset
+    (len(pulse)//2), converted via R = c*t/2, so the target sits at its true
+    range (997.5 m for the baseline 1000 m target).
+    """
+    if matched.ndim == 2:
+        matched = matched[0]
+    n_pulse = round(cfg.pulse_width_s * cfg.fs_hz)
+    r_m = (np.arange(len(matched)) - n_pulse // 2) * 3e8 / (2 * cfg.fs_hz)
+    fig, ax = plt.subplots()
+    ax.plot(r_m / 1e3, np.abs(matched))
+    ax.set_xlabel("range (km)")
+    ax.set_ylabel("|matched|")
+    ax.set_title("Range profile")
+    fig.tight_layout()
+    return fig
 
 
 def plot_rd_map(rd_map, cfg):
