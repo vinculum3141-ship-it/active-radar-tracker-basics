@@ -27,7 +27,13 @@ Legend: **✓ = must-have** · **◇ = stretch**
   are skeleton (04-python-discipline.md §5).
 - **Verification:** `test_signal_gen` green; chirp frequency sweep
   `f0→f1` spans `B`; plot of `pulse` shows `τ = 20 us` at `fs = 20 MHz`.
-- **◇** Plot the matched-filter-compressed chirp; measure the main-lobe width.
+- **◇** Pulse-compression preview: autocorrelate the chirp
+  (`scipy.signal.correlate`, `mode="same"`) and plot the magnitude.
+  `correlate` conjugates its kernel, so correlating the chirp with itself
+  *is* a matched filter. Measure the peak-to-first-null half-width (expect
+  `1/B` = 0.2 us, 4 samples) and the compression ratio (pulse samples ÷
+  half-width ≈ `tau*B` = 100). Self-contained — uses only the Stage 1 chirp;
+  this is the mechanism behind Q4's `ΔR = c/(2B)`.
 
 ### Stage 2 · Moving target simulation
 - **Objective:** a channel that turns a pulse into a delayed, attenuated,

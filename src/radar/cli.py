@@ -34,7 +34,31 @@ def bench(cfg: RadarConfig, args: argparse.Namespace) -> None:
 
 
 def plot(cfg: RadarConfig, args: argparse.Namespace) -> None:
-    raise NotImplementedError("roadmap stages 1-6 viz")
+    """Stages 1-3: plot the transmit pulse, echo, and range profile."""
+    import numpy as np
+
+    from radar import channel, receiver, signal_gen, viz
+
+    tx = signal_gen.transmit_waveform(cfg)
+    pulse = signal_gen.lfm_chirp(cfg)
+    target = channel.Target(
+        range_m=cfg.target_range_m,
+        velocity_mps=cfg.target_velocity_mps,
+        snr_db=cfg.snr_db,
+    )
+    rng = np.random.default_rng(cfg.seed)
+    rx = channel.simulate_channel(tx, [target], cfg, rng)
+    matched = receiver.matched_filter(rx, pulse)
+
+    paths = [
+        viz.save_plot(viz.plot_pulse(tx, cfg), "pulse", "stage1", cfg),
+        viz.save_plot(viz.plot_echo(rx, matched, cfg), "echo", "stage3", cfg),
+        viz.save_plot(
+            viz.plot_range_profile(matched, cfg), "range_profile", "stage3", cfg
+        ),
+    ]
+    for p in paths:
+        print(f"wrote {p}")
 
 
 def track(cfg: RadarConfig, args: argparse.Namespace) -> None:

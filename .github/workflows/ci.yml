@@ -25,7 +25,57 @@ jobs:
       - name: CLI smoke
         run: uv run radar --help
 
-  tests:
+  # One job per stage test file (05-roadmap.md). Each job runs a single
+  # module's tests, so learners watch each stage flip green in the Actions UI
+  # as it is implemented. An unimplemented stage's test file is empty, so its
+  # job exits 5 ("no tests ran") and stays red until that stage's tests and
+  # stubs are written (04-python-discipline.md §4) - the visible build
+  # progress.
+  #
+  # Stage -> test file:
+  #   stage 1 -> test_signal_gen.py
+  #   stage 2 -> test_channel.py        (+ stage 8: interferer target)
+  #   stage 3 -> test_receiver.py
+  #   stage 4 -> test_doppler.py
+  #   stage 5 -> test_tracker.py
+  #   stage 6 -> test_array.py
+  #   stage 7 -> test_beamformer.py     (+ stages 9-10: steering, LCMV)
+  #   stage 11-12 -> no new pytest file (end-to-end via cli; GNU Radio via the
+  #   grc-check job below)
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: stage1-signal-gen
+            file: test_signal_gen.py
+          - name: stage2-channel
+            file: test_channel.py
+          - name: stage3-receiver
+            file: test_receiver.py
+          - name: stage4-doppler
+            file: test_doppler.py
+          - name: stage5-tracker
+            file: test_tracker.py
+          - name: stage6-array
+            file: test_array.py
+          - name: stage7-beamformer
+            file: test_beamformer.py
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Sync environment (lockfile)
+        run: uv sync --frozen
+      - name: Test (${{ matrix.name }})
+        # no -q: pyproject.toml sets addopts="-v" so each test is listed by name
+        run: uv run pytest tests/${{ matrix.file }}
+
+  # Week 5 (stage 12) is the GNU Radio port: no pytest files, but the grc/
+  # artifacts and the array-math constants are re-generated headlessly.
+  grc-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +84,7 @@ jobs:
           python-version: "3.12"
       - name: Sync environment (lockfile)
         run: uv sync --frozen
-      # Intentionally red at first: the skeleton's tests/test_*.py files are
-      # empty, so pytest exits 5 ("no tests ran"). This job flips green as the
-      # learner writes the test bodies (04-python-discipline.md section 4) and
-      # implements the NotImplementedError stubs - the visible build progress.
-      - name: Test
-        run: uv run pytest
+      - name: Flowgraphs present
+        run: test -f grc/radar_tx.grc && test -f grc/radar_rx_sim.grc && test -f grc/radar_doppler.grc
+      - name: Regenerate array weights (headless smoke)
+        run: uv run python grc/gen_weights.py

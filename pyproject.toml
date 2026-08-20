@@ -21,3 +21,13 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/radar"]
+
+# Notebooks are trainer-only exploration artifacts (04-python-discipline.md §5):
+# their cells share state and run out of order, so per-cell linting is
+# misleading. Excluded from both ruff lint and format; verified by execution.
+[tool.ruff]
+extend-exclude = ["*.ipynb"]
+
+# Show every test by name on every run (local and CI) - 04-python-discipline.md §4.
+[tool.pytest.ini_options]
+addopts = "-v"
