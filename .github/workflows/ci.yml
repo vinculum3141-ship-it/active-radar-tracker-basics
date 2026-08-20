@@ -25,37 +25,43 @@ jobs:
       - name: CLI smoke
         run: uv run radar --help
 
-  # One job per roadmap phase (05-roadmap.md). Each phase's job runs only the
-  # test files that belong to that week's stages, so learners watch each phase
-  # flip green in the Actions UI as they implement it.
-  #
-  # Phase -> stages -> test files:
-  #   week1: stages 1-3  -> test_signal_gen, test_channel, test_receiver
-  #   week2: stages 4-5  -> test_doppler, test_tracker
-  #   week3: stages 6-8  -> test_array, test_beamformer (+ test_channel: stage 8
-  #                         extends channel.py with an interferer target)
-  #   week4: stages 9-11 -> test_beamformer (steering + LCMV) + test_channel
-  #                         (stage 11 may add an end-to-end test file later)
-  #   week5: stage 12    -> no pytest (GNU Radio); see the grc-check job below.
-  #
-  # Intentionally red at first: the skeleton's tests/test_*.py files are empty,
-  # so each phase job exits 5 ("no tests ran") until that phase's test bodies
-  # and stubs are written (04-python-discipline.md §4) - the visible build
+  # One job per stage test file (05-roadmap.md). Each job runs a single
+  # module's tests, so learners watch each stage flip green in the Actions UI
+  # as it is implemented. An unimplemented stage's test file is empty, so its
+  # job exits 5 ("no tests ran") and stays red until that stage's tests and
+  # stubs are written (04-python-discipline.md §4) - the visible build
   # progress.
+  #
+  # Stage -> test file:
+  #   stage 1 -> test_signal_gen.py
+  #   stage 2 -> test_channel.py        (+ stage 8: interferer target)
+  #   stage 3 -> test_receiver.py
+  #   stage 4 -> test_doppler.py
+  #   stage 5 -> test_tracker.py
+  #   stage 6 -> test_array.py
+  #   stage 7 -> test_beamformer.py     (+ stages 9-10: steering, LCMV)
+  #   stage 11-12 -> no new pytest file (end-to-end via cli; GNU Radio via the
+  #   grc-check job below)
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - phase: week1
-            files: tests/test_signal_gen.py tests/test_channel.py tests/test_receiver.py
-          - phase: week2
-            files: tests/test_doppler.py tests/test_tracker.py
-          - phase: week3
-            files: tests/test_array.py tests/test_beamformer.py tests/test_channel.py
-          - phase: week4
-            files: tests/test_beamformer.py tests/test_channel.py
+          - name: stage1-signal-gen
+            file: test_signal_gen.py
+          - name: stage2-channel
+            file: test_channel.py
+          - name: stage3-receiver
+            file: test_receiver.py
+          - name: stage4-doppler
+            file: test_doppler.py
+          - name: stage5-tracker
+            file: test_tracker.py
+          - name: stage6-array
+            file: test_array.py
+          - name: stage7-beamformer
+            file: test_beamformer.py
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -63,8 +69,8 @@ jobs:
           python-version: "3.12"
       - name: Sync environment (lockfile)
         run: uv sync --frozen
-      - name: Test (${{ matrix.phase }})
-        run: uv run pytest ${{ matrix.files }} -q
+      - name: Test (${{ matrix.name }})
+        run: uv run pytest tests/${{ matrix.file }} -q
 
   # Week 5 (stage 12) is the GNU Radio port: no pytest files, but the grc/
   # artifacts and the array-math constants are re-generated headlessly.
