@@ -12,6 +12,7 @@ a branch or strip it for the learner checkout).
 | `lab-solutions.md` | 06-training.md §6 hands-on labs L1–L5 + common failure modes |
 | `rubrics.md` | 06-training.md §7 verification rubrics with pass criteria and analytic truth |
 | `implementation/` | Stage-by-stage implementation narrative for slides/lessons (see its README) |
+| `python-notes.md` | Python deep dives kept out of the stage guides (dataclasses, etc.) |
 | `../notebooks/week01-solutions.ipynb` | Week 1 quiz + lab answers as a live, runnable notebook (trainer-only; on the implementation branch) |
 
 The numeric answers are locked to the constants baked into the teaching
