@@ -24,7 +24,7 @@ echo (compressed chirp main lobe ~`1/B`).
 | Plots labeled (time/range on the correct axes) | both correct | one correct | neither |
 | Week 1 tests green: signal_gen + channel + receiver | 3/3 | 2/3 | < 2 |
 
-## Milestone 1 — Range-Doppler map (Week 2)
+## Milestone 2 — Range-Doppler map (Week 2)
 
 Truth for the R=1000 m, v=40 m/s case: peak at range bin **~133**
 (±1 bin), Doppler bin for the *aliased* velocity **−21.2 m/s**
@@ -37,7 +37,7 @@ Truth for the R=1000 m, v=40 m/s case: peak at range bin **~133**
 | Aliasing handled honestly | peak annotated as aliased, or test explains it | note in code, no plot annotation | no comment; claimed as +40 m/s |
 | `Delta_v` computed = 0.96 m/s | stated and used in axis | stated only | absent/wrong |
 
-## Milestone 2 — Beam pattern (Week 3)
+## Milestone 3 — Beam pattern (Week 3)
 
 Truth for M=4, d=λ/2, θ_s = 20°: main lobe centered on 20°, CBF coherent
 gain 4 (`sum(w*a_t) = 4`), sidelobes ≤ −13.3 dB (uniform window,
@@ -50,7 +50,7 @@ gain 4 (`sum(w*a_t) = 4`), sidelobes ≤ −13.3 dB (uniform window,
 | Capon vs Bartlett contrast (L3) | two patterns shown, resolution difference stated | one pattern only | neither |
 | (Week 4) Null ≥ 40 dB at −30°; unit gain at +20° | `w^H a_t = 1.0`, `w^H a_i ≈ 0` (verified) | null 30–40 dB | < 30 dB or no verification |
 
-## Milestone 3 — Tracking plot (Week 2)
+## Milestone 4 — Tracking plot (Week 2)
 
 | Criterion | P | P- | R |
 |---|---|---|---|
@@ -58,7 +58,7 @@ gain 4 (`sum(w*a_t) = 4`), sidelobes ≤ −13.3 dB (uniform window,
 | Track smoother than measurements, no systematic lag | visibly, no offset | small offset explained | lag or noisier than truth |
 | Q/R reasoning (quiz Q8) in caption | both stated with effect | one stated | none |
 
-## Milestone 4 — GNU Radio RD map (Week 5)
+## Milestone 5 — GNU Radio RD map (Week 5)
 
 Truth: `radar_doppler.grc` with implemented epy blocks gives the same
 target cell as the Python sim for (1000 m, 40 m/s).
