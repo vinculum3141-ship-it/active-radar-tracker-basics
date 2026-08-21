@@ -5,6 +5,15 @@ physics it exercises, the code task (against the spec in
 `04-python-discipline.md`), and a **verification** you must see before moving
 on. Stages build on each other; each week ends in a demonstrable milestone.
 
+> **Grading & artifacts:** per-artifact grading rubrics (P / P- / R criteria +
+> analytic truth) live in `docs/trainer/rubrics.md`, keyed by **Milestone**
+> number — note a week may map to more than one milestone (e.g. Week 2 = M2
+> Range-Doppler map **and** M4 Tracking plot). The Week 2 portfolio-artifact
+> captions (config + 3–5 line write-up) are in
+> `docs/trainer/portfolio-week2.md`; the other weeks follow the same format.
+> Generate each from the CLI: `radar plot --plot` (stages 1-3),
+> `radar doppler --plot` (range-Doppler map), `radar track --plot` (track).
+
 > Pace yourself: if a week's verification is green, that week is done — even
 > if the "stretch" items are skipped. Come back later; the stages are
 > deliberately order-independent once complete.

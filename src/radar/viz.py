@@ -122,7 +122,40 @@ def plot_rd_map(rd_map, cfg):
 
 
 def plot_track(true, measured, track):
-    raise NotImplementedError("roadmap stage 5")
+    """Plot true, measured, and tracked range (and velocity) over time.
+
+    Each argument is a sequence of objects with ``range_m`` / ``velocity_mps``
+    (``State`` or ``Detection``). Shows how the Kalman track smooths the noisy
+    measurements toward the truth (roadmap stage 5).
+    """
+    t = np.arange(len(true))
+
+    def _get(seq, attr):
+        # `State` uses `velocity_mps`; `Detection` uses `velocity`.
+        alt = "velocity" if attr == "velocity_mps" else attr
+        return np.array(
+            [getattr(s, attr) if hasattr(s, attr) else getattr(s, alt) for s in seq]
+        )
+
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(9, 6))
+    axes[0].plot(t, _get(true, "range_m"), label="true")
+    axes[0].plot(t, _get(measured, "range_m"), ".", ms=3, alpha=0.5, label="measured")
+    axes[0].plot(t, _get(track, "range_m"), label="tracked")
+    axes[0].set_ylabel("range (m)")
+    axes[0].set_title("Kalman tracking: range")
+    axes[0].legend()
+
+    axes[1].plot(t, _get(true, "velocity_mps"), label="true")
+    axes[1].plot(
+        t, _get(measured, "velocity_mps"), ".", ms=3, alpha=0.5, label="measured"
+    )
+    axes[1].plot(t, _get(track, "velocity_mps"), label="tracked")
+    axes[1].set_ylabel("velocity (m/s)")
+    axes[1].set_xlabel("CPI index")
+    axes[1].set_title("Kalman tracking: velocity")
+    axes[1].legend()
+    fig.tight_layout()
+    return fig
 
 
 def plot_beam_pattern(thetas_deg, pattern):
