@@ -48,7 +48,6 @@ gain 4 (`sum(w*a_t) = 4`), sidelobes ≤ −13.3 dB (uniform window,
 | Main lobe centered on steer angle (±1°) | yes | ±2° | off / no pattern |
 | Sidelobe level ≤ −13 dB | yes | within +2 dB | above |
 | Capon vs Bartlett contrast (L3) | two patterns shown, resolution difference stated | one pattern only | neither |
-| (Week 4) Null ≥ 40 dB at −30°; unit gain at +20° | `w^H a_t = 1.0`, `w^H a_i ≈ 0` (verified) | null 30–40 dB | < 30 dB or no verification |
 
 ## Milestone 4 — Tracking plot (Week 2)
 
@@ -87,3 +86,15 @@ number, the takeaway*. Any missing element → P-.
 - Any **P-** → fix on the spot, log in the milestone note.
 - Any **R** → redo the milestone (the roadmap's "verification is green"
   gate means tests must pass again too).
+
+## Milestone 6 — Null steering / adaptive array (Week 4)
+
+Truth: M=4, d=λ/2, target at +20°, interferer at −30°. LCMV/MVDR weights
+place a deep null at the interferer while holding unit gain at the target.
+
+| Criterion | P | P- | R |
+|---|---|---|---|
+| Null depth ≥ 40 dB at interferer angle (−30°) | ≤ −40 dB | −30 to −40 dB | > −30 dB |
+| Unit gain (0 dB) at target (+20°): `w^H a_t = 1.0` (±0.1) | yes | gain −1..+1 dB | off / unverified |
+| Weights verified: `w^H a_i ≈ 0` at interferer | ≤ −40 dB | −30..−40 dB | not shown |
+| Before/after RD map shows target recovered | target visible post-null | partially | still masked |

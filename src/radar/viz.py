@@ -90,11 +90,72 @@ def plot_range_profile(matched, cfg):
 
 
 def plot_rd_map(rd_map, cfg):
-    raise NotImplementedError("roadmap stage 4")
+    """Plot the range-Doppler map magnitude (dB) over range and velocity.
+
+    Axes use ``doppler.range_axis`` / ``doppler.velocity_axis`` so the target's
+    true range and (folded) velocity land at their analytical cells (roadmap
+    stage 4). Velocity is on the y-axis, range on the x-axis; magnitude is in
+    dB relative to the map peak so the blob stands out from the noise floor.
+    """
+    from radar.doppler import range_axis, velocity_axis
+
+    r = range_axis(cfg) / 1e3  # km
+    v = velocity_axis(cfg)
+    mag_db = 20 * np.log10(np.abs(rd_map) + 1e-12)
+    mag_db -= mag_db.max()
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    im = ax.imshow(
+        mag_db,
+        origin="lower",
+        aspect="auto",
+        extent=[r[0], r[-1], v[0], v[-1]],
+        cmap="viridis",
+        vmin=-60,
+    )
+    ax.set_xlabel("range (km)")
+    ax.set_ylabel("velocity (m/s)")
+    ax.set_title("Range-Doppler map")
+    fig.colorbar(im, ax=ax, label="magnitude (dB)")
+    fig.tight_layout()
+    return fig
 
 
 def plot_track(true, measured, track):
-    raise NotImplementedError("roadmap stage 5")
+    """Plot true, measured, and tracked range (and velocity) over time.
+
+    Each argument is a sequence of objects with ``range_m`` / ``velocity_mps``
+    (``State`` or ``Detection``). Shows how the Kalman track smooths the noisy
+    measurements toward the truth (roadmap stage 5).
+    """
+    t = np.arange(len(true))
+
+    def _get(seq, attr):
+        # `State` uses `velocity_mps`; `Detection` uses `velocity`.
+        alt = "velocity" if attr == "velocity_mps" else attr
+        return np.array(
+            [getattr(s, attr) if hasattr(s, attr) else getattr(s, alt) for s in seq]
+        )
+
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(9, 6))
+    axes[0].plot(t, _get(true, "range_m"), label="true")
+    axes[0].plot(t, _get(measured, "range_m"), ".", ms=3, alpha=0.5, label="measured")
+    axes[0].plot(t, _get(track, "range_m"), label="tracked")
+    axes[0].set_ylabel("range (m)")
+    axes[0].set_title("Kalman tracking: range")
+    axes[0].legend()
+
+    axes[1].plot(t, _get(true, "velocity_mps"), label="true")
+    axes[1].plot(
+        t, _get(measured, "velocity_mps"), ".", ms=3, alpha=0.5, label="measured"
+    )
+    axes[1].plot(t, _get(track, "velocity_mps"), label="tracked")
+    axes[1].set_ylabel("velocity (m/s)")
+    axes[1].set_xlabel("CPI index")
+    axes[1].set_title("Kalman tracking: velocity")
+    axes[1].legend()
+    fig.tight_layout()
+    return fig
 
 
 def plot_beam_pattern(thetas_deg, pattern):
