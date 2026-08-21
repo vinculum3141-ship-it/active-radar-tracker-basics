@@ -13,6 +13,16 @@ from radar.config import RadarConfig
 C_MPS = 3e8
 
 
+def _wavelength_m(cfg: RadarConfig) -> float:
+    """Carrier wavelength lambda = c / f_c."""
+    return C_MPS / cfg.fc_hz
+
+
+def _doppler_hz(velocity_mps: float, cfg: RadarConfig) -> float:
+    """Doppler shift f_d = 2*v/lambda (01-physics.md §4)."""
+    return 2.0 * velocity_mps / _wavelength_m(cfg)
+
+
 @dataclass
 class Target:
     """A target the radar is trying to see.
@@ -68,13 +78,24 @@ def propagate(pulse: np.ndarray, target: Target, cfg: RadarConfig, rng) -> np.nd
 
 
 def simulate_channel(
-    tx: np.ndarray, targets: list[Target], cfg: RadarConfig, rng
+    tx: np.ndarray,
+    targets: list[Target],
+    cfg: RadarConfig,
+    rng,
+    *,
+    apply_doppler: bool = False,
 ) -> np.ndarray:
     """Return the received signal for a list of targets over a CPI.
 
     Sums each target's noiseless echo into every PRI row, then adds one noise
     draw per row — so multi-target SNR is not inflated by summing noise per
     target (01-physics.md §1 measurement loop).
+
+    ``apply_doppler`` is **opt-in** and defaults to ``False`` so the default
+    contract is exactly the Stage 1–3 channel (delay + attenuation + noise, no
+    slow-time phase) — earlier stages are untouched. Set it ``True`` (roadmap
+    stage 4) to impart the per-pulse Doppler phase from each target's radial
+    velocity.
 
     Parameters
     ----------
@@ -87,6 +108,10 @@ def simulate_channel(
         Radar configuration.
     rng : np.random.Generator
         Seeded generator (04-python-discipline.md §2).
+    apply_doppler : bool, keyword-only
+        If ``True``, rotate each PRI's echo by ``2*pi*f_d*T*n`` (``f_d =
+        2v/lambda``) — the slow-time phase that yields Doppler (01-physics.md
+        §4). If ``False`` (default) the channel is range-only.
 
     Returns
     -------
@@ -96,7 +121,17 @@ def simulate_channel(
     """
     rx = np.zeros_like(tx)  # [n_pulses, samples_per_pulse]
     for target in targets:
+        fd = _doppler_hz(target.velocity_mps, cfg) if apply_doppler else 0.0
         for n in range(cfg.n_pulses):
-            rx[n] += _echo(tx[n], target, cfg)
+            # Slow-time phase rotation (only when requested): the target's
+            # radial velocity advances the echo phase by 2*pi*f_d per PRI.
+            # Fast-time (within-pulse) motion is negligible, so only
+            # pulse-to-pulse phase changes (01-physics.md §4). The factor is
+            # unit-modulus, so magnitude/delay/power — and therefore Stage 2/3
+            # checks — are unaffected when enabled.
+            phase = (
+                np.exp(1j * 2.0 * np.pi * fd * cfg.pri_s * n) if apply_doppler else 1.0
+            )
+            rx[n] += phase * _echo(tx[n], target, cfg)
     rx += _complex_noise(rx.shape, rng)
     return rx
