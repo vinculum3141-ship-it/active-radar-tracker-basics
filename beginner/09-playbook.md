@@ -5,11 +5,10 @@ It converts the training spine into a concrete production sequence so the
 notebooks can be written quickly, consistently, and in the right order.
 
 The rule is simple: build the notebooks around the physics and learning goals
-first, and only use code as the demonstration vehicle. Each notebook must run
-independently. It may not assume any code from `src/radar/` exists or is
-importable. If shared functionality is needed, it lives directly under
-`beginner/` in a small importable helper structure.
+first, and only use code as the demonstration vehicle. Shared notebook
+functionality lives directly under `beginner/` in a small helper structure.
 
+Shared notebook functionality lives directly under `beginner/helpers/` in a small helper structure.
 ---
 
 ## 1. Purpose
@@ -100,7 +99,6 @@ The fastest way to build the notebook set is to work in layers.
 
 - Create a small helper area directly under `beginner/` for reusable notebook
   code.
-- Keep helpers importable from notebook cells without touching `src/radar/`.
 - Use this area for shared constants, plotting helpers, baseline calculations,
   and tiny radar-specific utilities that multiple notebooks need.
 - Keep the helper surface narrow so each notebook still teaches its own logic.
@@ -132,8 +130,6 @@ The fastest way to build the notebook set is to work in layers.
 - Check that every notebook has a clear beginning, middle, and end.
 - Check that every notebook teaches one new idea.
 - Check that every notebook links back to the glossary and physics docs.
-- Check that every notebook runs without importing from `src/radar/`.
-- Check that all shared notebook code is imported from `beginner/`.
 - Check that the trainer notes are enough to present the lesson without
   reverse-engineering the notebook.
 
@@ -406,16 +402,6 @@ interferer while preserving the target.
 
 Each notebook should have a companion trainer note page. The trainer packet
 should be short but complete.
-
-### Beginner-local helper convention
-
-- Shared notebook utilities belong under `beginner/`, not `src/radar/`.
-- Notebook imports should come from that folder or standard scientific Python
-  packages only.
-- Any helper that is reused across notebooks should be written as a tiny,
-  directly importable module rather than copied between notebooks.
-- If a helper starts to look like production pipeline code, keep it out of the
-  beginner folder and move the idea into the notebook itself instead.
 
 ### Required trainer packet fields
 
