@@ -483,3 +483,187 @@ which is the start of range measurement.
 A chirp keeps the transmit pulse long and energetic while its frequency sweep
 provides the bandwidth that sets range resolution; this notebook gives the
 learner the first clear picture of pulse compression.
+
+---
+
+## Chapter 02 — Channel Model and Echoes
+
+### Chapter purpose
+
+This chapter takes the learner across to the receive side for the first time.
+It builds the channel model step by step — delay, attenuation, noise — and
+shows why the echo is hard to see without processing. It also gives the learner
+the physical intuition for why the matched filter exists.
+
+### Teaching goal in one sentence
+
+Help the learner understand that the received signal is a known transmitted
+waveform, shifted and scaled, buried in noise — and that the matched filter is
+the tool that pulls it out.
+
+### What the trainer should emphasize
+
+- The echo is a copy of the transmitted pulse, not a different waveform.
+- Delay is deterministic (set by range), while noise is random.
+- Attenuation and noise are different things and must not be confused.
+- The three-panel plot is the key visual: clean pulse, weak echo, noisy mess.
+- The matched filter in Notebook 03 solves the problem this chapter introduces.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebooks 00 and 01
+
+Open by reminding the learner that the transmit side is done. The pulse and
+chirp are built, duty cycle and resolution are understood. Now the pulse
+travels to the target and comes back. Say simply: we are crossing the gap
+between the antenna and the receiver.
+
+#### 2. Present the channel model as three things
+
+Before any code, describe what the channel does in plain language:
+
+- it delays the pulse (range turns into time),
+- it weakens the echo (path and target losses),
+- it adds noise (receiver electronics).
+
+Keep the picture concrete: a pulse leaves, bounces, comes back smaller, and
+lands in a noisy buffer.
+
+#### 3. Build the delay cell
+
+Show the delay arithmetic — the same `delay_samples_for_range` calculation
+from Notebook 00, now used to know where in the received buffer the echo
+should land. Point out that the buffer must be at least `n_delay + pulse_length`
+samples long.
+
+#### 4. Build the echo by shifting
+
+Show the copy operation: write the pulse into the buffer at the right slot.
+This is the "delay" part of the channel. Say that the echo shape is identical
+to the transmitted pulse — only its position changes.
+
+#### 5. Add attenuation
+
+Explain the dB-to-linear conversion and why we use -40 dB. Point out that the
+echo amplitude is now 0.01 — a hundred times weaker in amplitude, ten thousand
+times weaker in power. This is realistic for a radar at moderate range.
+
+#### 6. Add noise
+
+Explain the SNR and how noise power is derived from the echo power. At 20 dB
+the echo is still 100 times stronger than the noise in power, but because the
+noise is spread across the whole buffer while the echo is concentrated, it can
+still be hard to spot by eye.
+
+#### 7. Walk through the three-panel plot slowly
+
+This is the key visual. Read it as a story:
+
+- top: the clean transmitted pulse,
+- middle: the attenuated echo — recognisable, just much smaller,
+- bottom: the noisy received signal — the echo disappears into the fluctuations.
+
+Ask the learner: can you see the echo in the bottom panel? The answer is usually
+no, or only barely. That is the moment to say: this is why the matched filter
+exists.
+
+#### 8. Use the stretch exercise for advanced learners
+
+The second-target cell is optional. If time allows, show what two echoes look
+like in the same buffer. This sets up the multi-target problem that later
+notebooks address.
+
+#### 9. Use the checkpoint to force verbal understanding
+
+The checkpoint should be answered out loud or in writing. The learner should be
+able to say:
+
+- the channel delays, attenuates, and adds noise,
+- doubling the range doubles the delay but does not change the pulse shape,
+- attenuation and noise are different things.
+
+#### 10. Use the common-mistake note as a teaching moment
+
+The common mistake is confusing attenuation with noise. Attenuation scales the
+echo down deterministically; noise adds random fluctuations. Correct it by
+pointing back at the middle panel (attenuation only) versus the bottom panel
+(attenuation plus noise).
+
+Also correct the idea that the echo is a different waveform. It is a copy — same
+shape, shifted and scaled.
+
+#### 11. Transition to the helper-based version
+
+Tell the learner why the helper functions exist:
+
+- `add_echo` places a delayed, attenuated copy in one call,
+- `awgn` adds noise to a target SNR,
+- `single_target_channel` runs the full pipeline.
+
+Make the helper cell feel like a second view of the same idea, not a new idea.
+
+#### 12. Close with the answers section and the narrative Summary
+
+Use the "Closing the loop" section as your recap device:
+
+- ask the learner to answer each opening question themselves first,
+- then read or paraphrase the matching narrative answer,
+- point back at the three-panel plot and the delay calculation while you do.
+
+After closing the loop, deliver the narrative Summary. The Summary should sound
+like a short explanation of the receive side, not a list of formulas.
+
+Say that the learner has now built the full channel:
+
+- the pulse is delayed by the round-trip travel time,
+- attenuated by path and target losses,
+- and corrupted by receiver noise.
+
+The point of the summary is to connect the channel to the next step: the
+matched filter in Notebook 03 is the tool that pulls the echo out of the noise.
+
+### How to explain attenuation in real-world terms
+
+Use this wording if the learner asks why we use -40 dB:
+
+- the echo power depends on the target radar cross section, the range to the
+  fourth power, and the system losses,
+- -40 dB amplitude is a convenient teaching value that produces a visible but
+  clearly weakened echo,
+- real attenuation varies with target type, range, and frequency, and is one of
+  the main reasons radar design involves careful link-budget analysis.
+
+### Likely learner questions and answers
+
+#### Why not just make the transmitted pulse stronger?
+
+Because legal limits, hardware constraints, and power consumption bound the
+transmit power. The radar must work with the echo it gets, which is why
+processing matters.
+
+#### Is the noise always Gaussian?
+
+Not always, but Gaussian thermal noise is a good first model and the standard
+assumption for matched-filter theory. Non-Gaussian clutter is addressed in
+more advanced courses.
+
+#### Why does the matched filter work?
+
+Because it correlates the received signal with the known transmitted shape.
+The echo is a match; the noise is not. The filter output peaks at the echo
+delay and stays low elsewhere.
+
+### Delivery notes
+
+- Pause after the three-panel plot; it is the conceptual turning point.
+- Do not rush the attenuation and noise cells; the numbers are the lesson.
+- Keep the tone physical: shift, weaken, corrupt.
+- If the learner seems lost, return to "the echo is a copy of the transmitted
+  pulse" before going back to the math.
+- The goal is comprehension, not speed.
+
+### One-sentence close
+
+The channel shifts the transmitted pulse by the round-trip delay, weakens it
+by the path losses, and adds receiver noise; this notebook gives the learner the
+first clear picture of why the matched filter is needed.

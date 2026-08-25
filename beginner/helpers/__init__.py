@@ -1,5 +1,6 @@
 """Beginner notebook helpers."""
 
+from .channel import add_echo, awgn, single_target_channel
 from .constants import RADAR_CONSTANTS, BaselineRadarSpec
 from .math import (
     baseline_spec,
@@ -20,6 +21,8 @@ from .waveforms import (
 __all__ = [
     "RADAR_CONSTANTS",
     "BaselineRadarSpec",
+    "add_echo",
+    "awgn",
     "baseline_spec",
     "delay_samples_for_range",
     "duty_cycle",
@@ -30,5 +33,6 @@ __all__ = [
     "range_resolution_from_bandwidth",
     "range_resolution_from_pulse_width",
     "rectangular_pulse",
+    "single_target_channel",
     "wavelength_m",
 ]
