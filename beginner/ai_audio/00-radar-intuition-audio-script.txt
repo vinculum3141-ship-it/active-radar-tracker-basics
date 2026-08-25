@@ -1,0 +1,75 @@
+[[slnc 800]] Radar Intuition and Baseline Parameters. [[slnc 600]]
+
+This notebook explains what pulse radar is, why the quiet listening interval matters, and why the baseline radar parameters were chosen.
+
+[[slnc 800]] What this notebook teaches. [[slnc 600]]
+
+Pulse radar is a system that transmits a short burst of energy, then stops transmitting and listens for the echo. That simple idea drives everything that follows in this course. [[slnc 350]]
+
+By the end, you should be able to explain what pulse radar is, why the radar listens after it transmits, how duty cycle is computed, and how a range delay turns into a range estimate.
+
+[[slnc 800]] Setup and baseline values. [[slnc 600]]
+
+These introductory lessons use one fixed baseline radar specification. [[slnc 700]]
+
+The carrier frequency is 2.45 gigahertz. This connects the radar to wavelength and, later, Doppler calculations. [[slnc 700]]
+
+The bandwidth is 5 megahertz. This sets the range resolution achievable with pulse compression. [[slnc 700]]
+
+The pulse width is 20 microseconds. This controls how long each burst is transmitted. [[slnc 700]]
+
+The pulse repetition interval, or P R I, is 1 millisecond. This sets how long the radar has to listen before the next pulse. [[slnc 700]]
+
+The sampling rate is 20 megahertz. In physical terms, the receiver records 20 million samples every second. [[slnc 700]]
+
+Finally, the example target is 1,000 meters away. We will use that concrete distance to connect travel time to measured range. [[slnc 1000]]
+
+[[slnc 800]] What pulse radar means. [[slnc 600]]
+
+A pulse radar does not transmit continuously. It sends a short burst of energy and then waits. During the transmit burst, the antenna is busy sending power out. During the quiet time after the burst, the radar listens for the echo returning from a target. [[slnc 350]]
+
+This back-and-forth rhythm is the foundation of range measurement. The transmitted pulse creates the event. The quiet listening window lets the echo arrive. The time delay of that echo tells us how far away the target is. [[slnc 350]]
+
+The important idea is that the radar is not trying to hear while it is speaking. It has to stop transmitting before it can listen clearly.
+
+[[slnc 800]] Why the radar listens after it transmits. [[slnc 600]]
+
+The radar needs a quiet interval because the echo from a distant target takes time to come back. If the radar kept transmitting, the weak echo would be buried under the outgoing signal. [[slnc 350]]
+
+That is why we define a pulse repetition interval. The pulse width is the short transmit burst, and the rest of the P R I is the listening window. [[slnc 350]]
+
+Duty cycle, represented by D, equals pulse width divided by the pulse repetition interval. Range, represented by R, equals the speed of light multiplied by the round-trip echo delay, divided by two. We divide by two because the energy travels to the target and back.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A longer P R I does not make the radar transmit more often. It gives the radar more time to listen, so the duty cycle becomes smaller. A pulse radar can be active for only a small fraction of the time and still gather useful range information. [[slnc 350]]
+
+Another common mistake is treating delay as a technical detail instead of the main measurement. In pulse radar, that delay is the signal that tells us where the target is.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: what is pulse radar? [[slnc 600]]
+
+Pulse radar is a distance sensor built from careful timing. It transmits a short burst of energy toward a scene, then goes quiet and waits for some energy to reflect from a target and return as an echo. Because the radar knows exactly when it transmitted and how fast the energy travels, the returning echo carries a measurement. The whole system is: transmit, listen, and time the return. [[slnc 350]]
+
+Second: why does the radar listen after transmitting? [[slnc 600]]
+
+The echo from a distant target takes time to return. While the transmitter is on, its outgoing signal drowns out everything else. The radar cannot hear a faint echo while it is still speaking. The pulse repetition interval is one cycle of speak, then listen. With the baseline values, the radar transmits for 20 microseconds, then listens for the remaining 980 microseconds of each 1 millisecond interval. The listening window is not idle time. It is when the measurement happens. [[slnc 350]]
+
+Third: how is duty cycle computed? [[slnc 600]]
+
+Duty cycle answers: what fraction of the time is the radar transmitting? It is pulse width divided by P R I. Twenty microseconds divided by one millisecond equals zero point zero two. This means the radar spends 2 percent of its time transmitting and 98 percent listening. Lengthening the P R I increases listening time, so the duty cycle shrinks. [[slnc 350]]
+
+Fourth: how does range delay become a range estimate? [[slnc 600]]
+
+The echo delay is the measurement; range is what we compute from it. Range equals the speed of light times the round-trip delay, divided by two. [[slnc 350]]
+
+A target at 1,000 meters produces a delay of two times 1,000 divided by the speed of light, or about 6.67 microseconds. At a sampling rate of 20 megahertz, that delay spans roughly 133 samples. Converting those samples back gives an estimated range of 996.8 meters rather than exactly 1,000 meters. This happens because the true delay falls between two sample boundaries and must land on a sample. The small gap is not an error in the physics. It is sample quantization, previewing the idea that resolution is limited by how finely delay can be measured.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+Pulse radar is a simple but powerful idea: transmit a short burst, wait quietly, and use the returning echo to measure range. The listening window is not optional; it is the part of the radar cycle that makes measurement possible. [[slnc 350]]
+
+The baseline example gives the beginner course a common physical situation linking range, timing, Doppler, and later applications. [[slnc 350]]
+
+The main takeaway is that radar is not only about transmitting energy. It is about carefully timing the transmit-and-listen cycle so the system can turn a delay into a meaningful physical measurement.

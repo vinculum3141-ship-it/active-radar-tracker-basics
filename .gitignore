@@ -220,3 +220,6 @@ __marimo__/
 # Generated artifacts - out/ is tracked only via .gitkeep
 out/*
 !out/.gitkeep
+
+# AI audio narration recordings (generated locally via macOS say)
+beginner/ai_audio/*.mp4

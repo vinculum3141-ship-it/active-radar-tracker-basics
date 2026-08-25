@@ -1,0 +1,101 @@
+[[slnc 800]] Channel Model and Echoes. [[slnc 600]]
+
+This lesson follows a radar pulse after it leaves the antenna. The pulse travels to a target, reflects back toward the radar, arrives much weaker than it started, and lands in the received signal as a delayed echo buried in noise.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+So far, we have built the transmitted waveform and seen why chirps improve range resolution. Now we move to the receive side and examine what happens when that waveform travels through the physical world and returns. [[slnc 350]]
+
+By the end, you should be able to explain how target range becomes a sample delay, what an echo looks like compared with the transmitted pulse, why attenuation makes the echo weak, and how receiver noise hides the echo and motivates matched filtering.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+The previous lessons built a rectangular pulse and a chirp. With the baseline values, each waveform is 400 samples long at a sampling rate of 20 megahertz. We also connected pulse timing to range and bandwidth to range resolution. [[slnc 350]]
+
+Now we ask a simple physical question. Once the pulse leaves the antenna, what comes back?
+
+[[slnc 800]] The channel model in one picture. [[slnc 600]]
+
+The channel is the path between the radar and the target. It does three important things to the transmitted pulse. [[slnc 700]]
+
+First, it delays the pulse. The electromagnetic energy travels from the radar to the target and then back again. The echo therefore arrives after the transmitted pulse by the round-trip travel time. [[slnc 700]]
+
+Second, it weakens the pulse. Only a tiny fraction of the transmitted energy reflects from the target and returns to the receiving antenna. The echo is much smaller than the original waveform. [[slnc 700]]
+
+Third, the receiver corrupts the echo with noise. Thermal motion in the receiver electronics creates random fluctuations across the recorded signal. At long range, those fluctuations can hide the weak echo almost completely. [[slnc 1000]]
+
+The received signal is therefore a delayed and scaled copy of the transmitted waveform, with random noise added on top. This is the signal the radar must process to find the target.
+
+[[slnc 800]] Step one: turn range into delay. [[slnc 600]]
+
+The round-trip delay equals twice the target range divided by the speed of light. The factor of two is essential because the pulse travels to the target and then returns to the radar. [[slnc 350]]
+
+The receiver does not store time as a continuous quantity. It records discrete samples. To convert the travel time into a position in the received buffer, multiply the delay by the sampling rate and round to the nearest whole sample. [[slnc 350]]
+
+For the baseline target at 1,000 meters, the round-trip travel time is about 6.67 microseconds. At a sampling rate of 20 megahertz, that delay spans approximately 133 samples. The returned echo therefore begins around sample 133 in the received signal buffer.
+
+[[slnc 800]] Step two: build the echo. [[slnc 600]]
+
+Before considering attenuation or noise, an echo is simply a copy of the transmitted pulse placed at the correct delay. We create an empty received buffer, move forward by 133 samples, and place the waveform there. [[slnc 350]]
+
+The pulse shape and pulse length do not change. Only the position changes. The delayed copy represents the time the energy spent travelling through space.
+
+[[slnc 800]] Step three: add attenuation. [[slnc 600]]
+
+In a real radar, only a tiny fraction of the transmitted energy returns. The signal loses strength as it spreads through space on the outward journey, reflects imperfectly from the target, and spreads again on the return journey. The radar hardware also introduces losses. [[slnc 350]]
+
+For this introductory model, we combine all of those effects into one attenuation factor. An attenuation of 40 decibels makes the echo amplitude equal to one hundredth of the transmitted amplitude. [[slnc 350]]
+
+Because power depends on amplitude squared, an echo that is 100 times weaker in amplitude is 10,000 times weaker in power. The echo still has the same waveform shape, but it is physically much smaller.
+
+[[slnc 800]] Step four: add noise. [[slnc 600]]
+
+Every radar receiver has a thermal noise floor. We represent it as additive white Gaussian noise: random fluctuations spread across the received buffer. The word additive means that the noise is placed on top of the delayed, attenuated echo. [[slnc 350]]
+
+The amount of noise is described using signal-to-noise ratio. At a signal-to-noise ratio of 20 decibels, signal power is 100 times noise power. That is strong enough for the echo to influence the received data, but the random fluctuations can still make it difficult to identify by eye.
+
+[[slnc 800]] The transmitted pulse and received signal. [[slnc 600]]
+
+Imagine three plots arranged from top to bottom. The top plot contains the clean transmitted pulse. It is large, orderly, and begins at the start of the transmit buffer. [[slnc 350]]
+
+The middle plot contains the echo after delay and attenuation. It is still recognizable as the same waveform, but it begins later and its amplitude is much smaller. [[slnc 350]]
+
+The bottom plot shows what the receiver actually records. The small delayed echo is surrounded by random noise. Without signal processing, it can be difficult to see where the echo begins or even whether it is present.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A common mistake is to imagine that the echo is a completely different waveform from the transmitted pulse. In this simple channel model, it is not. The echo has the same shape and length. It has only been shifted in time and scaled down in amplitude. Noise is what makes the recorded signal look different. [[slnc 350]]
+
+Another mistake is to treat attenuation and noise as the same effect. Attenuation is a predictable scaling operation. It makes a clean echo smaller. Noise is random. It adds fluctuations that corrupt the clean echo. Keeping those two effects separate makes the received signal much easier to understand.
+
+[[slnc 800]] Why this motivates the matched filter. [[slnc 600]]
+
+The radar already knows the shape of the waveform it transmitted. That knowledge is extremely valuable. Instead of searching for any arbitrary feature in the noise, the receiver can search specifically for delayed copies of the known transmit waveform. [[slnc 350]]
+
+A matched filter performs that search by comparing the received data with the transmitted shape. Where the known waveform lines up with an echo, the matched-filter output forms a strong peak. Random noise does not line up consistently, so it remains spread out. This is how the radar pulls a weak, known echo from a noisy signal.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: how does range become a sample delay? [[slnc 600]]
+
+Target range determines the round-trip travel time. Twice the range, divided by the speed of light, gives the delay in seconds. Multiplying that delay by the sampling rate gives its location in samples. For a target at 1,000 meters and a 20-megahertz sampling rate, the echo begins approximately 133 samples after transmission. [[slnc 350]]
+
+Second: what does an echo look like compared with the transmitted pulse? [[slnc 600]]
+
+The echo is a replica of the transmitted waveform. Its shape and duration remain the same, but its position is shifted by the travel delay and its amplitude is reduced by attenuation. [[slnc 350]]
+
+Third: why is the echo so weak? [[slnc 600]]
+
+Energy spreads as it travels away from the radar, only part of it reflects from the target, and the reflected energy spreads again on its return. With 40 decibels of attenuation, the echo amplitude is only one hundredth of the transmitted amplitude, and its power is only one ten-thousandth. [[slnc 350]]
+
+Fourth: how does noise hide the echo, and why do we need a matched filter? [[slnc 600]]
+
+Receiver noise adds random fluctuations across the entire buffer. A weak echo can disappear visually among those fluctuations even though it is physically present. The matched filter uses the known waveform shape to concentrate the echo into a detectable peak while leaving uncorrelated noise spread out.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+This lesson moved from the transmit side of the radar to the receive side. The channel delays the pulse by its round-trip travel time, weakens it through propagation and reflection losses, and places it inside a receiver signal containing thermal noise. [[slnc 350]]
+
+The delay is range information in disguise. For the baseline target, 1,000 meters becomes about 6.67 microseconds, or 133 samples. Attenuation and noise make that delayed copy difficult to recognize without processing. [[slnc 350]]
+
+The main takeaway is that the received echo is not a mystery. It is the known transmitted waveform, shifted, scaled, and buried in noise. The radar's next task is to pull that known shape out of the fluctuations, and the matched filter is the tool that makes this possible.

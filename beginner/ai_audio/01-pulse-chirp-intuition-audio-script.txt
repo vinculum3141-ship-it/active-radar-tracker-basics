@@ -1,0 +1,95 @@
+[[slnc 800]] Pulse Generation and Chirp Intuition. [[slnc 600]]
+
+This lesson shows how a plain rectangular pulse becomes a frequency-swept, linear frequency modulation chirp, and why that sweep gives a radar much better range resolution than the pulse length alone would allow.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+In the previous lesson, we treated the transmit burst as a simple interval of time. Here, we look inside that interval and build the waveform itself. [[slnc 350]]
+
+By the end, you should be able to explain what a rectangular pulse looks like in time, what an L F M chirp is, how its frequency sweeps, why a chirp can separate targets that are close together, and what the time-bandwidth product tells us about that improvement.
+
+[[slnc 800]] The rectangular pulse. [[slnc 600]]
+
+The simplest transmit waveform is a rectangular pulse. The transmitter is on at full amplitude for the pulse width, and then it turns off. In sampled form, the pulse is simply a block of ones. [[slnc 350]]
+
+The number of samples in the pulse equals the sampling rate multiplied by the pulse width. With a sampling rate of 20 megahertz and a pulse width of 20 microseconds, the pulse occupies 400 samples. [[slnc 350]]
+
+This block of energy is short in time. Its useful frequency width is related to one divided by the pulse duration. For a 20-microsecond pulse, that is roughly 50 kilohertz. The longer the plain pulse becomes, the narrower that natural frequency width becomes.
+
+[[slnc 800]] The L F M chirp. [[slnc 600]]
+
+L F M means linear frequency modulation. A linear frequency modulation chirp keeps the same pulse length, but its frequency changes continuously while the pulse is being transmitted. [[slnc 350]]
+
+In the baseband waveform used here, the instantaneous frequency starts near zero and rises in a straight line until it reaches the full bandwidth. The amplitude stays constant, but the phase changes more and more quickly as time passes. [[slnc 350]]
+
+The complex chirp can be written as an exponential whose phase contains time squared. Physically, that time-squared phase is what creates the linear climb in frequency. The chirp rate equals bandwidth divided by pulse width, and tells us how quickly the frequency rises. [[slnc 350]]
+
+The key point is that the chirp can cover a frequency range much wider than one divided by the pulse duration. That extra bandwidth is what gives us finer range resolution later.
+
+[[slnc 800]] The two waveforms side by side. [[slnc 600]]
+
+In a time-domain amplitude plot, the rectangular pulse is flat. Surprisingly, the chirp can also look like a flat, constant-amplitude burst. If we look only at amplitude versus time, their most important difference is hidden. [[slnc 350]]
+
+The difference lives in the chirp's changing phase, and therefore in its changing frequency. This is why we need the frequency-sweep view.
+
+[[slnc 800]] The frequency sweep. [[slnc 600]]
+
+The chirp's defining feature is a linear frequency ramp. A plain rectangular pulse has no intentional sweep. The chirp, by contrast, climbs steadily across its entire pulse width. [[slnc 350]]
+
+With the baseline values, the chirp rises from near zero to approximately 5 megahertz during a 20-microsecond pulse. Its chirp rate is 250 billion hertz per second. That sounds enormous, but the sweep lasts for only 20 millionths of a second.
+
+[[slnc 800]] Why chirps matter: range resolution. [[slnc 600]]
+
+Range resolution is the smallest distance between two targets that the radar can distinguish. If the targets are closer together than the resolution, their echoes blur into one response. [[slnc 350]]
+
+For a plain pulse, range resolution equals the speed of light multiplied by the pulse width, divided by two. With a 20-microsecond pulse, the resolution is approximately 2,997.9 meters. Two targets would need to be almost 3 kilometres apart before the radar could clearly separate them. [[slnc 350]]
+
+For a pulse-compressed chirp, range resolution equals the speed of light divided by twice the bandwidth. With a bandwidth of 5 megahertz, the resolution is approximately 30 meters. [[slnc 350]]
+
+That is about a one-hundred-times improvement. The long pulse keeps the transmitted energy high, while the wide bandwidth keeps the compressed response sharp. The chirp lets the radar have both properties at once.
+
+[[slnc 800]] The time-bandwidth product. [[slnc 600]]
+
+The time-bandwidth product equals bandwidth multiplied by pulse width. With 5 megahertz of bandwidth and a pulse width of 20 microseconds, the time-bandwidth product is 100. [[slnc 350]]
+
+This number describes the compression gain. After matched filtering, the long chirp produces a peak roughly 100 times narrower than the original pulse duration suggests. [[slnc 350]]
+
+A large time-bandwidth product means that a long, energetic pulse can still produce fine range resolution. This is the central trade that makes modern pulse radar practical.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A common mistake is to assume that pulse length always sets range resolution. That is true for a plain pulse, but a chirp separates the two roles. Pulse length can remain long for energy, while bandwidth sets the compressed resolution. That separation is the purpose of pulse compression. [[slnc 350]]
+
+Another mistake is to look at the chirp's time-domain amplitude and see only a strange rectangular pulse. The useful structure is in the frequency sweep, not the amplitude shape. Always examine the frequency view before judging what the waveform can do.
+
+[[slnc 800]] Matched-filter compression preview. [[slnc 600]]
+
+Pulse compression is what turns the long chirp into a sharp response. The matched filter compares the received signal with a time-reversed, complex-conjugated copy of the transmitted waveform. It effectively asks: where does this known waveform line up with the received data? [[slnc 350]]
+
+For the plain rectangular pulse, the matched-filter output remains wide. For the chirp, the changing frequency pattern aligns strongly at one precise delay, so the long waveform collapses into a narrow peak. The width of that peak is controlled by bandwidth, not by the original pulse length.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: what does a rectangular pulse look like in time? [[slnc 600]]
+
+A rectangular pulse is the transmitter on at full amplitude for the pulse width, and then off. With the baseline sampling rate and pulse width, it occupies 400 samples. It has no intentional frequency sweep, just a flat burst of energy with a natural frequency width of roughly 50 kilohertz. [[slnc 350]]
+
+Second: what is an L F M chirp, and how does its frequency sweep? [[slnc 600]]
+
+The chirp keeps the same 400 samples and the same constant amplitude, but its phase changes quadratically. That changing phase makes the instantaneous frequency rise linearly from near zero to approximately 5 megahertz across the pulse. The frequency sweep is the essential difference from the plain pulse. [[slnc 350]]
+
+Third: why can the chirp resolve targets much closer together than its pulse length suggests? [[slnc 600]]
+
+The plain 20-microsecond pulse has a range resolution of almost 3 kilometres. After pulse compression, the 5-megahertz chirp has a resolution of about 30 meters. The compressed width is controlled by one divided by bandwidth, not by the pulse duration. The chirp therefore stays long for energy while becoming sharp in range. [[slnc 350]]
+
+Fourth: what does the time-bandwidth product tell us? [[slnc 600]]
+
+The time-bandwidth product is 100. It captures the approximate compression ratio and explains the one-hundred-times improvement in resolution. It is the single number that summarizes how a long, energetic waveform can produce a narrow matched-filter peak.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+This lesson looked inside the transmit burst and compared two waveforms. The rectangular pulse is simply on for the pulse width, so its resolution is tied directly to that duration. The L F M chirp keeps the same length but sweeps across a wide frequency band. [[slnc 350]]
+
+The two resolution formulas tell the story. For the plain pulse, resolution depends on pulse width. For the compressed chirp, resolution depends on bandwidth. A long, energetic chirp can therefore still separate closely spaced targets. [[slnc 350]]
+
+The main takeaway is that radar resolution is fundamentally a bandwidth story, not only a pulse-length story. Matched filtering turns the long chirp into a sharp peak, allowing the radar to be both loud and precise at the same time.
