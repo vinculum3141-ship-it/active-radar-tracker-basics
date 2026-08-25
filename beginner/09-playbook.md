@@ -62,6 +62,7 @@ have to relearn the format each time.
 
 ### Required notebook style
 
+- Address the reader directly as **you**; never use "the learner" in a learner-facing notebook.
 - Use short markdown explanations before code.
 - Keep code cells small and incremental.
 - Show intermediate values, not only final plots.
@@ -453,3 +454,25 @@ If speed is the priority, do this first:
 
 That gives you the shortest path to a complete teaching package without
 revisiting the structure halfway through.
+
+---
+
+## 9. Publishing note (defer to the end)
+
+Publish-to-web setup (for example GitHub Pages, Quarto, Jupyter Book, or an
+nbconvert-based docs pipeline) should be done only after the notebook content
+and handbook chapters are stable.
+
+Why this is deferred:
+
+- early setup creates repeated configuration churn while notebooks are changing,
+- links, navigation, and chapter ordering will shift during development,
+- and build tooling decisions are easier once the final notebook set is known.
+
+When the beginner track is complete, add a final publishing stage:
+
+1. Freeze notebook filenames and chapter order.
+2. Choose the publishing toolchain.
+3. Generate a browsable documentation site.
+4. Add GitHub Pages deployment.
+5. Verify that notebook links, Colab links, and handbook chapter links all work.

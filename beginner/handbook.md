@@ -175,10 +175,22 @@ Also emphasize that beginners often treat delay as a mathematical nuisance.
 You should correct that by saying delay is the core radar observable in this
 lesson.
 
-#### 9. Close with the narrative Summary
+#### 9. Close with the answers section and the narrative Summary
 
-The Summary should sound like a short explanation of the radar system, not a
-list of formulas.
+The notebook now contains a "Closing the loop" section near the end that answers
+the four opening questions directly. Use it as your recap device:
+
+- ask the learner to answer each opening question themselves first,
+- then read or paraphrase the matching narrative answer,
+- point back at the timing diagram, the duty-cycle equation, and the
+  delay-to-range steps in the calculation cell while you do.
+
+Note that the answers section deliberately explains why the estimated range is
+996.8 m instead of exactly 1000 m; that is sample quantization, and naming it
+here prevents confusion later when resolution is discussed.
+
+After closing the loop, deliver the narrative Summary. The Summary should sound
+like a short explanation of the radar system, not a list of formulas.
 
 Say that the learner has now seen the basic pulse-radar cycle:
 
@@ -247,3 +259,227 @@ version. That teaches both understanding and clean reuse.
 Pulse radar works because it sends a short burst, listens in the quiet window,
 and measures the echo delay; this notebook gives the learner the first clear
 picture of that cycle.
+
+---
+
+## Chapter 01 — Pulse Generation and Chirp Intuition
+
+### Chapter purpose
+
+This chapter takes the learner inside the transmit burst and builds the actual
+waveform. It shows how a plain rectangular pulse becomes a frequency-swept LFM
+chirp, and why that sweep gives the radar much finer range resolution than the
+pulse length alone would allow. It is still about building the transmit signal,
+not the full receive-and-track chain.
+
+### Teaching goal in one sentence
+
+Help the learner understand that a chirp keeps the pulse long and energetic while
+its frequency sweep provides the bandwidth that sets range resolution.
+
+### What the trainer should emphasize
+
+- The rectangular pulse is just "transmitter on for the pulse width."
+- The chirp's difference from the plain pulse is in frequency, not amplitude.
+- Range resolution is a bandwidth story: chirp resolution is `c / (2B)`, not
+  `c * tau / 2`.
+- The time-bandwidth product `B * tau` is the compression gain that makes the
+  long pulse useful.
+- The matched filter is the mechanism that collapses the long chirp into a peak;
+  Notebook 03 will convert that peak into range.
+
+### Suggested presentation flow
+
+#### 1. Start with the waveform, not the math
+
+Open by reminding the learner that Notebook 00 treated the burst as a time
+interval. Now we look inside that interval and ask what actually leaves the
+antenna.
+
+Say plainly:
+
+- a rectangular pulse is the transmitter simply on at full amplitude,
+- an LFM chirp is the same length but with frequency sliding during the pulse,
+- the chirp looks similar in amplitude, so the difference hides in phase.
+
+Keep this concrete: the learner should picture a block of energy before any
+formula appears.
+
+#### 2. Build the rectangular pulse cell
+
+Show that the pulse is `N = fs * tau` samples of ones. Point out that the number
+of samples is set entirely by the sampling rate and pulse width from the baseline
+spec. This is the simplest possible waveform and the baseline for comparison.
+
+Do not over-explain here. The pulse is the control case; the chirp is the star.
+
+#### 3. Introduce the LFM chirp formula in words first
+
+Before showing the cell, say the chirp has the same length but its frequency
+rises from zero to the bandwidth `B` across the pulse. The complex baseband form
+is
+
+`exp(j * pi * (B / tau) * t^2)`
+
+where `B / tau` is the chirp rate. Emphasize that the frequency covered, `B`, can
+be far larger than `1 / tau` — that extra bandwidth is the resolution payoff.
+
+#### 4. Walk through the chirp construction cell
+
+Read the cell as a story:
+
+- build the time vector,
+- compute the chirp rate `B / tau`,
+- form the quadratic phase,
+- take the complex exponential,
+- estimate the instantaneous frequency from the phase slope.
+
+Point out that the stop frequency should equal the bandwidth. That check is the
+learner's first confidence that the sweep is correct.
+
+#### 5. Show the two waveforms in time
+
+Use the time-domain plot to show that both waveforms look like constant-amplitude
+bursts. Say clearly: the time plot alone does not reveal the chirp. This sets up
+the frequency view as the revealing one.
+
+#### 6. Show the frequency sweep
+
+The frequency-ramp plot is the key visual. Walk the learner along the line: it
+starts at zero and climbs steadily to `B`. Contrast with the plain pulse, which
+has no sweep at all. This is the moment the chirp becomes distinct.
+
+#### 7. Explain range resolution before the numbers
+
+State the two formulas in words:
+
+- plain pulse: resolution scales with pulse length,
+- chirp: resolution scales with bandwidth after compression.
+
+Then show the cell so the learner sees the arithmetic and the improvement factor.
+
+Make the teaching point explicit: the chirp is long for energy but sharp for
+resolution, and bandwidth is what decouples the two.
+
+#### 8. Explain the time-bandwidth product
+
+Introduce `TBP = B * tau` as the compression factor. With the baseline values it
+is a round 100, so the long pulse compresses by about 100x. Tell the learner
+this is the central trade that makes modern pulse radar practical: stay loud, get
+sharp.
+
+#### 9. Use the checkpoint to force verbal understanding
+
+The checkpoint should be answered out loud or in writing. The learner should be
+able to say:
+
+- a chirp resolves better than a same-length pulse because bandwidth, not length,
+  sets the resolution,
+- increasing `B` at fixed `tau` raises the time-bandwidth product and improves
+  (shrinks) the range resolution.
+
+#### 10. Use the common-mistake note as a teaching moment
+
+The common mistake is to think pulse length alone sets resolution. Correct it by
+restating that for a chirp, bandwidth sets the resolution while the pulse length
+stays free for energy.
+
+Also warn that the chirp's time plot looks like "just a weird pulse." Resolution
+lives in the frequency sweep, so always check the frequency view.
+
+#### 11. Transition to the helper-based version
+
+Tell the learner why the helper functions exist:
+
+- they keep one correct waveform definition for every later notebook,
+- they reduce repeated code,
+- and they make later cells shorter once the idea is known.
+
+Make the helper cell feel like a second view of the same idea, not a new idea.
+
+#### 12. Close with the matched-filter preview
+
+The compression plot is the payoff visual. Show that the plain-pulse filter
+output stays wide while the chirp collapses to a narrow peak. Say that this sharp
+peak is the object Notebook 03 will turn into a range estimate.
+
+Keep the preview forward-looking: the learner has now built the transmit
+waveform; the matched-filter output is the bridge to the next notebooks where
+the echo is received and turned into a measurement.
+
+#### 13. Close the loop on the opening questions and the narrative Summary
+
+The notebook now contains a "Closing the loop" section that answers the four
+opening questions directly. Use it as your recap device:
+
+- ask the learner to answer each opening question themselves first,
+- then read or paraphrase the matching narrative answer,
+- point back at the resolution comparison cell, the matched-filter plot, and the
+  time-bandwidth product while you do.
+
+After closing the loop, deliver the narrative Summary. The Summary should sound
+like a short explanation of the chirp, not a list of formulas.
+
+Say that the learner has now built two waveforms and understood the core trade:
+
+- the plain pulse is short and limited in resolution by its length,
+- the chirp sweeps frequency across a wide bandwidth,
+- that bandwidth, not the pulse length, sets the range resolution after
+  compression,
+- and the time-bandwidth product captures the compression gain.
+
+The point of the summary is to connect the waveform lesson to the next step:
+Notebook 03 will take the compressed peak and turn it into a range estimate.
+
+### How to explain the waveform choices in real-world terms
+
+Use this wording if the learner asks why the numbers look specific:
+
+- The baseline pulse width of 20 microseconds is long enough to carry useful
+  energy but short enough to reason about directly.
+- The 5 MHz bandwidth is the sweep range that gives a clean, visible compression
+  gain over the pulse length.
+- Staying at baseband (frequency sweep from 0 to `B`) keeps the math simple while
+  still showing the real LFM idea used in radio-frequency radars.
+
+Then add the engineering caveat: real waveforms are chosen by trading energy,
+resolution, hardware bandwidth, and legal spectral limits. The notebook uses
+fixed values because it is a lesson, not a waveform design report.
+
+### Likely learner questions and answers
+
+#### Why not just use a short pulse for good resolution?
+
+Because a very short pulse has little energy, so the echo is weak. The chirp keeps
+the pulse long for energy and uses bandwidth for resolution instead.
+
+#### Why does the chirp look like a normal pulse in the time plot?
+
+Because the sweep changes the phase, not the amplitude. The resolution lives in
+the frequency view, which is why the frequency-ramp plot matters.
+
+#### Why show the math once and then use helpers?
+
+Because the learner should see the quadratic phase first, then see the reusable
+code version. That teaches both understanding and clean reuse.
+
+#### What is the matched filter doing in the preview?
+
+It correlates the received waveform with a reversed, conjugated copy of the
+transmit waveform. For the chirp this collapses a long pulse into a sharp peak,
+which is the start of range measurement.
+
+### Delivery notes
+
+- Pause after the frequency-sweep plot; it is the conceptual turning point.
+- Do not rush the resolution comparison; the numbers are the lesson.
+- Keep the tone physical: loud versus sharp, long versus narrow.
+- If the learner seems lost, return to "the chirp is a long pulse that sweeps
+  frequency" before going back to formulas.
+- The goal is comprehension, not speed.
+
+### One-sentence close
+
+A chirp keeps the transmit pulse long and energetic while its frequency sweep
+provides the bandwidth that sets range resolution; this notebook gives the
+learner the first clear picture of pulse compression.

@@ -20,7 +20,7 @@ def duty_cycle(pulse_width_s: float, pri_s: float) -> float:
 def delay_samples_for_range(range_m: float, fs_hz: float, c_mps: float = C_MPS) -> int:
     """Convert a monostatic round-trip range into a sample delay."""
 
-    return int(round((2.0 * range_m / c_mps) * fs_hz))
+    return round((2.0 * range_m / c_mps) * fs_hz)
 
 
 def range_from_delay_samples(delay_samples: int, fs_hz: float, c_mps: float = C_MPS) -> float:
@@ -33,3 +33,15 @@ def baseline_spec() -> BaselineRadarSpec:
     """Return the default beginner baseline radar specification."""
 
     return RADAR_CONSTANTS
+
+
+def range_resolution_from_pulse_width(pulse_width_s: float, c_mps: float = C_MPS) -> float:
+    """Return range resolution of an unmodulated pulse in meters."""
+
+    return c_mps * pulse_width_s / 2.0
+
+
+def range_resolution_from_bandwidth(bandwidth_hz: float, c_mps: float = C_MPS) -> float:
+    """Return range resolution of a pulse-compressed waveform in meters."""
+
+    return c_mps / (2.0 * bandwidth_hz)
