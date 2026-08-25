@@ -461,7 +461,7 @@ revisiting the structure halfway through.
 
 Publish-to-web setup (for example GitHub Pages, Quarto, Jupyter Book, or an
 nbconvert-based docs pipeline) should be done only after the notebook content
-and handbook chapters are stable.
+and trainer guide chapters are stable.
 
 Why this is deferred:
 
@@ -475,4 +475,4 @@ When the beginner track is complete, add a final publishing stage:
 2. Choose the publishing toolchain.
 3. Generate a browsable documentation site.
 4. Add GitHub Pages deployment.
-5. Verify that notebook links, Colab links, and handbook chapter links all work.
+5. Verify that notebook links, Colab links, and trainer guide chapter links all work.

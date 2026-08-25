@@ -1,0 +1,113 @@
+[[slnc 800]] Matched Filtering and Range Estimation. [[slnc 600]]
+
+This lesson shows how correlation pulls a known radar echo out of noise, how the compressed peak gives us a range estimate, and why matched filtering is more reliable than placing a threshold on the raw received signal.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+We have built the transmitted waveform, followed it through the channel, and seen the delayed echo buried in receiver noise. Now we introduce the tool that pulls that echo back into view. [[slnc 350]]
+
+By the end, you should be able to explain what correlation means in a matched filter, why the compressed response forms a sharp peak, how the location of that peak becomes a range estimate, and why matched filtering beats simple thresholding.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+The first lesson connected pulse timing to range. The second built rectangular pulses and chirps and connected bandwidth to resolution. The third placed a delayed, attenuated echo inside a noisy received buffer. [[slnc 350]]
+
+We now face a practical problem. The echo is physically present, but it may be impossible to identify by looking directly at the noisy samples. The matched filter is the solution.
+
+[[slnc 800]] What the matched filter does. [[slnc 600]]
+
+The radar knows the exact waveform it transmitted. The matched filter uses that knowledge by sliding a time-reversed, complex-conjugated copy of the transmitted waveform across the received signal. At every possible position, it measures how closely the two shapes match. [[slnc 350]]
+
+The calculation is a correlation. At each lag position, multiply the overlapping received samples by the corresponding samples of the reversed transmit waveform, and then add all of those products together. [[slnc 350]]
+
+The process can be remembered in four physical actions. Slide. Multiply. Sum. Then look for the peak. [[slnc 350]]
+
+When the stored waveform is in the wrong position, positive and negative contributions tend to cancel, and the output remains small. When it lines up with the delayed echo, the contributions reinforce one another, and the output becomes large.
+
+[[slnc 800]] Why the waveform is reversed and conjugated. [[slnc 600]]
+
+Reversing the waveform turns the operation into a sliding comparison across time. Taking the complex conjugate makes the phases align correctly for complex signals such as a chirp. [[slnc 350]]
+
+The detailed notation matters when implementing the filter, but the intuition remains simple. We are asking where a known transmitted pattern best matches the received data.
+
+[[slnc 800]] Build the received signal. [[slnc 600]]
+
+We begin with a rectangular pulse because its shape makes the correlation easy to picture. The channel places one echo at the baseline target range of 1,000 meters. The echo has 40 decibels of attenuation and sits inside noise corresponding to a 20-decibel signal-to-noise ratio. [[slnc 350]]
+
+In the raw received signal, individual noise samples can be comparable to the attenuated echo. Looking for one large sample is therefore unreliable.
+
+[[slnc 800]] Correlation step by step. [[slnc 600]]
+
+Imagine placing the reversed transmit pulse at the beginning of the received buffer. Only a few samples overlap, so the sum is small. Move the pulse forward by one sample, repeat the multiplication and addition, and record the new result. [[slnc 350]]
+
+Continue sliding across the buffer. As the stored pulse approaches the echo, more of the known shape aligns with the returned shape, and the correlation grows. At exact alignment, the complete echo contributes coherently, creating the largest output. After passing the echo, the alignment weakens and the correlation falls again. [[slnc 350]]
+
+The result is a new sequence indexed by lag. Each lag represents a possible echo delay, and the height at that lag tells us how strongly the received signal resembles the transmitted waveform there.
+
+[[slnc 800]] Raw echo versus compressed output. [[slnc 600]]
+
+Picture two plots. The upper plot contains the raw received signal. The attenuated echo is small and surrounded by noise, so its location is difficult to judge. [[slnc 350]]
+
+The lower plot contains the matched-filter output. The same echo now forms a distinct peak above a lower, irregular background. The filter has accumulated evidence across the complete waveform instead of trusting any single sample. [[slnc 350]]
+
+This improvement is called matched-filter gain. The echo pattern adds coherently at the correct lag, while random noise does not maintain the right pattern and tends to cancel as it is summed.
+
+[[slnc 800]] Why raw thresholding fails. [[slnc 600]]
+
+A tempting approach is to inspect the raw received samples and declare a detection whenever one sample exceeds a chosen threshold. The difficulty is that noise can create isolated samples as large as, or larger than, the echo. [[slnc 350]]
+
+Set the threshold too high, and the radar misses weak echoes. Set it too low, and random noise produces false detections. A threshold on one raw sample ignores the known structure spread across the full pulse. [[slnc 350]]
+
+The matched filter uses every sample in that structure. The echo contributes consistently across the pulse length, while uncorrelated noise adds inconsistently. This makes the matched-filter peak a far more dependable place to apply a detection threshold.
+
+[[slnc 800]] Repeat the process with a chirp. [[slnc 600]]
+
+The matched-filter principle works with any known waveform. When we replace the rectangular pulse with a chirp, the output peak becomes much narrower. [[slnc 350]]
+
+Both transmitted waveforms have the same duration and contain 400 samples, but the chirp covers a much wider frequency band. Its changing frequency pattern only aligns perfectly at a very precise delay. Away from that delay, the phases fail to reinforce. [[slnc 350]]
+
+The compressed chirp peak is therefore controlled by bandwidth rather than by the original pulse duration. This is the sharp range response predicted by the time-bandwidth product in the chirp lesson.
+
+[[slnc 800]] Convert peak location into range. [[slnc 600]]
+
+The matched-filter peak appears at a particular lag. That lag represents the number of samples between transmission and echo arrival. It is a delay measurement, not yet a distance. [[slnc 350]]
+
+Full correlation includes an offset caused by the length of the stored waveform. If the transmit waveform contains N samples, subtract N minus one from the peak's array index to obtain the physical echo delay in samples. [[slnc 350]]
+
+Next, divide the sample delay by the sampling rate to obtain delay in seconds. Multiply by the speed of light, and divide by two for the outward and return journeys. The result is the estimated target range. [[slnc 350]]
+
+For the baseline case, the echo delay is approximately 133 samples. At 20 megahertz, this produces a range estimate close to 1,000 meters. Any small difference is caused by the true travel time falling between discrete sample positions.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A common mistake is to say that the matched filter amplifies the echo or creates extra energy. It does neither. It concentrates energy that was already spread across the waveform into a localized response by adding the samples coherently. The peak becomes prominent because the evidence is concentrated, not because energy has appeared from nowhere. [[slnc 350]]
+
+Another mistake is to treat the peak's array index as a physical range. The index must first be corrected for the correlation offset, interpreted as a sample delay, converted into seconds, and only then converted into distance using the round-trip range equation.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: what does correlation mean in the matched-filter context? [[slnc 600]]
+
+Correlation is a sliding comparison. The matched filter moves a reversed, conjugated copy of the transmitted waveform across the received signal. At every lag, it multiplies overlapping samples and adds the products. A large result means that the known transmit shape is strongly aligned with something in the received data. [[slnc 350]]
+
+Second: why is the compressed peak sharper than the raw echo? [[slnc 600]]
+
+The raw echo extends across the full transmitted pulse. The matched filter combines the evidence from all of those samples at their common delay. For a chirp, the wide frequency sweep only aligns coherently in a narrow region, so its compressed peak is much sharper than the rectangular-pulse response. [[slnc 350]]
+
+Third: how does peak location become a range estimate? [[slnc 600]]
+
+Correct the peak index for the correlation offset to obtain the sample delay. Divide by sampling rate to obtain travel time. Then multiply by the speed of light and divide by two. For the baseline target, a delay of about 133 samples corresponds to a range close to 1,000 meters. [[slnc 350]]
+
+Fourth: why does matched filtering beat simple thresholding? [[slnc 600]]
+
+Raw thresholding makes a decision from isolated sample amplitudes, which can easily be produced by noise. Matched filtering accumulates consistent evidence across the entire known waveform. The echo adds coherently, while random noise tends to average out, leaving a peak that is easier to detect reliably.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+The matched filter turns a weak, noisy echo into a clear, localized peak. It works by sliding the known transmitted waveform across the received signal and calculating correlation at every possible delay. [[slnc 350]]
+
+The peak location gives the echo delay in samples. After correcting the correlation offset, the familiar round-trip equation converts that delay into a target range. The chirp produces the sharper peak because its larger bandwidth gives finer delay resolution. [[slnc 350]]
+
+Taken together, these first four lessons now form one complete radar measurement story. We build the waveform, send it through the channel, pull the delayed echo out of noise with a matched filter, and convert the measured delay into a physical range. [[slnc 350]]
+
+The main takeaway is that the radar uses information it already possesses—the exact transmitted waveform—to find a matching shape inside noise. Every pulse-radar range measurement begins with this matched-filter peak.
