@@ -667,3 +667,185 @@ delay and stays low elsewhere.
 The channel shifts the transmitted pulse by the round-trip delay, weakens it
 by the path losses, and adds receiver noise; this notebook gives the learner the
 first clear picture of why the matched filter is needed.
+
+---
+
+## Chapter 03 — Matched Filtering and Range Estimation
+
+### Chapter purpose
+
+This chapter is the payoff for everything built so far. It takes the transmit
+waveform from Notebook 01, the channel model from Notebook 02, and produces a
+range estimate — the first complete radar measurement in the course. It also
+explains why matched filtering is superior to thresholding the raw received
+signal.
+
+### Teaching goal in one sentence
+
+Help the learner understand that correlation with the known transmitted shape
+concentrates the echo into a sharp peak whose location gives the range
+estimate.
+
+### What the trainer should emphasize
+
+- The matched filter exploits knowledge the radar already has: the transmitted
+  waveform.
+- The output peaks at the echo delay, not at the echo amplitude.
+- The chirp peak is sharper because bandwidth sets the compressed width, not
+  pulse length.
+- Thresholding fails because noise can exceed the echo on individual samples.
+- This notebook is the first complete radar measurement in the course.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebooks 00 through 02
+
+Open by reminding the learner of the story so far:
+
+- Notebook 00 introduced range, delay, and duty cycle.
+- Notebook 01 built the transmit waveform and showed why chirps buy resolution.
+- Notebook 02 showed the channel — delay, attenuation, noise — and ended with
+  the echo buried in the received signal.
+
+Say simply: the echo is there, but you cannot see it. The matched filter is the
+tool that pulls it out.
+
+#### 2. Explain the matched filter in words before the equation
+
+Say the radar already knows the shape it transmitted. The matched filter slides
+a copy of that shape across the received signal and measures how well they line
+up at each position. Where the shapes match, the output is large. Where they
+do not, the output stays low.
+
+Only after that intuition should you show the correlation equation. The learner
+should hear "slide, multiply, sum, look for the peak" before seeing the math.
+
+#### 3. Build the received signal
+
+Use the channel from Notebook 02: one rectangular pulse, one echo at the
+baseline range, -40 dB attenuation, 20 dB SNR. The learner should recognise
+this as the same received signal they saw in the previous notebook.
+
+#### 4. Walk through the correlation-by-hand cell
+
+Read the cell as a story:
+
+- slide the transmitted pulse across the received signal,
+- multiply overlapping samples,
+- sum at each position,
+- the result is a vector with a peak at the echo delay.
+
+Point out that the peak index must be converted to a lag by subtracting
+`len(pulse) - 1` because of the `full`-mode correlation convention.
+
+#### 5. Show the two-panel comparison plot slowly
+
+This is the key visual. Read it as a story:
+
+- top: the raw received signal — echo invisible in noise,
+- bottom: the matched-filter output — echo as a clear peak.
+
+Ask the learner: can you see the echo in the top panel? The answer is usually
+no. Then ask: can you see it in the bottom panel? The answer is yes. That is
+the matched-filter gain.
+
+#### 6. Explain why thresholding fails
+
+Use the threshold cell to show that the raw signal peak is not at the echo
+location, and that multiple samples exceed the threshold. The matched filter
+avoids this because it accumulates energy across the entire pulse length, not
+just one sample.
+
+#### 7. Repeat with the chirp
+
+Show the chirp overlay plot. The chirp peak is sharper because its bandwidth is
+larger. Point back to Notebook 01's resolution formulas: the compressed width
+is set by 1/B, not by tau.
+
+#### 8. Use the checkpoint to force verbal understanding
+
+The checkpoint should be answered out loud or in writing. The learner should be
+able to say:
+
+- the matched filter slides a copy of the transmitted shape and looks for the
+  peak,
+- the chirp peak is narrower because bandwidth, not pulse length, sets the
+  compressed width,
+- the peak gives a sample delay, which converts to range with the round-trip
+  formula.
+
+#### 9. Use the common-mistake note as a teaching moment
+
+The common mistake is thinking the matched filter amplifies the signal. It does
+not; it concentrates energy into a narrow peak by coherently adding across the
+pulse length. The peak is higher because energy is compressed in time.
+
+Also correct the idea that the peak index is directly a range. It is a sample
+delay, and the range equation converts it.
+
+#### 10. Transition to the helper-based version
+
+Tell the learner why the helper functions exist:
+
+- `matched_filter` runs the correlation in one call,
+- `range_from_delay_samples` converts the delay to range.
+
+Make the helper cell feel like a second view of the same idea, not a new idea.
+
+#### 11. Close with the answers section and the narrative Summary
+
+Use the "Closing the loop" section as your recap device:
+
+- ask the learner to answer each opening question themselves first,
+- then read or paraphrase the matching narrative answer,
+- point back at the two-panel plot, the threshold cell, and the chirp overlay
+  while you do.
+
+After closing the loop, deliver the narrative Summary. The Summary should sound
+like a short explanation of the matched filter, not a list of formulas.
+
+Say that the learner has now completed the first full radar measurement:
+
+- the transmit waveform was built in Notebook 01,
+- the channel placed an echo in Notebook 02,
+- and the matched filter pulled it out and converted it to a range estimate here.
+
+The point of the summary is to connect the matched filter to the rest of the
+course: every range measurement in a pulse radar starts with this operation.
+
+### Likely learner questions and answers
+
+#### Why not just look for the loudest sample?
+
+Because noise can be louder than the echo on any single sample. The matched
+filter accumulates energy across the entire pulse, so the echo contribution
+grows while the noise averages out.
+
+#### Why is the chirp peak narrower?
+
+Because the compressed width is set by the bandwidth, not the pulse length.
+The chirp has a much larger bandwidth than the rectangular pulse, so its
+compressed peak is proportionally narrower.
+
+#### Does the matched filter work for any waveform?
+
+Yes. The matched filter is optimal for any known waveform in white noise. The
+choice of waveform determines the peak shape and width, but the detection
+principle is the same.
+
+### Delivery notes
+
+- Pause after the two-panel comparison; it is the conceptual turning point.
+- Do not rush the threshold cell; it is the strongest argument for the matched
+  filter.
+- Keep the tone physical: slide, multiply, sum, peak.
+- If the learner seems lost, return to "the radar knows what it transmitted"
+  before going back to the math.
+- The goal is comprehension, not speed.
+
+### One-sentence close
+
+The matched filter correlates the received signal with the known transmitted
+shape to concentrate a weak echo into a sharp peak whose location gives the
+range estimate; this notebook is the first complete radar measurement in the
+course.

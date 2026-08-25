@@ -45,8 +45,10 @@ def instantaneous_frequency_hz(
 def matched_filter(received: np.ndarray, template: np.ndarray) -> np.ndarray:
     """Return the matched-filter output of ``received`` against ``template``.
 
-    The template is conjugated and time-reversed (the optimal filter for a
-    known waveform in white noise), then correlated with the received signal.
+    The matched filter is the cross-correlation of the received signal with the
+    transmitted template. For a known waveform in white noise this is the
+    optimal detector: the output peaks at the echo delay with a gain proportional
+    to the pulse length.
     """
 
-    return np.correlate(received, np.conj(template)[::-1], mode="full")
+    return np.correlate(received, template, mode="full")
