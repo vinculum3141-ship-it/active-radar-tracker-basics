@@ -79,6 +79,69 @@ have to relearn the format each time.
 
 ---
 
+## 3b. Learner handbook style
+
+The learner handbook (`beginner/learner_guide.md`) is a companion to the notebooks.
+It is the deeper, slower read — the place where a learner goes when a notebook
+cell does not click, or when they want the full story before running the code.
+
+### Audience
+
+- The reader is the learner, not the trainer.
+- The trainer guide tells you *how to teach*; the learner handbook tells you
+  *what the concept means*.
+
+### Required structure per chapter
+
+1. Open with the same learning objectives as the notebook.
+2. Walk through the concepts in narrative form, with equations and diagrams.
+3. Reference specific notebook cells by name or section heading — do not
+   duplicate the code or output.
+4. Close with expanded "closing the loop" answers that add physical intuition
+   beyond what the notebook provides.
+
+### Scope boundaries
+
+- Each chapter is **2–3× the prose** of the notebook markdown, not a textbook
+  chapter.
+- Reference the notebook cell; do not repeat the code, output, or plots.
+- One concept per section, same as the notebook.
+- No executable code blocks — this is reading, not running.
+- Do not introduce new equations or helper functions that the notebook does not
+  use. If the notebook calls `matched_filter`, the handbook explains what
+  correlation means; it does not redefine the helper.
+- Do not duplicate the trainer guide. If a point is about *how to teach* rather
+  than *what the concept means*, it belongs in the trainer guide, not the
+  handbook.
+
+### Cross-referencing convention
+
+- When the handbook discusses a computation, point to the specific notebook cell:
+  "See the calculation cell in Notebook 03" or "In the correlation-by-hand cell..."
+- When the trainer guide discusses a concept, point to the handbook:
+  "The full derivation is in the learner handbook, Chapter 03, §Correlation by hand."
+- This keeps the three layers connected without duplicating content.
+
+### Build order rule
+
+- **Notebooks 00–03 (first draft exception):** the notebooks already exist.
+  Write the handbook chapters retroactively, referencing the notebooks as they
+  stand today.
+- **Notebook 04 onward:** write the notebook first, then the handbook chapter
+  references it. Never write the handbook before the notebook.
+
+### What not to do
+
+- Do not write a second textbook. The handbook supports the notebook; it does
+  not replace it.
+- Do not let the handbook grow past 3× the notebook prose without a review.
+- Do not add historical anecdotes, tangential theory, or advanced topics unless
+  they directly help the learner understand the notebook material.
+- Do not use "the learner" — address the reader as **you**, same as the
+  notebooks.
+
+---
+
 ## 4. Production sequence
 
 The fastest way to build the notebook set is to work in layers.
@@ -126,13 +189,26 @@ The fastest way to build the notebook set is to work in layers.
 - Add suggested timing and pacing.
 - Add checkpoint answers and expected observations.
 
-### Layer G — quality pass
+### Layer G — learner handbook
+
+- Write handbook chapters that reference the completed notebooks.
+- Each chapter opens with the same learning objectives.
+- Walk through the concepts in narrative form with equations.
+- Reference specific notebook cells; do not duplicate code or output.
+- Close with expanded "closing the loop" answers.
+- Check that the 2–3× prose ratio is respected.
+
+### Layer H — quality pass
 
 - Check that every notebook has a clear beginning, middle, and end.
 - Check that every notebook teaches one new idea.
 - Check that every notebook links back to the glossary and physics docs.
 - Check that the trainer notes are enough to present the lesson without
   reverse-engineering the notebook.
+- Check that every learner handbook chapter references the correct notebook cells
+  and respects the 2–3× prose ratio.
+- Check that the trainer guide references the learner handbook where deeper
+  explanation is available.
 
 ---
 
