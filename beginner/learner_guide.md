@@ -14,7 +14,7 @@ guide is the place to understand why the code works.
 
 ---
 
-## Chapter 00 — Radar Intuition and Baseline Parameters
+## Chapter 0 — Radar Intuition and Baseline Parameters
 
 ### What you should be able to explain
 
@@ -154,7 +154,7 @@ functions package it for reuse in later notebooks.
 
 ---
 
-## Chapter 01 — Pulse Generation and Chirp Intuition
+## Chapter 1 — Pulse Generation and Chirp Intuition
 
 ### What you should be able to explain
 
@@ -274,7 +274,7 @@ same length.
 
 ---
 
-## Chapter 02 — Channel Model and Echoes
+## Chapter 2 — Channel Model and Echoes
 
 ### What you should be able to explain
 
@@ -388,7 +388,7 @@ to concentrate its energy into a detectable peak.
 
 ---
 
-## Chapter 03 — Matched Filtering and Range Estimation
+## Chapter 3 — Matched Filtering and Range Estimation
 
 ### What you should be able to explain
 
