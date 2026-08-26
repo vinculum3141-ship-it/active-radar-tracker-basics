@@ -176,9 +176,38 @@ of ones, 400 samples long at 20 megahertz. There is no hidden structure — just
 flat burst of energy.
 
 The rectangular pulse is the baseline waveform, and it is still used in some
-radar systems. But it has a limitation: its range resolution is tied directly to
-its length. A long pulse has poor resolution. That limitation is what motivates
-the chirp.
+radar systems. But it has a limitation that is worth understanding before we
+move on.
+
+When the radar receives an echo, it arrives as a pulse of energy spread over
+time. The echo from a single target is as wide as the transmitted pulse — 400
+samples, or 20 microseconds. During that entire window, the radar sees energy
+arriving, but it cannot tell where within the window the energy came from. The
+echo is a blurred copy of the transmitted shape.
+
+Now imagine two targets at nearly the same range. Their echoes arrive almost at
+the same time, overlapping each other. If the overlap is significant, the radar
+sees one combined blob of energy instead of two distinct returns. The targets
+blur together.
+
+How far apart must the targets be to remain distinguishable? They need to be
+separated by at least half the pulse length in time, which corresponds to a
+range separation of c * tau / 2. For the baseline 20-microsecond pulse, that is
+roughly 3000 metres. Two targets closer than 3000 metres apart will merge into
+one echo.
+
+A longer pulse makes this worse, not better. A 40-microsecond pulse would
+require 6000 metres of separation. A shorter pulse improves resolution, but it
+also contains less energy, so the echo from a distant target becomes weaker.
+This is the fundamental trade: pulse length controls both the echo strength and
+the resolution, and they pull in opposite directions.
+
+The resolution formula is:
+
+    delta_R = c * tau / 2
+
+This is what limits the rectangular pulse. The chirp breaks the link between
+pulse length and resolution, and the next section explains how.
 
 ### The LFM chirp
 
@@ -214,19 +243,16 @@ range resolution after compression.
 
 ### Range resolution
 
-Range resolution is the smallest separation between two targets that the radar
-can tell apart. For a plain rectangular pulse it is set by the pulse length:
+The rectangular pulse resolution was delta_R = c * tau / 2 — roughly 3000
+metres for the baseline pulse. That is the limitation described above.
 
-    delta_R = c * tau / 2
-
-With the baseline values that gives roughly 3000 metres — very coarse.
-
-For a chirp after pulse compression it is set by the bandwidth:
+For a chirp after pulse compression, the resolution is set by the bandwidth
+instead:
 
     delta_R = c / (2 * B)
 
 With 5 megahertz of bandwidth that gives roughly 30 metres — a hundred times
-better.
+better than the rectangular pulse of the same length.
 
 The improvement factor is the ratio of these two numbers, which equals the
 time-bandwidth product. The notebook's resolution comparison cell computes both
