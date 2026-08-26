@@ -93,7 +93,7 @@ and explains what it controls.
 
 The carrier frequency is 2.45 gigahertz. This sets the wavelength and later
 connects to Doppler calculations. The bandwidth is 5 megahertz, which determines
-the range resolution once pulse compression appears. The pulse width is 20
+the range resolution once the matched filter compresses the echo (Notebook 03). The pulse width is 20
 microseconds. The PRI is 1 millisecond. The sampling rate is 20 megahertz, which
 tells us how many samples the receiver records per second. The example target is
 at 1000 metres.
@@ -230,24 +230,26 @@ resolution.
 
 ### Why the frequency sweep matters
 
-Plotted in time, both the rectangular pulse and the chirp look like
-constant-amplitude bursts. The difference hides in the phase. The frequency
-sweep plot in the notebook makes this visible: the instantaneous frequency ramps
-linearly from zero to the bandwidth across the pulse. The rectangular pulse has
-no sweep at all.
+Plotted in time, the rectangular pulse is a flat block of ones while the chirp
+oscillates with a rising frequency. But their envelopes are the same shape —
+both are constant-amplitude bursts. The difference is hidden in the phase. The
+frequency sweep plot in the notebook makes this visible: the instantaneous
+frequency ramps linearly from zero to the bandwidth across the pulse. The
+rectangular pulse has no sweep at all.
 
 This is why the frequency view matters. A chirp that looks like "just another
 pulse" in the time domain is revealed as a wideband waveform in the frequency
 domain. And it is that bandwidth — not the pulse length — that determines the
-range resolution after compression.
+range resolution after the matched filter compresses the echo (introduced in
+Notebook 03).
 
 ### Range resolution
 
 The rectangular pulse resolution was delta_R = c * tau / 2 — roughly 3000
 metres for the baseline pulse. That is the limitation described above.
 
-For a chirp after pulse compression, the resolution is set by the bandwidth
-instead:
+For a chirp after the matched filter compresses the echo (Notebook 03), the
+resolution is set by the bandwidth instead:
 
     delta_R = c / (2 * B)
 
