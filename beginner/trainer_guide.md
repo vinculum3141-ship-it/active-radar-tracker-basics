@@ -286,7 +286,7 @@ its frequency sweep provides the bandwidth that sets range resolution.
 - The time-bandwidth product `B * tau` is the compression gain that makes the
   long pulse useful.
 - The matched filter is the mechanism that collapses the long chirp into a peak;
-  Notebook 03 will convert that peak into range.
+  Notebook 04 will convert that peak into range.
 
 ### Suggested presentation flow
 
@@ -401,7 +401,7 @@ Make the helper cell feel like a second view of the same idea, not a new idea.
 
 The compression plot is the payoff visual. Show that the plain-pulse filter
 output stays wide while the chirp collapses to a narrow peak. Say that this sharp
-peak is the object Notebook 03 will turn into a range estimate.
+peak is the object Notebook 04 will turn into a range estimate.
 
 Keep the preview forward-looking: the learner has now built the transmit
 waveform; the matched-filter output is the bridge to the next notebooks where
@@ -429,7 +429,7 @@ Say that the learner has now built two waveforms and understood the core trade:
 - and the time-bandwidth product captures the compression gain.
 
 The point of the summary is to connect the waveform lesson to the next step:
-Notebook 03 will take the compressed peak and turn it into a range estimate.
+Notebook 04 will take the compressed peak and turn it into a range estimate.
 
 ### How to explain the waveform choices in real-world terms
 
@@ -486,7 +486,99 @@ learner the first clear picture of pulse compression.
 
 ---
 
-## Chapter 02 — Channel Model and Echoes
+## Chapter 02 — The Radar Equation
+
+### Chapter purpose
+
+This chapter explains why radar echoes are so weak and introduces the radar
+equation as the physics foundation for everything on the receive side. It gives
+the learner the quantitative understanding for why attenuation is so large and
+why signal processing is essential.
+
+### Teaching goal in one sentence
+
+Help the learner understand that the radar equation connects transmitted power,
+range, and target properties to the received signal level, and that the 1 / R⁴
+dependence is why echoes are so weak.
+
+### What the trainer should emphasize
+
+- The signal spreads twice (out and back), giving 1 / R⁴, not 1 / R².
+- The radar cross section is a target property, not a system parameter.
+- The −40 dB used in later notebooks comes from this equation, not from
+  arbitrary choice.
+- This is the physics that motivates the matched filter.
+
+### Suggested presentation flow
+
+#### 1. Bridge from the transmit side
+
+Open by reminding the learner that Notebooks 00 and 01 built the transmit
+waveform. Now we ask: once the pulse leaves the antenna, how much comes back?
+
+#### 2. Build the intuition before the equation
+
+Explain the four losses in plain language:
+
+- outward spreading (1 / R²),
+- target interception (radar cross section),
+- return spreading (another 1 / R²),
+- system losses.
+
+The two spreading losses combine to give 1 / R⁴. Make sure the learner
+understands this is a round-trip effect.
+
+#### 3. Introduce the radar equation
+
+Show the equation and walk through each term. Do not rush — the learner should
+understand what each symbol means before moving on.
+
+#### 4. Show the 1 / R⁴ curve
+
+The log–log plot is the key visual. Walk the learner along the curve: a factor
+of 10 in range gives a factor of 10,000 in received power. Mark the baseline
+target on the curve.
+
+#### 5. Compute the round-trip loss
+
+Show the loss factor computation by hand. The learner should see the number
+and understand it is tiny.
+
+#### 6. Connect to the −40 dB
+
+This is the bridge to the next notebook. Explain that the −40 dB attenuation
+comes from the radar equation with plausible parameters. The learner should
+understand it is physics, not a magic number.
+
+### Likely learner questions and answers
+
+#### Why is it R⁴ and not R²?
+
+Because the signal makes a round trip. It loses as 1 / R² on the way out and
+1 / R² on the way back. Multiplying gives 1 / R⁴.
+
+#### What is radar cross section?
+
+It measures how much energy the target reflects back toward the radar, expressed
+as an equivalent area. A large aircraft might be 100 m²; a small drone might be
+0.01 m².
+
+### Delivery notes
+
+- Pause after the 1 / R⁴ plot; it is the conceptual turning point.
+- Make sure the learner understands −40 dB is not arbitrary before moving on.
+- Keep the tone physical: spread, reflect, spread again.
+
+### One-sentence close
+
+The radar equation shows that received power falls as 1 / R⁴ because the
+signal spreads on both legs of the round trip; this notebook gives the learner
+the physics foundation for why attenuation is so large and matched filtering
+is essential.
+
+---
+
+## Chapter 03 — Channel Model and Echoes
 
 ### Chapter purpose
 
@@ -511,7 +603,7 @@ the tool that pulls it out.
 
 ### Suggested presentation flow
 
-#### 1. Bridge from Notebooks 00 and 01
+#### 1. Bridge from Notebooks 00, 01, and 02
 
 Open by reminding the learner that the transmit side is done. The pulse and
 chirp are built, duty cycle and resolution are understood. Now the pulse
@@ -670,12 +762,12 @@ first clear picture of why the matched filter is needed.
 
 ---
 
-## Chapter 03 — Matched Filtering and Range Estimation
+## Chapter 04 — Matched Filtering and Range Estimation
 
 ### Chapter purpose
 
 This chapter is the payoff for everything built so far. It takes the transmit
-waveform from Notebook 01, the channel model from Notebook 02, and produces a
+waveform from Notebook 01, the channel model from Notebook 03, and produces a
 range estimate — the first complete radar measurement in the course. It also
 explains why matched filtering is superior to thresholding the raw received
 signal.
@@ -704,7 +796,7 @@ Open by reminding the learner of the story so far:
 
 - Notebook 00 introduced range, delay, and duty cycle.
 - Notebook 01 built the transmit waveform and showed why chirps buy resolution.
-- Notebook 02 showed the channel — delay, attenuation, noise — and ended with
+- Notebook 03 showed the channel — delay, attenuation, noise — and ended with
   the echo buried in the received signal.
 
 Say simply: the echo is there, but you cannot see it. The matched filter is the
@@ -722,7 +814,7 @@ should hear "slide, multiply, sum, look for the peak" before seeing the math.
 
 #### 3. Build the received signal
 
-Use the channel from Notebook 02: one rectangular pulse, one echo at the
+Use the channel from Notebook 03: one rectangular pulse, one echo at the
 baseline range, -40 dB attenuation, 20 dB SNR. The learner should recognise
 this as the same received signal they saw in the previous notebook.
 

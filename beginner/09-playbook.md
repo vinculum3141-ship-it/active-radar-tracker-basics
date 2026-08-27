@@ -117,7 +117,7 @@ cell does not click, or when they want the full story before running the code.
 ### Cross-referencing convention
 
 - When the handbook discusses a computation, point to the specific notebook cell:
-  "See the calculation cell in Notebook 03" or "In the correlation-by-hand cell..."
+  "See the calculation cell in Notebook 04" or "In the correlation-by-hand cell..."
 - When the trainer guide discusses a concept, point to the handbook:
   "The full derivation is in the learner handbook, Chapter 03, §Correlation by hand."
 - This keeps the three layers connected without duplicating content.
@@ -127,7 +127,7 @@ cell does not click, or when they want the full story before running the code.
 - **Notebooks 00–03 (first draft exception):** the notebooks already exist.
   Write the handbook chapters retroactively, referencing the notebooks as they
   stand today.
-- **Notebook 04 onward:** write the notebook first, then the handbook chapter
+- **Notebook 05 onward:** write the notebook first, then the handbook chapter
   references it. Never write the handbook before the notebook.
 
 ### What not to do
@@ -179,7 +179,7 @@ The fastest way to build the notebook set is to work in layers.
 
 - Fill Notebook 0 and Notebook 1 completely.
 - Validate the learner flow before continuing.
-- Build Notebook 2 through Notebook 8 in dependency order.
+- Build Notebook 2 through Notebook 9 in dependency order.
 - Finish with the integration notebook and portfolio artifact notebook.
 
 ### Layer F — trainer package
@@ -272,7 +272,33 @@ chirps improve range resolution.
 - Keep the physics simple: energy spread in time, resolution gained through
   bandwidth.
 
-### Notebook 2 — Channel model and echoes
+### Notebook 2 — The radar equation
+
+**Learner goal:** understand why radar echoes are so weak and how the radar
+equation connects transmitted power, range, and target properties to the
+received signal level.
+
+**Must contain:**
+
+- Why echoes are weak (spreading, reflection, spreading again).
+- The monostatic radar equation with all terms explained.
+- The 1 / R⁴ dependence and why it matters.
+- Computing round-trip loss for the baseline target.
+- Connecting the equation to the −40 dB used in later notebooks.
+
+**Code cells should show:**
+
+- The 1 / R⁴ curve on a log–log scale.
+- Round-trip loss factor computation by hand.
+- Baseline target loss in decibels.
+
+**Trainer companion notes:**
+
+- This is the physics foundation for everything on the receive side.
+- Stress the round-trip nature of the loss (1 / R² out, 1 / R² back).
+- Make sure the learner understands −40 dB is not arbitrary before moving on.
+
+### Notebook 3 — Channel model and echoes
 
 **Learner goal:** understand how a transmitted pulse becomes a delayed,
 attenuated, noisy echo.
@@ -299,7 +325,7 @@ attenuated, noisy echo.
 - Stress that the learner is now seeing the physical meaning of delay.
 - Keep the second target as an optional extension, not a required concept.
 
-### Notebook 3 — Matched filtering and range estimation
+### Notebook 4 — Matched filtering and range estimation
 
 **Learner goal:** understand correlation as matched filtering and convert a
 peak delay into range.
@@ -325,7 +351,7 @@ peak delay into range.
 - Pause on the idea that the filter is “looking for a known shape.”
 - Use the plot to show why the compressed peak is the key improvement.
 
-### Notebook 4 — Doppler and the range-Doppler map
+### Notebook 5 — Doppler and the range-Doppler map
 
 **Learner goal:** understand fast time versus slow time and how Doppler turns
 into velocity.
@@ -352,7 +378,7 @@ into velocity.
 - Make the aliasing example deliberate and visible.
 - This notebook should feel like the first major milestone.
 
-### Notebook 5 — Kalman tracking
+### Notebook 6 — Kalman tracking
 
 **Learner goal:** see how noisy detections become a stable track over time.
 
@@ -377,7 +403,7 @@ into velocity.
   the sensor.
 - Do not over-mathematize the first pass; keep the plot central.
 
-### Notebook 6 — Array geometry and beam patterns
+### Notebook 7 — Array geometry and beam patterns
 
 **Learner goal:** understand how a ULA measures angle and why beam patterns
 form main lobes and sidelobes.
@@ -401,7 +427,7 @@ form main lobes and sidelobes.
 - Use geometry language before matrix language.
 - Keep the number of elements small so the pattern is easy to interpret.
 
-### Notebook 7 — DOA and interference
+### Notebook 8 — DOA and interference
 
 **Learner goal:** compare Bartlett and Capon, then see how interference can
 mask a target.
@@ -425,7 +451,7 @@ mask a target.
 - Make the resolution difference visible, not just stated.
 - Frame interference as a practical obstacle, not an abstract side case.
 
-### Notebook 8 — Beam steering and adaptive nulling
+### Notebook 9 — Beam steering and adaptive nulling
 
 **Learner goal:** understand how steering and LCMV nulling suppress an
 interferer while preserving the target.
@@ -450,7 +476,7 @@ interferer while preserving the target.
 - Explain why nulling happens before the matched filter.
 - Emphasize that the target should remain visible after cancellation.
 
-### Notebook 9 — Integration and portfolio artifacts
+### Notebook 10 — Integration and portfolio artifacts
 
 **Learner goal:** connect the full chain and produce the final artifacts.
 
@@ -522,8 +548,8 @@ If speed is the priority, do this first:
 
 1. Draft this playbook fully.
 2. Create notebook skeletons for all ten notebooks.
-3. Write trainer notes for Notebook 0 through Notebook 4.
-4. Fill Notebook 0 through Notebook 4.
+3. Write trainer notes for Notebook 0 through Notebook 5.
+4. Fill Notebook 0 through Notebook 5.
 5. Validate the learner flow.
 6. Finish Notebook 5 through Notebook 9.
 7. Add the extension-track notebook plan only after the spine is stable.

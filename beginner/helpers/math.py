@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import numpy as np
+
 from .constants import RADAR_CONSTANTS, BaselineRadarSpec
 
 C_MPS = 299_792_458.0
@@ -45,3 +47,12 @@ def range_resolution_from_bandwidth(bandwidth_hz: float, c_mps: float = C_MPS) -
     """Return range resolution of a pulse-compressed waveform in meters."""
 
     return c_mps / (2.0 * bandwidth_hz)
+
+
+def round_trip_loss_factor(sigma_m2: float, wavelength_m: float, range_m: float) -> float:
+    """Return the geometric round-trip loss factor (no antenna gain, no Tx power).
+
+    This is sigma * lambda^2 / ((4*pi)^3 * R^4).
+    """
+
+    return (sigma_m2 * wavelength_m**2) / ((4.0 * np.pi)**3 * range_m**4)

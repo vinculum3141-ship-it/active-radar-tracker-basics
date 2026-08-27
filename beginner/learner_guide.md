@@ -93,7 +93,7 @@ and explains what it controls.
 
 The carrier frequency is 2.45 gigahertz. This sets the wavelength and later
 connects to Doppler calculations. The bandwidth is 5 megahertz, which determines
-the range resolution once the matched filter compresses the echo (Notebook 03). The pulse width is 20
+the range resolution once the matched filter compresses the echo (Notebook 04). The pulse width is 20
 microseconds. The PRI is 1 millisecond. The sampling rate is 20 megahertz, which
 tells us how many samples the receiver records per second. The example target is
 at 1000 metres.
@@ -241,14 +241,14 @@ This is why the frequency view matters. A chirp that looks like "just another
 pulse" in the time domain is revealed as a wideband waveform in the frequency
 domain. And it is that bandwidth — not the pulse length — that determines the
 range resolution after the matched filter compresses the echo (introduced in
-Notebook 03).
+Notebook 04).
 
 ### Range resolution
 
 The rectangular pulse resolution was delta_R = c * tau / 2 — roughly 3000
 metres for the baseline pulse. That is the limitation described above.
 
-For a chirp after the matched filter compresses the echo (Notebook 03), the
+For a chirp after the matched filter compresses the echo (Notebook 04), the
 resolution is set by the bandwidth instead:
 
     delta_R = c / (2 * B)
@@ -267,7 +267,7 @@ The time-bandwidth product is:
     TBP = B * tau = 5 MHz * 20 microseconds = 100
 
 This number is the compression ratio. The long chirp, squeezed by the matched
-filter (introduced in Notebook 03), collapses into a peak roughly 100 times
+filter (introduced in Notebook 04), collapses into a peak roughly 100 times
 narrower than the pulse itself. It captures the central trade of modern pulse
 radar: the pulse can stay long for energy while the bandwidth provides the
 resolution. The two properties are decoupled.
@@ -302,7 +302,117 @@ same length.
 
 ---
 
-## Chapter 2 — Channel Model and Echoes
+## Chapter 2 — The Radar Equation
+
+### What you should be able to explain
+
+- Why radar echoes are billions of times weaker than the transmitted pulse.
+- What the radar equation says and what each term means.
+- Why received power falls as the fourth power of range.
+- How the −40 dB attenuation used in later notebooks comes from the physics.
+
+### Why the echo is so weak
+
+When the radar transmits, the energy spreads outward in all directions like the
+surface of an expanding sphere. Only a tiny fraction of that energy hits the
+target. The target reflects some of it, again spreading in all directions. Only
+a tiny fraction of the reflected energy heads back toward the radar. And by the
+time it arrives, it has traveled twice the distance.
+
+There are four separate losses at work:
+
+1. **Outward spreading.** The transmitted power density at the target falls as
+   1 / R², where R is the range.
+2. **Target interception.** The target intercepts only the power that falls on
+   its effective area, called the radar cross section (σ).
+3. **Return spreading.** The reflected energy spreads outward again, and the
+   power density at the radar falls as 1 / R² a second time.
+4. **System losses.** The transmitter, antenna, receiver, and propagation medium
+   all introduce losses.
+
+Combining the two spreading losses gives the characteristic 1 / R⁴ dependence.
+That is why radar echoes are so much weaker than the transmitted pulse.
+
+### The radar equation
+
+The monostatic radar equation relates the received power to the transmitted
+power and the system parameters:
+
+    P_r = (P_t * G² * λ² * σ) / ((4π)³ * R⁴ * L)
+
+where:
+
+- P_r is the received power (what the radar detects),
+- P_t is the transmitted power (what the radar puts out),
+- G is the antenna gain (how much the antenna concentrates the beam),
+- λ is the wavelength of the carrier frequency,
+- σ is the target radar cross section (effective reflecting area),
+- R is the range to the target,
+- L is the combined system losses.
+
+The R⁴ in the denominator is the key. Doubling the range does not halve the
+received power — it reduces it by a factor of 16.
+
+### The 1 / R⁴ dependence
+
+The fourth-power law comes from the signal making a round trip: the power falls
+as 1 / R² on the way out and 1 / R² on the way back. Multiplying the two gives
+1 / R⁴.
+
+On a log–log scale, the curve is steep: a factor of 10 in range gives a factor
+of 10,000 in received power. The notebook's plot makes this visible with the
+baseline target marked on the curve.
+
+### What each term controls
+
+The radar designer can control the transmitted power, the antenna gain, and (to
+some extent) the operating wavelength. The target's radar cross section is not
+under the designer's control — it depends on the target's size, shape, and
+materials. The range is the variable the radar is trying to measure, not
+something the designer chooses.
+
+**Transmitted power.** More power means a stronger echo, but higher power costs
+more electricity and requires heavier hardware.
+
+**Antenna gain.** A high-gain antenna sends more energy toward the target and
+collects more on the return, but it covers a smaller patch of sky.
+
+**Radar cross section.** A large aircraft might have a radar cross section of
+100 m²; a small drone might be 0.01 m². Stealth shapes and materials can reduce
+the cross section by orders of magnitude.
+
+### Connecting to the channel model
+
+The next notebook (Chapter 3) uses an attenuation of −40 dB for the baseline
+1000-metre target. That value comes from the radar equation with plausible
+transmitter power, antenna gain, and target cross section. It is not arbitrary —
+it is the physical consequence of the signal path. When you see −40 dB in
+Chapter 3, you will know it encodes the range, the target, and the geometry.
+
+### Closing the loop
+
+**Why radar echoes are so weak.** The energy spreads on the way out (1 / R²),
+only a fraction hits the target (radar cross section), and the reflected energy
+spreads again on the way back (another 1 / R²). The two spreading losses
+combine to give 1 / R⁴.
+
+**What the radar equation says.** It connects received power to transmitted
+power, antenna gain, wavelength, target cross section, range, and losses. The
+R⁴ denominator is the dominant term — it is why range is the hardest challenge
+in radar.
+
+**Why received power falls as the fourth power of range.** The signal makes a
+round trip, losing power as 1 / R² on each leg. Doubling the range reduces
+received power by a factor of 16.
+
+**How the −40 dB attenuation comes from the physics.** It is the combined
+effect of the radar equation with plausible system parameters. The exact value
+depends on the specific radar and target, but −40 dB is a realistic ballpark
+for a 1000-metre target.
+
+---
+
+## Chapter 3 — Channel Model and Echoes
 
 ### What you should be able to explain
 
@@ -386,7 +496,7 @@ concentrated in a short slot, the echo can still be hard to spot by eye.
 The bottom panel of the notebook's three-part plot shows the problem: the small,
 delayed echo disappears into the noise fluctuations. Without signal processing,
 you cannot reliably tell whether the echo is present at all. This is what
-motivates the matched filter in Notebook 03.
+motivates the matched filter in Notebook 04.
 
 ### Attenuation and noise are different
 
@@ -424,12 +534,12 @@ transmitted amplitude.
 **How noise hides the echo and why the matched filter is needed.** Receiver noise
 adds random fluctuations across the entire buffer. A weak echo can disappear
 visually among those fluctuations even though it is physically present. The
-matched filter in Notebook 03 exploits the fact that the echo is a known shape
+matched filter in Notebook 04 exploits the fact that the echo is a known shape
 to concentrate its energy into a detectable peak.
 
 ---
 
-## Chapter 3 — Matched Filtering and Range Estimation
+## Chapter 4 — Matched Filtering and Range Estimation
 
 ### What you should be able to explain
 
@@ -441,7 +551,7 @@ to concentrate its energy into a detectable peak.
 ### The problem this notebook solves
 
 You have built the transmit waveform (Notebook 01) and seen what the channel
-does to it (Notebook 02). The echo is in the received buffer, but it is buried
+does to it (Notebook 03). The echo is in the received buffer, but it is buried
 in noise. You cannot see it by eye, and a simple threshold on the raw signal
 would trigger on noise as often as on the echo.
 
