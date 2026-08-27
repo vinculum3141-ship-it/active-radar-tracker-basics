@@ -361,14 +361,37 @@ Then show the cell so the learner sees the arithmetic and the improvement factor
 Make the teaching point explicit: the chirp is long for energy but sharp for
 resolution, and bandwidth is what decouples the two.
 
-#### 8. Explain the time-bandwidth product
+#### 8. Explain why the chirp compresses (the mechanism)
+
+The width formula says the compressed peak is `1 / B`, but make sure the learner
+understands *why* correlation produces a narrow peak at all. This is the heart of
+pulse compression and the easiest fact to gloss over.
+
+Walk through the mechanism: the matched filter slides the template along the
+received signal and sums the products at each lag. The plain pulse has no
+internal structure, so any overlap looks the same and its output stays wide — a
+fat triangle as wide as the pulse. The chirp is different: it labels every
+instant with a unique frequency as it sweeps across `B`. The products only add
+constructively at the exact lag where the template's frequency matches the
+echo's at every instant. Slide the template a little and the frequency labels
+fall out of alignment, so the products cancel and the sum collapses.
+
+Tie the width back to the bandwidth: the wider `B`, the faster the labels
+diverge as the template slides, so the narrower the peak. Bandwidth is the
+"clock" that tells the filter how precisely the chirp must line up, which is why
+resolution is set by `B` and not by the pulse length. A plain pulse has almost no
+bandwidth (only `1 / tau`), so it has no such clock and cannot compress. Use the
+preview plot to let the learner *see* the wide rectangle versus the sharp chirp
+peak.
+
+#### 9. Explain the time-bandwidth product
 
 Introduce `TBP = B * tau` as the compression factor. With the baseline values it
 is a round 100, so the long pulse compresses by about 100x. Tell the learner
 this is the central trade that makes modern pulse radar practical: stay loud, get
 sharp.
 
-#### 9. Use the checkpoint to force verbal understanding
+#### 10. Use the checkpoint to force verbal understanding
 
 The checkpoint should be answered out loud or in writing. The learner should be
 able to say:
@@ -378,7 +401,7 @@ able to say:
 - increasing `B` at fixed `tau` raises the time-bandwidth product and improves
   (shrinks) the range resolution.
 
-#### 10. Use the common-mistake note as a teaching moment
+#### 11. Use the common-mistake note as a teaching moment
 
 The common mistake is to think pulse length alone sets resolution. Correct it by
 restating that for a chirp, bandwidth sets the resolution while the pulse length
@@ -387,7 +410,7 @@ stays free for energy.
 Also warn that the chirp's time plot looks like "just a weird pulse." Resolution
 lives in the frequency sweep, so always check the frequency view.
 
-#### 11. Transition to the helper-based version
+#### 12. Transition to the helper-based version
 
 Tell the learner why the helper functions exist:
 
@@ -397,7 +420,7 @@ Tell the learner why the helper functions exist:
 
 Make the helper cell feel like a second view of the same idea, not a new idea.
 
-#### 12. Close with the matched-filter preview
+#### 13. Close with the matched-filter preview
 
 The compression plot is the payoff visual. Show that the plain-pulse filter
 output stays wide while the chirp collapses to a narrow peak. Say that this sharp
@@ -407,7 +430,7 @@ Keep the preview forward-looking: the learner has now built the transmit
 waveform; the matched-filter output is the bridge to the next notebooks where
 the echo is received and turned into a measurement.
 
-#### 13. Close the loop on the opening questions and the narrative Summary
+#### 14. Close the loop on the opening questions and the narrative Summary
 
 The notebook now contains a "Closing the loop" section that answers the four
 opening questions directly. Use it as your recap device:

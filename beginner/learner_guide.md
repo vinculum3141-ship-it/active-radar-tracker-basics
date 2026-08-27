@@ -260,6 +260,38 @@ The improvement factor is the ratio of these two numbers, which equals the
 time-bandwidth product. The notebook's resolution comparison cell computes both
 values and shows the factor explicitly.
 
+### Why the chirp compresses: the mechanism
+
+The width formula tells you *how* sharp the peak is, but not *why* correlation
+squeezes a long chirp into a short spike. Here is that mechanism, because it is
+the heart of pulse compression.
+
+Cross-correlation slides a copy of the transmitted waveform across the received
+signal and adds up the products at each lag. For a plain rectangular pulse there
+is nothing to distinguish one lag from another — the block of ones overlaps a
+block of ones over a wide span, so the output stays large for roughly the whole
+pulse length. The result is a wide triangle, as wide as the pulse itself. There
+is no way to localize it.
+
+A chirp is different because it *labels each instant with its own frequency*.
+The frequency sweeps from 0 to B across the pulse, so at any moment the chirp
+has a unique, current frequency. When the sliding template lines up exactly with
+the echo, those frequency labels match at every instant and the products add
+constructively — the sum is large. Slide the template even slightly, and the
+template's frequency at each instant no longer matches the echo's. Positive and
+negative products start to cancel, and the sum collapses.
+
+The wider the bandwidth B, the faster the frequency labels diverge as you slide,
+so the faster the sum collapses and the narrower the peak. That is why the
+compressed width is set by 1/B, not by the pulse length: the bandwidth is the
+"clock" that tells the matched filter how precisely the chirp must line up. A
+plain pulse has almost no bandwidth (only 1/tau), so it has no such clock and
+cannot compress.
+
+In short: the chirp compresses because its frequency sweep gives the matched
+filter a precise way to tell when the template truly aligns with the echo, and
+the bandwidth sets how sensitive that alignment is.
+
 ### The time-bandwidth product
 
 The time-bandwidth product is:
