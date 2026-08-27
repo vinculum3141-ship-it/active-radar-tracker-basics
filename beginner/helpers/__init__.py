@@ -14,6 +14,11 @@ from .doppler import (
     range_doppler_map,
     velocity_from_doppler,
 )
+from .doa import (
+    bartlett_spectrum,
+    mvdr_spectrum,
+    sample_covariance,
+)
 from .kalman import (
     predict,
     run_kalman_track,
@@ -41,6 +46,7 @@ __all__ = [
     "add_echo",
     "array_factor",
     "awgn",
+    "bartlett_spectrum",
     "baseline_spec",
     "build_pulse_stack",
     "delay_samples_for_range",
@@ -51,6 +57,7 @@ __all__ = [
     "inter_element_phase_rad",
     "lfm_chirp",
     "matched_filter",
+    "mvdr_spectrum",
     "predict",
     "range_from_delay_samples",
     "range_doppler_map",
@@ -58,6 +65,7 @@ __all__ = [
     "range_resolution_from_pulse_width",
     "rectangular_pulse",
     "run_kalman_track",
+    "sample_covariance",
     "single_target_channel",
     "state_transition_matrix",
     "steering_vector",

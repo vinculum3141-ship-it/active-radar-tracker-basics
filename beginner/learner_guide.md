@@ -1235,3 +1235,147 @@ is standard.
 If you can retell these five answers, you know how an array measures direction —
 the coordinate that lets a radar point at a target in angle as well as range and
 velocity.
+
+## Chapter 8 — Direction of Arrival and Interference
+
+### What you should be able to explain
+
+- How a set of snapshots becomes a covariance matrix R.
+- How scanning a spatial spectrum turns R into an angle estimate.
+- Why the Bartlett scan cannot separate targets that are close in angle.
+- How the Capon (MVDR) scan resolves them, and the price it pays.
+- Why a strong interferer masks a weak target in a conventional scan, and how an adaptive scan recovers it.
+
+### The missing measurement: where sideways
+
+Notebook 7 gave you a beam you can point. A real radar does more than draw a
+pattern — it *scans* that beam over every angle and reads where the power peaks.
+That is direction of arrival (DOA): sweeping a spatial spectrum over candidate
+angles and treating the peaks as target directions. It is the natural completion
+of range and velocity, except that the conventional scan has two weaknesses you
+must understand: it blurs close targets, and it can be drowned out by a loud
+interferer.
+
+### From snapshots to a covariance
+
+At each moment the array records a snapshot: a vector x of N complex values, one
+per element. Each snapshot is the sum of the targets' steering vectors (scaled
+by their amplitudes) plus noise. Over many moments you collect many snapshots
+and average their outer products into the sample covariance
+
+    R = (1/K) * sum over snapshots of x x^H
+
+R is the object both scans read from. Its diagonal entries hold the per-element
+power, and its off-diagonal entries hold the correlations between elements —
+which is exactly where the phase differences that carry the angle live. For the
+baseline 8-element array the diagonal came out near 2 (target power plus noise),
+and R is Hermitian: R equals its own conjugate transpose, as it must for any
+real covariance.
+
+### Scanning a spatial spectrum: Bartlett
+
+Imagine a plane wave arriving from each candidate angle theta and ask how
+strongly the array's data agree with it. The Bartlett beamformer simply weights
+the array with the steering vector a(theta) and reads the power:
+
+    P_Bartlett(theta) = a(theta)^H R a(theta)
+
+Sweeping theta, the power peaks where a(theta) matches the actual direction of a
+source. For a single target at 20 degrees the scan peaks cleanly at 20 — the
+simplest possible angle estimate.
+
+### The limit: close targets blur together
+
+Bartlett's beam is as wide as the array's main lobe, about 14 degrees for our 8
+elements. Two targets closer together than that produce peaks that merge into
+one. Adding a second target at 30 degrees — only 10 away — the Bartlett scan
+reports a single wide bump somewhere between them (at about 25 degrees) instead
+of two. The beam is simply too fat to see the separation.
+
+### The fix: Capon / MVDR
+
+Capon's insight is to make the weights *adaptive*. Instead of fixed
+steering-vector weights, it chooses weights that pass the look direction with
+unit gain while minimising power from every other direction. That constraint
+forces sharp notches at the other sources, so the response is far narrower than
+Bartlett's fixed beam:
+
+    P_Capon(theta) = 1 / ( a(theta)^H R^-1 a(theta) )
+
+For the two-target scene Capon resolves both: sharp peaks at about 22.4 and 27.7
+degrees. It sees what Bartlett cannot. The price is that Capon needs a reliable
+estimate of R and its inverse — with too few snapshots that inverse is unstable
+and Capon invents spurious peaks.
+
+### A strong interferer can mask the target
+
+Now the problem is not two weak targets but one weak target and one very loud
+interferer: our target at 20 degrees and a strong interferer at -30 degrees, 20
+dB stronger. In the Bartlett scan the interferer's broad response through the
+beam's sidelobes swamps everything. The target's feature is buried more than 15
+dB below the interferer peak and drifts off its true angle. To a conventional
+radar the scene looks like *only* the interferer: the weak target is masked.
+
+### Capon confines the interferer and recovers the target
+
+Capon combines the elements so that a strong source at one angle cannot speak
+loudly at the target's angle. The interferer's energy is *confined* to its own
+direction instead of leaking through sidelobes, so the weak target's peak
+reappears at its true 20-degree angle, exactly on target. Looking at the
+before-and-after numbers: Bartlett's target feature collapses from 0 dB (target
+alone) to about -16 dB and drifts to 21.6 degrees, while Capon's stays at 20.0
+degrees throughout. That contrast — a conventional scan at the mercy of a loud
+neighbour, an adaptive scan not — is the heart of the notebook.
+
+### Common mistake
+
+Bartlett's resolution is not something you can tweak away. It is the best
+*non-adaptive* scan, and its width is fixed by the array aperture (N d). You
+cannot beat it with weights; you must go adaptive, and adaptivity needs an
+estimated covariance and its inverse.
+
+Equally, do not trust Capon on too few snapshots. R is estimated from snapshots,
+and with too few the inverse is unreliable and Capon shows spurious peaks. With
+8 snapshots the two-target scene produced 3 peaks; with 2000 it cleanly found 2.
+
+### Checkpoint answers
+
+**Why can Bartlett not separate two close targets, and how does Capon?**
+Bartlett's fixed beam has a finite width (about 14 degrees here), so targets
+closer than that blend into one broad bump. Capon is adaptive: it passes the
+look angle and minimises power from everywhere else, which forces sharp notches
+at the other sources and lets it resolve peaks the fixed beam cannot.
+
+**How does the target's fate differ between the scans when a loud interferer
+sits nearby?** In Bartlett the interferer leaks power through the sidelobes and
+buried the weak target (its feature fell to about -16 dB and drifted off angle),
+so the target disappeared. In Capon the interferer is confined to its own angle
+and the target stayed as a sharp peak at exactly 20 degrees — recovered.
+
+### Closing the loop
+
+**How snapshots become an angle.** Averaging many snapshots x x^H builds the
+covariance R, whose cross-element entries carry the phase differences that
+encode direction. Scanning a power measure built from R and the steering vector
+a(theta) peaks at a source's angle.
+
+**Why Bartlett cannot separate close targets.** Its resolution is fixed by the
+array main-lobe width, about 14 degrees, so targets 10 degrees apart merged into
+one bump near 25 degrees.
+
+**How Capon resolves them.** It chooses adaptive weights that pass the look
+direction and minimise all other power, forcing sharp notches at other sources —
+giving two resolved peaks at 22.4 and 27.7 degrees.
+
+**The price Capon pays.** It needs a trustworthy estimate of R and its inverse.
+With too few snapshots the inverse is unstable and Capon produces spurious
+peaks; with enough snapshots it is clean.
+
+**How a loud interferer masks the target, and how adaptivity saves it.** In
+Bartlett, sidelobe leakage from a 20 dB-stronger interferer buried the target
+feature. In Capon, the interferer is confined to its own angle and the target
+reappeared at exactly 20 degrees, so the radar is not fooled into thinking the
+scene holds only the interferer.
+
+If you can retell these five answers, you understand how a radar turns its array
+into a direction-finder that stays trustworthy even with loud neighbours.

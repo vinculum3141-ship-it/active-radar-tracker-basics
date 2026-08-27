@@ -1301,3 +1301,116 @@ The learner converted the path difference between the elements of an 8-element
 line array into an inter-element phase step, formed a steering vector, and read
 the resulting beam pattern — main lobe, sidelobes, and the grating lobes that
 half-wavelength spacing exists to avoid.
+
+## Chapter 08 — Direction of Arrival and Interference
+
+### Chapter purpose
+
+Turn the array from Notebook 07 into a direction-measuring instrument: the
+learner scans a spatial spectrum to locate sources by angle, then confronts the
+two real problems of DOA — resolving close targets and surviving a loud
+interferer. This is where beam-steering geometry becomes a working direction
+finder with an adaptive option.
+
+### Teaching goal in one sentence
+
+The learner estimates the array covariance from snapshots, scans it with a
+conventional Bartlett beamformer and an adaptive Capon/MVDR beamformer, and
+understands why Capon resolves close targets and recovers a weak target from
+under a strong interferer.
+
+### What the trainer should emphasize
+
+- Snapshots averaged into the covariance R are the object both scans read.
+- A DOA scan sweeps theta and peaks where R agrees with the steering vector.
+- Bartlett's resolution is fixed by the array aperture; close targets merge.
+- Capon's adaptive weights narrow the response at the cost of needing a reliable
+  R and its inverse.
+- A strong interferer masks the target in a conventional scan but not in an
+  adaptive one.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebook 07
+
+Remind the learner they can point a beam but have not yet read where a target
+is. Frame DOA as scanning the array over all angles and treating peaks as
+source directions — the third coordinate alongside range and velocity.
+
+#### 2. Build the covariance by hand
+
+Take one snapshot x, then many, and show that R is the average of x x^H. Point
+out the perceptual leap: the angle information now lives in the off-diagonal
+correlations, not in any single sample. Verify R is Hermitian.
+
+#### 3. Scan with Bartlett
+
+Sweep theta with `a(theta)^H R a(theta)` and read a clean single peak for one
+target at 20 degrees. This is the intuitive, non-adaptive starting point.
+
+#### 4. Show the resolution limit before the fix
+
+Add a second target at 30 degrees and let the learner see Bartlett collapse it
+into one bump near 25 degrees. Establish the problem concretely before
+introducing Capon, so the fix answers a felt difficulty.
+
+#### 5. Introduce Capon as the adaptive fix
+
+Explain the constraint (pass the look angle, minimise all other power) and show
+the two sharp peaks it produces. Emphasise the snapshot price — this leads
+naturally to the stretch activity.
+
+#### 6. Make the masking story a before/after contrast
+
+Add the +20 dB interferer at -30 degrees, run both scans, and compare the target
+feature before and after. Let the learner see Bartlett's feature buried and
+drifted while Capon's stays nailed at 20 degrees. The contrast, not a single
+plot, carries the lesson.
+
+### Likely learner questions and answers
+
+#### Why does Bartlett merge the two targets when the beam is only 14 degrees wide?
+
+The beam is about 14 degrees wide and the targets are 10 apart, so both fall
+well inside the same main lobe and the array sums them coherently into one bump
+near their midpoint. Resolution is set by the aperture, not by anything the scan
+can tweak.
+
+#### Does Capon really place a null on the interferer?
+
+In the power plot the interferer still shows as a peak at its own angle (Capon
+reports each source's power where it is). The nulling is spatial: the
+interferer's energy is confined to its own direction and no longer leaks through
+sidelobes onto the target. That is why the weak target's peak survives.
+
+#### Why does Capon misbehave with few snapshots?
+
+Capon needs R^-1, and with only a handful of snapshots the estimated R is close
+to singular or unrepresentative. Its inverse is unstable, so spurious, jittery
+peaks appear. With enough snapshots R is a good estimate and the scan is clean.
+
+#### Is Capon always better than Bartlett?
+
+It is sharper but demands trustworthy data: enough snapshots relative to the
+number of elements, and a well-conditioned covariance. If R is bad, Capon is
+worse than Bartlett, which is robust even with poor estimates.
+
+### Delivery notes
+
+- Keep the covariance step concrete: verify the diagonal carries power and that
+  R is Hermitian, so the estimate feels trustworthy before Capon uses its inverse.
+- Drive resolution with the two-close-target scene before introducing Capon, so
+  the learner wants the fix before you give it.
+- Avoid claiming Capon "puts a null at the interferer" in the plot itself; frame
+  it as confining the interferer's energy to its own angle.
+- Let the stretch (few vs many snapshots) be the learner's discovery of Capon's
+  practical price.
+- Use the printed before/after target-feature numbers to summarise the masking
+  story cleanly: Bartlett drifts and buries, Capon holds 20 degrees.
+
+### One-sentence close
+
+The learner turned the array into a direction finder — reading angles from a
+scanned spatial spectrum — and learned that when close targets blur together, or
+a loud interferer threatens to mask the target, the adaptive Capon scan sees
+what the conventional Bartlett scan cannot.
