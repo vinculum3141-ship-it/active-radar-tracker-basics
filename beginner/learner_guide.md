@@ -701,10 +701,30 @@ and so on. Each slow-time tick is one whole PRI, here 1 ms. You do not sample
 at 20 MHz along slow time; you sample at the pulse repetition frequency, once
 per pulse.
 
-The two clocks turn the received data into a grid. One axis is fast time
-(range), the other is slow time (pulse number / velocity). Any single pulse
+The two clocks turn the received data into a grid: a two-dimensional array. It
+is worth being precise about its two axes.
+
+- **Rows are slow time.** Each row is one pulse, indexed by pulse number. Slow
+  time advances once per PRI, once per pulse, at the 1000 Hz pulse repetition
+  frequency. The row index is what you will FFT across to get Doppler.
+- **Columns are fast time.** Each column is one *range bin* — a particular
+  fast-time sample inside the receive window, mapped to a distance. The column
+  index carries range.
+
+So a **range bin** is a fast-time column (a range cell), while **once per PRI**
+is how the slow-time rows are sampled. They are two different axes, not two
+names for the same thing. One cell of the grid, at pulse k, range bin r, holds
+one sampled value of the echo at that range, on that pulse. Any single pulse
 answers "how far?"; the sequence of pulses answers "how fast?". This notebook
 shows you how to read the second answer.
+
+One more thing about that cell value: it is now a **complex number**. In earlier
+notebooks you worked with the real waveform as it might appear on a single wire.
+To see Doppler you must track the carrier's *phase*, which requires both the
+in-phase and quadrature parts — the real and imaginary components. The chirp you
+built in Notebook 01 is already complex, so each cell carries a real part and an
+imaginary part. The phase, the thing that actually moves, only exists if you
+keep both parts, which is why the pulse stack is built with a complex dtype.
 
 ### Why the echo phase advances
 
@@ -748,11 +768,13 @@ the numbers.
 
 ### Finding the Doppler frequency with an FFT
 
-Now that you have one complex number per pulse at the target's range bin, the
-tool from Notebook 01 reappears: an FFT. You take the fast Fourier transform of
-the slow-time samples and look for the peak. It sits at the Doppler frequency.
-This is exactly the frequency analysis you did on the transmit waveform, but
-now the "signal" is sampled once per PRI rather than at 20 MHz.
+Now take a single column of the grid: slice the complex values at the target's
+range bin out of *every* pulse. That slice is a row of slow-time samples — one
+complex number per pulse, sampled once per PRI. The tool from Notebook 01 now
+reappears: an FFT. You take the fast Fourier transform of those slow-time
+samples and look for the peak. It sits at the Doppler frequency. This is
+exactly the frequency analysis you did on the transmit waveform, but now the
+"signal" is sampled once per PRI rather than at 20 MHz.
 
 The slow-time sampling rate is the PRF, or pulse repetition frequency — the
 number of pulses the radar sends per second. It is simply the inverse of the
