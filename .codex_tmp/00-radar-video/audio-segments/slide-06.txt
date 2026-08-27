@@ -1,0 +1,5 @@
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A longer P R I does not make the radar transmit more often. It gives the radar more time to listen, so the duty cycle becomes smaller. A pulse radar can be active for only a small fraction of the time and still gather useful range information. [[slnc 350]]
+
+Another common mistake is treating delay as a technical detail instead of the main measurement. In pulse radar, that delay is the signal that tells us where the target is.

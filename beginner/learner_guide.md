@@ -494,10 +494,12 @@ decibels the signal power is 100 times the noise power. That sounds high, but
 because the noise is spread across the entire received buffer while the echo is
 concentrated in a short slot, the echo can still be hard to spot by eye.
 
-The bottom panel of the notebook's three-part plot shows the problem: the small,
-delayed echo disappears into the noise fluctuations. Without signal processing,
-you cannot reliably tell whether the echo is present at all. This is what
-motivates the matched filter in Notebook 04.
+The bottom panel of the notebook's three-part plot shows the result: the
+attenuated echo is still there, but receiver noise has been added on top. Your
+eye can still pick out the general shape if you know where to look — the signal
+is no longer a flat burst, it fluctuates across the buffer. But a detector
+cannot rely on visual inspection. The radar needs a systematic way to pull the
+echo out of the noise, which is what the matched filter does in Notebook 04.
 
 ### Attenuation and noise are different
 

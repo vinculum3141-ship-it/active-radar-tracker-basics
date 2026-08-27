@@ -1,0 +1,121 @@
+[[slnc 800]] The Radar Equation. [[slnc 600]]
+
+This lesson explains why radar echoes are extraordinarily weak, and how the radar equation connects transmitted power, target range, antenna properties, and target reflectivity to the power that returns to the receiver.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+The previous lessons established the transmit-and-listen rhythm and built the pulse and chirp waveforms. We now step into the space between transmitter and receiver and ask a physical question. Once the pulse leaves the antenna, how much of its energy actually comes back? [[slnc 350]]
+
+By the end, you should be able to explain why echoes are billions of times weaker than the transmitted pulse, what each part of the radar equation means, why received power falls with the fourth power of range, and why the attenuation used in the channel model is a consequence of physics rather than an arbitrary setting.
+
+[[slnc 800]] Why the echo is so weak. [[slnc 600]]
+
+Imagine the radar transmitting energy into space. As that energy travels outward, it spreads across the surface of an expanding sphere. The same transmitted power must cover an area that grows with the square of distance, so the power density at the target falls as one divided by range squared. [[slnc 350]]
+
+Only a small part of that outward-moving energy strikes the target. The target reflects only part of what it intercepts, and the reflected energy then spreads outward again. By the time a tiny portion returns to the radar, it has experienced spreading on both legs of the journey. [[slnc 350]]
+
+Four effects determine the returned power. [[slnc 700]]
+
+First, outward spreading. The power density reaching the target falls as one divided by range squared. [[slnc 700]]
+
+Second, target interception and reflection. The target captures only the energy that falls on its effective reflecting area, and only some of that energy is directed back toward the radar. [[slnc 700]]
+
+Third, return spreading. The reflected energy spreads across space, producing a second one-divided-by-range-squared loss. [[slnc 700]]
+
+Fourth, system loss. The transmitter, antenna, receiver, and propagation medium all reduce the usable signal further. [[slnc 1000]]
+
+Multiplying the outward and return spreading effects gives one divided by range to the fourth power. This fourth-power dependence is the central reason radar echoes become weak so quickly.
+
+[[slnc 800]] The radar equation. [[slnc 600]]
+
+The monostatic radar equation brings the complete link together. Monostatic means that the transmitter and receiver are located together, usually sharing the same antenna. [[slnc 350]]
+
+The received power equals transmitted power, multiplied by transmit antenna gain, receive antenna gain, wavelength squared, and target radar cross section. That numerator is divided by four pi, cubed, multiplied by range to the fourth power and the combined system loss. [[slnc 350]]
+
+When the same antenna is used for transmitting and receiving, its gain appears twice. We can therefore describe the antenna contribution as gain squared. [[slnc 350]]
+
+The most important feature is range to the fourth power in the denominator. Doubling the target range does not merely halve the received power. It reduces the power by two to the fourth power, which is a factor of 16.
+
+[[slnc 800]] What received and transmitted power mean. [[slnc 600]]
+
+Transmitted power is the energy rate the radar sends into the antenna. Increasing it produces a stronger echo, but costs electrical power, requires heavier or more expensive hardware, creates heat, and can make the radar easier to detect. [[slnc 350]]
+
+Received power is what arrives back at the radar after the complete outward and return path. It is the tiny signal the receiver must detect and process. The radar equation connects these two ends of the journey.
+
+[[slnc 800]] What antenna gain controls. [[slnc 600]]
+
+Antenna gain measures how strongly the antenna concentrates energy in one direction compared with an antenna that radiates equally in every direction. High gain puts more transmitted energy toward the target. On reception, it also collects more of the returning energy from that direction. [[slnc 350]]
+
+This concentration comes with a trade. A high-gain beam covers a smaller region of the sky, so the radar must point or scan it carefully.
+
+[[slnc 800]] What wavelength controls. [[slnc 600]]
+
+Wavelength is connected to the carrier frequency. The baseline carrier frequency is 2.45 gigahertz, corresponding to a wavelength of approximately 12.2 centimetres. [[slnc 350]]
+
+Wavelength appears in the radar equation because it helps determine the antenna's effective collecting area. It also influences how a target reflects energy, although the target's overall reflection behaviour is summarized separately by radar cross section.
+
+[[slnc 800]] What radar cross section means. [[slnc 600]]
+
+Radar cross section describes how strongly a target reflects energy back toward the radar. It is expressed as an equivalent area in square metres, but it is not simply the target's physical size. [[slnc 350]]
+
+Shape, material, orientation, and wavelength all matter. A large aircraft might have a radar cross section near 100 square metres, while a small drone might be closer to one hundredth of a square metre. A carefully shaped stealth aircraft can have a radar cross section far smaller than its visible physical area because it redirects energy away from the radar. [[slnc 350]]
+
+For the baseline hand calculation, we use a target radar cross section of one square metre.
+
+[[slnc 800]] The one-divided-by-range-to-the-fourth law. [[slnc 600]]
+
+The fourth-power law becomes intuitive when we keep the two journeys separate. The outward trip contributes one divided by range squared. The return trip contributes another one divided by range squared. Multiplying them gives one divided by range to the fourth. [[slnc 350]]
+
+Consider two targets, one at 200 metres and another at 1,000 metres. The second target is five times farther away. With everything else equal, its returned power is one divided by five to the fourth, or one six-hundred-and-twenty-fifth, of the nearer target's power. [[slnc 350]]
+
+A modest-looking increase in distance therefore causes a severe reduction in echo strength. This is why extending radar range is so demanding.
+
+[[slnc 800]] Compute the round-trip loss. [[slnc 600]]
+
+To isolate the geometry and target reflection, we can calculate a round-trip loss factor without choosing a transmitter power or antenna gain. [[slnc 350]]
+
+The loss factor equals radar cross section multiplied by wavelength squared, divided by four pi cubed and range to the fourth power. It tells us what fraction survives the outward spreading, target reflection, and return spreading in this simplified link. [[slnc 350]]
+
+For the baseline case, the carrier frequency is 2.45 gigahertz, the wavelength is about 12.2 centimetres, the target range is 1,000 metres, and the radar cross section is one square metre. The resulting fraction is extraordinarily small. Real radar design uses transmitter power and antenna gain to compensate for part of this loss, but the receiver still faces a very weak return.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+A common mistake is to assume that the radar equation matters only at very long range. It matters at every distance. The fourth-power loss is the reason weak-signal processing, including matched filtering and integration, is necessary throughout radar operation. [[slnc 350]]
+
+Another mistake is to treat radar cross section as physical surface area. Radar cross section describes how much energy returns in the radar's direction. A target can be physically large and still have a small radar cross section if its shape and materials direct the energy elsewhere.
+
+[[slnc 800]] Connecting the equation to the channel model. [[slnc 600]]
+
+The channel model in the next lesson represents all the propagation and target effects using one attenuation number. For the baseline example, it uses 40 decibels of attenuation. [[slnc 350]]
+
+That simplified value stands in for a complete link budget containing transmitted power, antenna gain, target radar cross section, range, and system loss. The precise value depends on the chosen radar and target, but its physical origin is the radar equation. [[slnc 350]]
+
+When the channel model scales the echo down, it is not inventing weakness for convenience. It is compressing the real outward journey, reflection, return journey, and hardware losses into one manageable parameter.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: why are radar echoes so weak? [[slnc 600]]
+
+The transmitted energy spreads on the way to the target. Only a fraction strikes and reflects from the target. The reflected energy spreads again on the way back, and the radar receives only a tiny part of it. System losses reduce it further. [[slnc 350]]
+
+Second: what does the radar equation say? [[slnc 600]]
+
+It connects received power to transmitted power, antenna gain, wavelength, target radar cross section, range, and system losses. The numerator describes the factors that help energy reach and return from the target. The denominator describes geometric spreading and loss, dominated by range to the fourth power. [[slnc 350]]
+
+Third: why does received power fall with the fourth power of range? [[slnc 600]]
+
+Power density falls as one divided by range squared on the outward journey and again on the return journey. Multiplying the two spreading losses gives one divided by range to the fourth. Doubling range reduces received power by a factor of 16. [[slnc 350]]
+
+Fourth: where does the channel model's attenuation come from? [[slnc 600]]
+
+It summarizes the physical link described by the radar equation: transmitted power, antenna concentration, wavelength, target reflectivity, range, and system losses. The attenuation is not arbitrary. It is the compact result of the complete round trip.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+The radar equation explains how transmitted energy becomes an extremely weak received echo. Antenna gain, wavelength, and radar cross section help determine the return, while geometric spreading and system loss reduce it. [[slnc 350]]
+
+The defining feature is the one-divided-by-range-to-the-fourth relationship. Because the pulse spreads on both the outward and return paths, even a moderate increase in range produces a dramatic reduction in received power. [[slnc 350]]
+
+This lesson completes the physical link between waveform generation and the channel model. We built the pulse, followed its energy through space, and now understand why the returning echo must be delayed, attenuated, and processed. [[slnc 350]]
+
+The main takeaway is that a weak radar echo is not a numerical inconvenience. It is the expected physical outcome of sending energy to a distant target and asking a tiny fraction of it to make the complete journey back.

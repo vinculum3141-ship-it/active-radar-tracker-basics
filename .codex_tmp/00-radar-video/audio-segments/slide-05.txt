@@ -1,0 +1,7 @@
+[[slnc 800]] Why the radar listens after it transmits. [[slnc 600]]
+
+The radar needs a quiet interval because the echo from a distant target takes time to come back. If the radar kept transmitting, the weak echo would be buried under the outgoing signal. [[slnc 350]]
+
+That is why we define a pulse repetition interval. The pulse width is the short transmit burst, and the rest of the P R I is the listening window. [[slnc 350]]
+
+Duty cycle, represented by D, equals pulse width divided by the pulse repetition interval. Range, represented by R, equals the speed of light multiplied by the round-trip echo delay, divided by two. We divide by two because the energy travels to the target and back.

@@ -1,0 +1,3 @@
+Second: why does the radar listen after transmitting? [[slnc 600]]
+
+The echo from a distant target takes time to return. While the transmitter is on, its outgoing signal drowns out everything else. The radar cannot hear a faint echo while it is still speaking. The pulse repetition interval is one cycle of speak, then listen. With the baseline values, the radar transmits for 20 microseconds, then listens for the remaining 980 microseconds of each 1 millisecond interval. The listening window is not idle time. It is when the measurement happens. [[slnc 350]]

@@ -1,0 +1,5 @@
+[[slnc 800]] What this notebook teaches. [[slnc 600]]
+
+Pulse radar is a system that transmits a short burst of energy, then stops transmitting and listens for the echo. That simple idea drives everything that follows in this course. [[slnc 350]]
+
+By the end, you should be able to explain what pulse radar is, why the radar listens after it transmits, how duty cycle is computed, and how a range delay turns into a range estimate.
