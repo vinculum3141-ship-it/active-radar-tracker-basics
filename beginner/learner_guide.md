@@ -945,3 +945,152 @@ the wrong direction.
 
 If you can retell these five answers, you can measure velocity as well as
 range, and you are ready to combine both into a trajectory.
+
+---
+
+## Chapter 6 — Kalman Tracking
+
+### What you should be able to explain
+
+- Why a single noisy detection is not enough to know where a target is.
+- What the predict step does and why its guess is uncertain.
+- What the update step does with each new measurement.
+- How the filter decides how much to trust the model versus the sensor.
+- Why the filtered track is smoother than the raw measurements.
+
+### The problem: one noisy measurement is not enough
+
+A range-Doppler map gives you one (range, velocity) reading per CPI. Reading it
+again every 64 ms produces a stream of detections, but each one is the true
+value plus noise. Your detector's peak wobbles around the truth, so a single
+reading can be off by several metres or m/s. If you steered the radar by one
+reading you would chase noise. You need to combine many readings and use the
+knowledge that targets move smoothly - that combination is a Kalman filter.
+
+### What the filter keeps: state and uncertainty
+
+The filter's belief is two objects.
+
+- The **state vector** `x = [range, velocity]` — its best guess of where the
+  target is and how fast it is moving right now.
+- The **covariance matrix** `P` — how unsure the filter is about that guess.
+  Big diagonal entries mean big uncertainty.
+
+Two settings you choose ahead of time describe how much to trust the inputs:
+
+- `Q`, the **process noise** — how much the model is trusted (how strongly the
+  target really obeys constant velocity).
+- `R`, the **measurement noise** — how much the sensor is trusted (how noisy
+  the detections are).
+
+### Step 1: predict from the model
+
+The first half of each timestep uses only the model, no new measurement. If the
+current estimate is range `r` and velocity `v`, then after a time `dt` the best
+guess is:
+
+    new range = r + v*dt
+    new velocity = v
+
+That is the transition matrix `F = [[1, dt], [0, 1]]` applied to the state. The
+covariance grows by adding `Q`, because the model is not perfect. Predict
+answers "where do I expect the target to be now?" before you look at the
+measurement.
+
+### Step 2: update with the measurement
+
+The second half fuses the prediction with the newest detection. You look at the
+difference between what the model predicted and what the sensor measured — the
+innovation `z - x_pred` — and decide how much of it to accept. The weight is
+the **Kalman gain** `K`, derived from the two uncertainties:
+
+- if the measurement is very trustworthy relative to the prediction (R small, P
+  large), `K` is close to 1 and you mostly follow the measurement;
+- if the prediction is very trustworthy (P small, R large), `K` is close to 0
+  and you mostly keep the prediction.
+
+The update is `new_state = prediction + K * (measurement - prediction)`, and the
+covariance shrinks because the measurement reduced the uncertainty. The gain is
+recomputed every step as the uncertainties change.
+
+### The recursive loop and the gain over time
+
+One step is predict then update. Repeating it over every CPI yields the whole
+track. The filter keeps only the state and covariance and carries them forward,
+so each new measurement is folded in with the latest belief rather than the full
+history — that is what makes it *recursive*.
+
+The gain is not a fixed constant. Early on the filter is very unsure (P is
+large), so it leans on each measurement and the gain is high. As measurements
+arrive and P shrinks, it trusts its own estimate more and the gain settles to a
+lower, steady value. That adaptation is the balance between model and sensor.
+
+### Why the filtered track is smoother
+
+The filter combines information across many detections while still tracking
+motion. Measurement noise tends to cancel out when combined, so the filtered
+range and velocity wobble far less than any single measurement, while the
+predict step keeps the track from lagging a moving target. In the notebook the
+filtered range RMS error (about 1.8 m) was far below the single-measurement
+error (about 4.8 m).
+
+### A common mistake
+
+The filter does not simply average the measurements. If the target is moving, a
+plain average of past positions lags behind the truth. The predict step —
+using velocity to guess where the target is now — is what lets the track keep
+up with a moving target instead of trailing it.
+
+Do not tune the Kalman gain by hand. The gain is *derived* from P, Q, and R at
+each step. You tune the covariances (how much you trust model and sensor), and
+the gain follows. Set R too small and the filter chases every bit of measurement
+noise; set R too large and it ignores the sensor and drifts.
+
+### Checkpoint answers
+
+**What does the predict step do?** It advances the state using only the model —
+range grows by `v*dt`, velocity is unchanged — and grows the covariance by the
+process noise `Q`, because the model is not perfect. It is the filter's guess of
+where the target is *before* it looks at the new measurement.
+
+**What does the update step do?** It fuses the prediction with a new measurement.
+It forms the innovation (measurement minus prediction), weights it by the
+Kalman gain `K`, and adds that weighted correction to the prediction. Then it
+shrinks the covariance because the measurement reduced the uncertainty.
+
+**If measurement noise were larger (bigger R), would the filter trust the
+measurements more or less?** Less. Larger `R` makes the gain `K` smaller, so the
+filter leans more on its prediction and does not chase the noisier measurements.
+That is the correct instinct, though it costs the filter some ability to respond
+to genuinely new information — which is why `R` should reflect the real noise.
+
+### Closing the loop
+
+**Why a single noisy detection is not enough.** Each detection is the true
+range and velocity plus noise, so one reading can be off by several metres or
+m/s. Steering by a single reading would chase noise; the track must combine
+many readings and use the fact that targets move smoothly.
+
+**What the predict step does.** Predict uses only the model: it advances the
+state by `dt` (range grows by `v*dt`, velocity unchanged) and grows the
+covariance by `Q`. It answers "where do I expect the target to be now?" before
+looking at the new measurement.
+
+**What the update step does.** Update forms the innovation, weights it by the
+Kalman gain, and adds the weighted correction to the prediction, then shrinks
+the covariance.
+
+**How the filter balances model and sensor.** The gain is derived from the two
+uncertainties. When the sensor is trustworthy (R small, P large), K is near 1
+and the filter follows the measurement. When the prediction is trustworthy
+(P small, R large), K is near 0 and the filter keeps its prediction. Larger R
+means less trust in the sensor, a smaller gain, and a more model-driven
+estimate.
+
+**Why the filtered track is smoother.** Combining many measurements cancels the
+noise that jitters each single detection, while the predict step keeps the track
+from lagging a moving target. The filtered error against truth drops well below
+the single-measurement error.
+
+If you can retell these five answers, you have turned a stream of noisy
+detections into a stable estimate of where a target is and where it is going.

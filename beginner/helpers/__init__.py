@@ -8,6 +8,12 @@ from .doppler import (
     range_doppler_map,
     velocity_from_doppler,
 )
+from .kalman import (
+    predict,
+    run_kalman_track,
+    state_transition_matrix,
+    update,
+)
 from .math import (
     delay_samples_for_range,
     duty_cycle,
@@ -36,12 +42,16 @@ __all__ = [
     "instantaneous_frequency_hz",
     "lfm_chirp",
     "matched_filter",
+    "predict",
     "range_from_delay_samples",
     "range_doppler_map",
     "range_resolution_from_bandwidth",
     "range_resolution_from_pulse_width",
     "rectangular_pulse",
+    "run_kalman_track",
     "single_target_channel",
+    "state_transition_matrix",
+    "update",
     "velocity_from_doppler",
     "wavelength_m",
 ]

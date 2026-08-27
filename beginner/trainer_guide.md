@@ -1064,3 +1064,123 @@ By stacking 64 pulses, compressing each one, and taking an FFT along slow time,
 the learner produced a range-Doppler map that measures both range and velocity,
 and saw that the baseline 40 m/s target aliases because it outruns the
 unambiguous velocity limit set by half the PRF.
+
+---
+
+## Chapter 06 — Kalman Tracking
+
+### Chapter purpose
+
+Show the learner that noisy (range, velocity) detections from a range-Doppler
+map become a stable track when fused over time. This is the first notebook that
+acts on the *sequence* of detections rather than a single measurement, and it
+introduces the predict-then-update loop that later notebooks will reuse for
+moving scenes.
+
+### Teaching goal in one sentence
+
+Given a stream of noisy detections, the learner builds a two-state Kalman filter
+(range and velocity) whose predict and update steps produce a track far smoother
+than any single measurement.
+
+### What the trainer should emphasize
+
+- A single detection is noisy; the task is to combine many detections while
+  still tracking motion.
+- The filter keeps two things: the state vector (range, velocity) and the
+  covariance (uncertainty).
+- Each timestep is predict (model only, uncertainty grows) then update (measure
+  fuses, uncertainty shrinks).
+- The Kalman gain is derived from the uncertainties, not tuned by hand: trust
+  the sensor when R is small relative to P, trust the model otherwise.
+- The track is smoother than the scatter because noise cancels across many
+  measurements, while predict keeps it from lagging a moving target.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebook 05
+
+Remind the learner that the range-Doppler map gave one (range, velocity) reading
+per CPI. Re-reading it every 64 ms gives a stream of detections. Pose the
+problem: each reading is noisy, and a moving target is not a simple average.
+Keep the plot of true-versus-measured front and centre; the scatter is the
+motivation.
+
+#### 2. Present the filter as a balance, not a formula
+
+Frame everything as trust. The model says "the target keeps moving so I expect
+it here"; the sensor says "I directly measured it there." The filter weighs the
+two. Introduce the state and the covariance as "what I believe" and "how sure I
+am", before writing any matrix.
+
+#### 3. Walk the predict step by hand
+
+Show one predict on the first timestep with printed numbers: the state advances
+by the transition matrix `F = [[1, dt], [0, 1]]` and the covariance grows by
+`Q`. Point out that the velocity guess starts at zero (unknown), so the first
+predict barely moves range — which is exactly where the filter is uncertain.
+
+#### 4. Walk the update step by hand
+
+Show the innovation and the Kalman gain as numbers on the same first step. Let
+the learner see the gain pulling the unknown velocity toward the measurement
+(the first velocity estimate comes almost entirely from the sensor). Then
+reveal the one-line blend: prediction + gain times innovation.
+
+#### 5. Run the recursive loop
+
+Let the code repeat predict + update over every CPI and collect the track. Do
+not let the learner over-focus on the matrix algebra; the recursive idea — keep
+only state and covariance, fold each measurement in, move on — is the message.
+
+#### 6. Read the gain and the error together
+
+Plot the gain dropping from a high value to a lower steady one, and the filtered
+error below the measured error. Both plots together tell the whole story: the
+filter starts unsure and trusting the sensor, then firms up and blends.
+
+### Likely learner questions and answers
+
+#### Why does the predict step barely move range on the first step?
+
+Because the initial velocity guess is zero (unknown). Range advances by `v*dt`,
+so with `v = 0` it stays put. That is not a bug; the filter does not yet know
+the velocity, and the update step supplies it from the measurement.
+
+#### Is the Kalman filter just a moving average?
+
+No. A moving average of past positions lags behind a target that is moving
+because it never accounts for velocity. The predict step uses velocity to guess
+where the target is now, which is what keeps the track from trailing. This is a
+crucial distinction to state explicitly.
+
+#### Why is the gain high at the start and lower later?
+
+The gain is derived from the covariance, which starts large (the filter is cold)
+and shrinks as measurements arrive. High covariance means the filter leans on
+the measurement; low covariance means it trusts its own estimate. Emphasise that
+the learner tunes P, Q, and R, not the gain itself.
+
+#### What does Q really represent?
+
+The process noise — how much the target might deviate from constant velocity.
+A maneuvering target needs a larger Q so the filter stays responsive; a
+slowly-moving target can use a small Q for a very smooth track. Raise Q and the
+steady-state gain rises; the filter trusts the model less.
+
+### Delivery notes
+
+- Keep the plot central; do not over-mathematize the first pass.
+- Make the trust framing explicit on every step: model guess versus sensor
+  reading, and how the gain chooses.
+- Use the printed hand-calculated gain on the first step; the numbers make the
+  balance concrete where a plot cannot.
+- The multi-target stretch is optional and should stay brief — one filter per
+  target, never blending detections across targets.
+
+### One-sentence close
+
+The learner turned a stream of noisy range and velocity detections into a
+smooth, recursively-updated track, by balancing a model prediction against each
+new measurement through a Kalman gain derived from how much the filter trusts
+each source.
