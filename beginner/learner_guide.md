@@ -359,9 +359,10 @@ The fourth-power law comes from the signal making a round trip: the power falls
 as 1 / R² on the way out and 1 / R² on the way back. Multiplying the two gives
 1 / R⁴.
 
-On a log–log scale, the curve is steep: a factor of 10 in range gives a factor
-of 10,000 in received power. The notebook's plot makes this visible with the
-baseline target marked on the curve.
+On a log–log scale, the curve is steep. The notebook's plot shows this with
+the baseline target marked: at 1000 m — five times further than the 200 m
+reference — the received power is 1/5⁴ = 1/625 of the reference. A fivefold
+increase in range costs a factor of 625 in received power.
 
 ### What each term controls
 
