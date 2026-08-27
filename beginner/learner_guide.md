@@ -736,11 +736,15 @@ is the Doppler frequency. For a monostatic radar the Doppler shift is
 
 The factor of two comes from the round trip: the wave travels out and back, so
 a target moving at speed `v` produces a shift equal to two radial velocities.
-For the 20 m/s target at 2.45 GHz (wavelength 12.2 cm), that is
+Here `lambda` is the carrier wavelength you met in Notebook 00/02, c / fc, which
+is 12.2 cm at the 2.45 GHz baseline — the distance the carrier wave travels in
+one cycle. For the 20 m/s target at 2.45 GHz, that is
 
     fd = 2 * 20 / 0.1224 = 327 Hz
 
-which is well within the unambiguous band, so it appears cleanly.
+which is well within the unambiguous band, so it appears cleanly. The band is
+plus or minus half the PRF (plus or minus 500 Hz here); the next section gives
+the numbers.
 
 ### Finding the Doppler frequency with an FFT
 
@@ -750,10 +754,16 @@ the slow-time samples and look for the peak. It sits at the Doppler frequency.
 This is exactly the frequency analysis you did on the transmit waveform, but
 now the "signal" is sampled once per PRI rather than at 20 MHz.
 
-The slow-time sampling rate is the PRF, 1000 Hz. Just as fast-time sampling at
-`fs` limits the frequencies you can name, sampling slow time at the PRF limits
-the Doppler frequencies to plus or minus half the PRF, or plus or minus 500 Hz.
-The 327 Hz peak from a 20 m/s target is comfortably inside that range.
+The slow-time sampling rate is the PRF, or pulse repetition frequency — the
+number of pulses the radar sends per second. It is simply the inverse of the
+PRI: PRF = 1 / PRI = 1 / 0.001 = 1000 pulses per second. The radar transmits
+one pulse every 1 ms, so it fires 1000 times a second, and that is how often it
+samples each slow-time location.
+
+Just as fast-time sampling at `fs` limits the frequencies you can name, sampling
+slow time at the PRF of 1000 Hz limits the Doppler frequencies you can name to
+plus or minus half the PRF — the slow-time Nyquist rate — which is plus or minus
+500 Hz. The 327 Hz peak from a 20 m/s target is comfortably inside that range.
 
 ### From Doppler frequency to velocity
 
@@ -796,10 +806,16 @@ one bin, which translates to a velocity resolution of
 Two targets whose speeds differ by less than that appear as one blob.
 
 **Ambiguity.** Because slow time samples once per PRI, the unambiguous Doppler
-band is plus or minus half the PRF. With a PRF of 1000 Hz that is plus or
-minus 500 Hz, which is plus or minus 30.6 m/s. A target faster than that has a
-Doppler beyond the band and *aliases*: it folds over and appears at a lower,
-wrong frequency, often with the wrong sign of velocity.
+band is plus or minus half the PRF, plus or minus 500 Hz. To find the fastest
+speed that band can name, feed the edge frequency into the velocity formula
+`v = fd * lambda / 2`:
+
+    v_max = (500 Hz) * (0.1224 m) / 2 = 30.6 m/s
+
+So the highest velocity measured uniquely is plus or minus 30.6 m/s
+(equivalently lambda * PRF / 4). A target faster than that has a Doppler beyond
+the band and *aliases*: it folds over and appears at a lower, wrong frequency,
+often with the wrong sign of velocity.
 
 ### The 40 m/s ambiguity case
 
@@ -809,9 +825,18 @@ true Doppler would be
     fd = 2 * 40 / 0.1224 = 654 Hz
 
 but the system can only name frequencies up to 500 Hz. The 654 Hz tone aliases:
-it wraps around the band and is measured as minus 346 Hz. Reading that back
-through the velocity formula gives about minus 21 m/s. A target really moving
-toward you at 40 m/s is reported as receding at 21 m/s.
+because 654 lies between 500 Hz and 1000 Hz (twice the Nyquist edge), it wraps
+around the band by subtracting one PRF, so it is measured as
+
+    654 - 1000 = -346 Hz
+
+The minus sign means it appears on the receding side. Reading that back through
+the velocity formula,
+
+    v = (-346 Hz) * (0.1224 m) / 2 = -21.2 m/s
+
+A target really moving toward you at 40 m/s is reported as receding at about
+21 m/s.
 
 This is not a bug in the FFT; it is a consequence of sampling slow time too
 coarsely. Reducing the PRF raises the unambiguous velocity but reduces the
