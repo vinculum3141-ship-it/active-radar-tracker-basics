@@ -333,10 +333,15 @@ back. The total travel time is the round-trip delay:
 For the baseline 1000-metre target this is about 6.67 microseconds. At a
 sampling rate of 20 megahertz, the delay spans 133 samples.
 
-In the received signal buffer, the echo begins at sample 133 and extends for
-the length of the pulse (400 samples). The buffer must be at least 533 samples
-long to hold the entire echo. The notebook builds this step by step: first the
-empty buffer, then the pulse written at the correct offset.
+The radar receiver digitises the incoming signal — it samples the voltage
+coming from the antenna 20 million times per second and stores the samples in a
+digital array. This array is the received signal buffer. Think of it like
+recording audio, but for radar echoes.
+
+In this buffer, the echo begins at sample 133 and extends for the length of the
+pulse (400 samples). The buffer must be at least 533 samples long to hold the
+entire echo. The notebook builds this step by step: first the empty buffer, then
+the pulse written at the correct offset.
 
 The critical point is that the echo is a copy of the transmitted pulse — same
 shape, same length. Only its position has changed. The delay is the range
@@ -353,6 +358,14 @@ The notebook uses -40 decibels, which corresponds to an amplitude factor of
 0.01. The echo amplitude is one hundredth of the transmitted amplitude, and
 because power scales with amplitude squared, the echo power is only
 one ten-thousandth of the transmitted power.
+
+Why -40 dB specifically? In a real radar, the attenuation depends on the
+transmitted power, antenna gains, target radar cross section, and range —
+combined through the radar equation. For a 1000-metre target with typical
+parameters, -40 dB is a plausible ballpark. The exact value is not the point;
+the point is to see what a weak echo looks like when it arrives at the receiver.
+You will use a different attenuation value in later notebooks when the scenario
+calls for it.
 
 Attenuation is deterministic: it scales the echo down but does not change its
 shape. The middle panel of the notebook's three-part plot shows this clearly —
