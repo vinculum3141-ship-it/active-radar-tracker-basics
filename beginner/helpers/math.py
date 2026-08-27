@@ -31,12 +31,6 @@ def range_from_delay_samples(delay_samples: int, fs_hz: float, c_mps: float = C_
     return (delay_samples / fs_hz) * c_mps / 2.0
 
 
-def baseline_spec() -> BaselineRadarSpec:
-    """Return the default beginner baseline radar specification."""
-
-    return RADAR_CONSTANTS
-
-
 def range_resolution_from_pulse_width(pulse_width_s: float, c_mps: float = C_MPS) -> float:
     """Return range resolution of an unmodulated pulse in meters."""
 

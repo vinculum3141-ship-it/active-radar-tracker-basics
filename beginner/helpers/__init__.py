@@ -1,9 +1,8 @@
 """Beginner notebook helpers."""
 
 from .channel import add_echo, awgn, single_target_channel
-from .constants import RADAR_CONSTANTS, BaselineRadarSpec
+from .constants import RADAR_CONSTANTS, BaselineRadarSpec, baseline_spec
 from .math import (
-    baseline_spec,
     delay_samples_for_range,
     duty_cycle,
     range_from_delay_samples,

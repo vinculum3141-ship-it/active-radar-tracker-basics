@@ -19,3 +19,9 @@ class BaselineRadarSpec:
 
 
 RADAR_CONSTANTS = BaselineRadarSpec()
+
+
+def baseline_spec() -> BaselineRadarSpec:
+    """Return the default beginner baseline radar specification."""
+
+    return RADAR_CONSTANTS
