@@ -1,5 +1,0 @@
-[[slnc 800]] Closing the loop. [[slnc 600]]
-
-First: what is pulse radar? [[slnc 600]]
-
-Pulse radar is a distance sensor built from careful timing. It transmits a short burst of energy toward a scene, then goes quiet and waits for some energy to reflect from a target and return as an echo. Because the radar knows exactly when it transmitted and how fast the energy travels, the returning echo carries a measurement. The whole system is: transmit, listen, and time the return. [[slnc 350]]

@@ -1,7 +1,0 @@
-[[slnc 800]] What pulse radar means. [[slnc 600]]
-
-A pulse radar does not transmit continuously. It sends a short burst of energy and then waits. During the transmit burst, the antenna is busy sending power out. During the quiet time after the burst, the radar listens for the echo returning from a target. [[slnc 350]]
-
-This back-and-forth rhythm is the foundation of range measurement. The transmitted pulse creates the event. The quiet listening window lets the echo arrive. The time delay of that echo tells us how far away the target is. [[slnc 350]]
-
-The important idea is that the radar is not trying to hear while it is speaking. It has to stop transmitting before it can listen clearly.

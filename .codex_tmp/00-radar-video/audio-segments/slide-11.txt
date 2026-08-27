@@ -1,7 +1,0 @@
-[[slnc 800]] Summary. [[slnc 600]]
-
-Pulse radar is a simple but powerful idea: transmit a short burst, wait quietly, and use the returning echo to measure range. The listening window is not optional; it is the part of the radar cycle that makes measurement possible. [[slnc 350]]
-
-The baseline example gives the beginner course a common physical situation linking range, timing, Doppler, and later applications. [[slnc 350]]
-
-The main takeaway is that radar is not only about transmitting energy. It is about carefully timing the transmit-and-listen cycle so the system can turn a delay into a meaningful physical measurement.

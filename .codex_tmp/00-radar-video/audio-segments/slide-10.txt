@@ -1,5 +1,0 @@
-Fourth: how does range delay become a range estimate? [[slnc 600]]
-
-The echo delay is the measurement; range is what we compute from it. Range equals the speed of light times the round-trip delay, divided by two. [[slnc 350]]
-
-A target at 1,000 meters produces a delay of two times 1,000 divided by the speed of light, or about 6.67 microseconds. At a sampling rate of 20 megahertz, that delay spans roughly 133 samples. Converting those samples back gives an estimated range of 996.8 meters rather than exactly 1,000 meters. This happens because the true delay falls between two sample boundaries and must land on a sample. The small gap is not an error in the physics. It is sample quantization, previewing the idea that resolution is limited by how finely delay can be measured.

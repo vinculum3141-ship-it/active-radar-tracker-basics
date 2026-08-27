@@ -223,3 +223,4 @@ out/*
 
 # AI audio narration recordings (generated locally via macOS say)
 beginner/ai_audio/*.mp4
+.codex_tmp/

@@ -1,3 +1,0 @@
-[[slnc 800]] Radar Intuition and Baseline Parameters. [[slnc 600]]
-
-This notebook explains what pulse radar is, why the quiet listening interval matters, and why the baseline radar parameters were chosen.

@@ -1,3 +1,0 @@
-Third: how is duty cycle computed? [[slnc 600]]
-
-Duty cycle answers: what fraction of the time is the radar transmitting? It is pulse width divided by P R I. Twenty microseconds divided by one millisecond equals zero point zero two. This means the radar spends 2 percent of its time transmitting and 98 percent listening. Lengthening the P R I increases listening time, so the duty cycle shrinks. [[slnc 350]]
