@@ -781,11 +781,21 @@ reported velocity.
 
 ### The range-Doppler map
 
-You do not have to pick a single range bin by eye. Repeat the slow-time FFT at
-*every* fast-time position and you get a two-dimensional array: one dimension
-is range, the other is velocity, and the value at each cell is the echo power
-for that combination. Plot it as a heatmap and you can read a whole scene at a
-glance.
+So far you picked a single range bin and found its Doppler. But which range bin
+is the right one? A *range bin* is one fast-time sample of the receive window —
+after matched filtering, each one corresponds to a specific distance. Range bin
+133, for example, is the 1000 m cell. It is purely a range concept; it has
+nothing to do with velocity. The 20 m/s you fed in was the target's speed,
+which lives in slow time, not in the choice of range bin.
+
+A real radar does not know where the targets are. Rather than guess a single
+range bin, it repeats the slow-time FFT at *every* range bin, building a
+two-dimensional array: one axis is range (the range bins), the other is
+velocity (the Doppler frequency at each bin), and the value in each cell is the
+echo power for that range-and-velocity combination. You build the 2D map
+precisely so the data can tell you which range bins hold moving targets and how
+fast each one is going — you do not need to know where to look in advance.
+Plot it as a heatmap and you can read a whole scene at a glance.
 
 A single target shows up as one bright blob at its range and velocity. Two
 targets that share a range but move at different speeds — invisible overlap in
@@ -797,13 +807,25 @@ collapse into one peak in a single matched filter.
 
 Doppler has limits, and they mirror the range limits you met in Notebook 00.
 
-**Resolution.** The slow-time observation is one CPI: 64 pulses at 1 ms, so
-64 ms. The FFT over that window can distinguish frequencies separated by about
-one bin, which translates to a velocity resolution of
+**Resolution.** To measure velocity you collect a batch of pulses and process
+them together. That batch is the **CPI**, or coherent processing interval — the
+total time over which the radar gathers pulses that it will look at as one
+coherent group. The size of the batch, N = 64 pulses, is a baseline choice (the
+`n_pulses = 64` setting in the helpers); it is not forced by the physics, it is
+a knob the radar uses, alongside PRI, to shape how long and how fine the
+velocity measurement will be. Each CPI lasts
+
+    CPI = N * PRI = 64 * 1 ms = 64 ms
+
+During that window the FFT has N slow-time samples (one per pulse) per range
+bin, so it can tell apart frequencies up to one bin apart. That frequency
+spacing becomes a velocity resolution of
 
     delta_v = lambda / (2 N PRI) = 0.1224 / (2 * 64 * 0.001) = 0.96 m/s
 
-Two targets whose speeds differ by less than that appear as one blob.
+The longer the CPI (more pulses, or a longer PRI), the finer the velocity
+resolution; a shorter CPI gives coarser resolution but a faster update. Two
+targets whose speeds differ by less than delta_v appear as one blob.
 
 **Ambiguity.** Because slow time samples once per PRI, the unambiguous Doppler
 band is plus or minus half the PRF, plus or minus 500 Hz. To find the fastest
