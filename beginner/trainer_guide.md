@@ -941,3 +941,103 @@ The matched filter correlates the received signal with the known transmitted
 shape to concentrate a weak echo into a sharp peak whose location gives the
 range estimate; this notebook is the first complete radar measurement in the
 course.
+
+---
+
+## Chapter 05 — Doppler and the Range-Doppler Map
+
+### Chapter purpose
+
+Give the learner a second measurement axis — velocity — by collecting many
+pulses and reading the phase advance in slow time. This is the first milestone
+that combines everything so far into a two-dimensional view of a scene.
+
+### Teaching goal in one sentence
+
+The learner builds a 64-pulse stack, takes an FFT along slow time, and reads a
+range-Doppler map that locates a target in both range and velocity.
+
+### What the trainer should emphasize
+
+- Fast time is 20 MHz sampling within a PRI and resolves range; slow time is
+  once-per-pulse sampling at the PRF and resolves velocity.
+- A moving target's echo magnitude stays flat but its phase rotates.
+- An FFT across pulses turns that phase advance into a Doppler frequency.
+- `v = fd * lambda / 2` maps Doppler to velocity.
+- Sampling slow time at the PRF sets the unambiguous velocity, and the 40 m/s
+  baseline target aliases because it exceeds the 30.6 m/s limit.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebook 04
+
+Remind the learner that the matched filter measured *where* a target is, but a
+single peak cannot say *how fast* it moves. To learn velocity you need many
+pulses so you can watch the phase change. Introduce the two clocks: fast time
+inside a PRI, slow time across pulses.
+
+#### 2. Build the intuition with phase, not magnitude
+
+Emphasise that the echo's magnitude is roughly constant across pulses. The
+motion shows up in the phase. Show the real and imaginary parts of the target's
+range-bin value drawing out a sinusoid — that sinusoid *is* the Doppler signal.
+
+#### 3. Let the FFT reveal the Doppler frequency
+
+Have the learner FFT the slow-time samples to find the peak at `fd`. Connect it
+back to Notebook 01's frequency analysis, but now sampling once per PRI at the
+PRF.
+
+#### 4. Build the full map
+
+Show that repeating the slow-time FFT at every range bin produces the
+range-Doppler heatmap. Point out the single blob and explain that overlapping
+targets in range split apart in velocity.
+
+#### 5. Make the aliasing deliberate
+
+Before revealing the 40 m/s case, ask what happens when a Doppler exceeds half
+the PRF. Then show it fold over and appear as a negative velocity. This is the
+conceptual payoff of the notebook.
+
+### Likely learner questions and answers
+
+#### Why does the echo stay at the same range bin if the target is moving?
+
+Because over one short CPI the target's motion is far smaller than a range bin
+(about 2.5 m at 40 m/s over 64 ms, versus a 30 m range resolution). The delay
+is unchanged; only the carrier phase changes.
+
+#### Where does the factor of two in `fd = 2v/lambda` come from?
+
+From the round trip. The wave travels out and back, so a target moving at speed
+`v` contributes two radial velocities to the observed shift.
+
+#### Why is a 40 m/s target reported as -21 m/s?
+
+Its true Doppler of 654 Hz is beyond the plus or minus 500 Hz unambiguous band.
+The tone aliases (wraps around the band) and is measured as minus 346 Hz, which
+reads back as about -21 m/s — wrong speed and wrong direction.
+
+#### Can we just lower the PRF to fix the aliasing?
+
+Lowering the PRF raises the unambiguous velocity but shrinks the unambiguous
+range. The trade-off is real; radars handle it with staggered or multiple PRFs.
+The notebook just makes the aliasing visible.
+
+### Delivery notes
+
+- Emphasise that slow time samples at the PRF, not at 20 MHz; this is the most
+  common source of confusion.
+- Keep the phase story front and centre; the magnitude plot hides motion.
+- The 40 m/s aliasing case should feel like a surprise the learner discovers,
+  not a fact you announce first.
+- This is the first notebook where a plot shows a scene rather than a single
+  waveform — let that land.
+
+### One-sentence close
+
+By stacking 64 pulses, compressing each one, and taking an FFT along slow time,
+the learner produced a range-Doppler map that measures both range and velocity,
+and saw that the baseline 40 m/s target aliases because it outruns the
+unambiguous velocity limit set by half the PRF.

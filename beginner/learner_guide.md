@@ -656,3 +656,191 @@ signal triggers on the single largest sample, which may be noise. The matched
 filter accumulates energy across the entire pulse, so the echo grows while the
 noise averages out. The result is a clear peak even when the echo is invisible
 in the raw received data.
+
+---
+
+## Chapter 5 — Doppler and the Range-Doppler Map
+
+### What you should be able to explain
+
+- The difference between fast time and slow time, and which carries range versus velocity.
+- Why a moving target's echo phase advances from pulse to pulse.
+- How an FFT across pulses turns that phase advance into a Doppler frequency.
+- How the Doppler frequency maps to a radial velocity.
+- Why the baseline 40 m/s target wraps to a wrong speed.
+
+### The problem this notebook solves
+
+By the end of Notebook 04 you could measure *where* a target is. The matched
+filter turned a weak, noisy echo into a sharp peak, and reading the peak's
+position gave you the range. But a single peak says nothing about motion. Two
+targets at the same range are indistinguishable in fast time, and a stationary
+target looks the same as a receding one to a detector that only measures
+arrival time.
+
+Doppler fixes this. When a target moves toward or away from you, the round-trip
+changes each pulse, and that change carries a velocity signal. This notebook
+makes you measure that signal. It is the first major milestone in the course:
+you will leave it able to build a two-dimensional picture that locates targets
+in *both* range and velocity at once.
+
+### Fast time versus slow time
+
+A pulse radar has two clocks running at very different speeds, and keeping them
+apart is the key to this notebook.
+
+**Fast time** is the clock you already know. Inside a single PRI you sample the
+receive window at 20 MHz, so each fast-time sample is a tiny fraction of a
+microsecond later than the last. Because radio waves travel at the speed of
+light, a fast-time sample index maps directly to a time-of-arrival, and
+therefore to a range. Fast time is where range lives.
+
+**Slow time** is a much slower clock. The radar sends one pulse per PRI, so the
+number of the pulse itself is a second kind of time: pulse 0, pulse 1, pulse 2,
+and so on. Each slow-time tick is one whole PRI, here 1 ms. You do not sample
+at 20 MHz along slow time; you sample at the pulse repetition frequency, once
+per pulse.
+
+The two clocks turn the received data into a grid. One axis is fast time
+(range), the other is slow time (pulse number / velocity). Any single pulse
+answers "how far?"; the sequence of pulses answers "how fast?". This notebook
+shows you how to read the second answer.
+
+### Why the echo phase advances
+
+Imagine a target at 1000 m, stationary. Every pulse you send travels the same
+round trip, so the echo comes back with the same phase, pulse after pulse. The
+echo sits at the same fast-time delay and its shape does not change. A
+stationary target is boring in slow time.
+
+Now let the target move toward you at 20 m/s. Between one pulse and the next
+(1 ms later) it closes a little ground, so the round trip is a little shorter.
+That tiny change in path length is tiny compared with a range bin, so the echo
+still lands at the same fast-time delay — you cannot see the motion by watching
+delay. But the *phase* of the carrier is sensitive to changes far smaller than
+a whole wavelength. Over that 1 ms the target moves 2 cm, which is a noticeable
+fraction of the 12 cm carrier wavelength. The echo phase rotates by that
+fraction each pulse.
+
+The result is a steady phase advance across slow time. Extract the complex echo
+at the target's range bin from every pulse and the real and imaginary parts
+draw out a sinusoid whose frequency is the Doppler shift. Magnitude stays flat;
+phase is where the motion lives.
+
+### From phase advance to Doppler frequency
+
+The phase advance has a rate: it completes `fd` cycles per second, where `fd`
+is the Doppler frequency. For a monostatic radar the Doppler shift is
+
+    fd = 2 v / lambda
+
+The factor of two comes from the round trip: the wave travels out and back, so
+a target moving at speed `v` produces a shift equal to two radial velocities.
+For the 20 m/s target at 2.45 GHz (wavelength 12.2 cm), that is
+
+    fd = 2 * 20 / 0.1224 = 327 Hz
+
+which is well within the unambiguous band, so it appears cleanly.
+
+### Finding the Doppler frequency with an FFT
+
+Now that you have one complex number per pulse at the target's range bin, the
+tool from Notebook 01 reappears: an FFT. You take the fast Fourier transform of
+the slow-time samples and look for the peak. It sits at the Doppler frequency.
+This is exactly the frequency analysis you did on the transmit waveform, but
+now the "signal" is sampled once per PRI rather than at 20 MHz.
+
+The slow-time sampling rate is the PRF, 1000 Hz. Just as fast-time sampling at
+`fs` limits the frequencies you can name, sampling slow time at the PRF limits
+the Doppler frequencies to plus or minus half the PRF, or plus or minus 500 Hz.
+The 327 Hz peak from a 20 m/s target is comfortably inside that range.
+
+### From Doppler frequency to velocity
+
+To recover the speed, invert the Doppler relation:
+
+    v = fd * lambda / 2
+
+This is the same formula with the two unknowns swapped. Feed the FFT's peak
+frequency into it and you get the radial velocity — positive for approaching,
+negative for receding. For the 327 Hz peak you get about 20 m/s, matching the
+target. The scale factor `lambda / 2` is small, which is why radar can resolve
+fine velocities: even a large Doppler frequency compresses to a modest speed.
+The relation is linear, so doubling the Doppler frequency exactly doubles the
+reported velocity.
+
+### The range-Doppler map
+
+You do not have to pick a single range bin by eye. Repeat the slow-time FFT at
+*every* fast-time position and you get a two-dimensional array: one dimension
+is range, the other is velocity, and the value at each cell is the echo power
+for that combination. Plot it as a heatmap and you can read a whole scene at a
+glance.
+
+A single target shows up as one bright blob at its range and velocity. Two
+targets that share a range but move at different speeds — invisible overlap in
+fast time — split into two blobs along the velocity axis. This is why the
+range-Doppler map is the standard radar display: it separates targets that
+collapse into one peak in a single matched filter.
+
+### Velocity resolution and ambiguity
+
+Doppler has limits, and they mirror the range limits you met in Notebook 00.
+
+**Resolution.** The slow-time observation is one CPI: 64 pulses at 1 ms, so
+64 ms. The FFT over that window can distinguish frequencies separated by about
+one bin, which translates to a velocity resolution of
+
+    delta_v = lambda / (2 N PRI) = 0.1224 / (2 * 64 * 0.001) = 0.96 m/s
+
+Two targets whose speeds differ by less than that appear as one blob.
+
+**Ambiguity.** Because slow time samples once per PRI, the unambiguous Doppler
+band is plus or minus half the PRF. With a PRF of 1000 Hz that is plus or
+minus 500 Hz, which is plus or minus 30.6 m/s. A target faster than that has a
+Doppler beyond the band and *aliases*: it folds over and appears at a lower,
+wrong frequency, often with the wrong sign of velocity.
+
+### The 40 m/s ambiguity case
+
+The baseline target moves at 40 m/s, which is beyond the 30.6 m/s limit. Its
+true Doppler would be
+
+    fd = 2 * 40 / 0.1224 = 654 Hz
+
+but the system can only name frequencies up to 500 Hz. The 654 Hz tone aliases:
+it wraps around the band and is measured as minus 346 Hz. Reading that back
+through the velocity formula gives about minus 21 m/s. A target really moving
+toward you at 40 m/s is reported as receding at 21 m/s.
+
+This is not a bug in the FFT; it is a consequence of sampling slow time too
+coarsely. Reducing the PRF raises the unambiguous velocity but reduces the
+unambiguous range, and vice versa — the classic trade-off real radars resolve
+with staggering or multiple PRFs. For now, the point is to see the aliasing
+deliberately and understand where it comes from.
+
+### Closing the loop
+
+**Fast time versus slow time.** Fast time is the 20 MHz sampling within a PRI
+that resolves range; slow time is the once-per-pulse sampling at the PRF that
+resolves velocity. Range lives in fast time, velocity in slow time.
+
+**Why the echo phase advances.** A moving target changes the round-trip
+distance slightly each pulse, so although the echo stays at the same fast-time
+delay, its carrier phase rotates steadily at the Doppler frequency
+`fd = 2 v / lambda`. The magnitude stays flat; the phase carries the motion.
+
+**How the FFT turns that into Doppler.** Sampling the complex echo once per
+pulse and taking an FFT across pulses produces a peak at `fd`. For the 20 m/s
+target that peak sat at about 327 Hz.
+
+**How Doppler maps to velocity.** Inverting the relation gives
+`v = fd * lambda / 2`. The 327 Hz peak became about 20 m/s, matching the truth.
+
+**Why the 40 m/s target wraps.** Slow time samples at the 1000 Hz PRF, so the
+unambiguous velocity is plus or minus 30.6 m/s. The 40 m/s target's 654 Hz
+Doppler folds over and was reported at about minus 21 m/s — the wrong speed and
+the wrong direction.
+
+If you can retell these five answers, you can measure velocity as well as
+range, and you are ready to combine both into a trajectory.
