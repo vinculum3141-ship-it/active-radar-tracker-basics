@@ -404,7 +404,7 @@ in radar.
 
 **Why received power falls as the fourth power of range.** The signal makes a
 round trip, losing power as 1 / R² on each leg. Doubling the range reduces
-received power by a factor of 16.
+received power by a factor of 16, which is 10 * log10(16) ≈ 12 dB.
 
 **How the −40 dB attenuation comes from the physics.** It is the combined
 effect of the radar equation with plausible system parameters. The exact value
