@@ -1094,3 +1094,144 @@ the single-measurement error.
 
 If you can retell these five answers, you have turned a stream of noisy
 detections into a stable estimate of where a target is and where it is going.
+
+---
+
+## Chapter 7 — Array Geometry and Beam Patterns
+
+### What you should be able to explain
+
+- How a line of antennas turns a time difference between elements into an angle.
+- What the element spacing is and why half a wavelength is the usual choice.
+- How the phase stepping between elements forms the steering vector.
+- Why the array factor (beam pattern) has a main lobe and sidelobes.
+- When and why grating lobes appear.
+
+### The missing coordinate: direction
+
+You can already measure range and velocity. A single antenna cannot tell you
+direction — the echo only says the target lies somewhere on a circle of constant
+range, not where on that circle. An array of antennas changes this. If the same
+echo reaches several elements, it travels a slightly different distance to each
+one, so it arrives at a slightly different time and phase. That difference is
+the seed of an angle measurement.
+
+### Array geometry
+
+A uniform linear array (ULA) places N identical elements along a line spaced d
+apart, with the first at the origin. The target's direction is the angle theta
+measured from broadside (theta = 0 is perpendicular to the line of elements).
+A wave from direction theta travels an extra path
+
+    d * sin(theta)
+
+from one element to the next. That is the whole geometry: the angle is buried
+in how much farther each element is from the target.
+
+### Why element spacing is half a wavelength
+
+The spacing d is a trade-off. Wider spacing makes the phase difference grow
+faster with angle, so the beam is narrower and resolves angles better — but the
+phase wraps every full wavelength, and past d = lambda/2 the array cannot tell
+one direction from another: it grows spurious **grating lobes**, whole extra
+copies of the main beam. Narrower spacing is unambiguous but gives a wider beam.
+
+The standard compromise is d = lambda/2. Then the phase step per element is
+
+    Delta_phi = (2 pi d / lambda) * sin(theta) = pi * sin(theta)
+
+which stays within plus or minus pi over the whole visible range (plus or minus
+90 degrees), so there is exactly one main lobe and no grating lobes.
+
+### The steering vector
+
+The phase step builds up along the array. Element 0 has phase 0, element 1 has
+the step, element 2 twice the step, and so on. The complex values at each
+element form the steering vector
+
+    a(theta) = [1, e^{j Delta_phi}, e^{j 2 Delta_phi}, ..., e^{j (N-1) Delta_phi}]
+
+It is one complex number per element — the pattern of echo phases the array
+records for a wave from theta. For the baseline 20-degree target at half-
+wavelength spacing, Delta_phi came to about 61.6 degrees and the extra path per
+gap was about 2.1 cm (0.17 wavelengths).
+
+### The array factor and the beam pattern
+
+Summing the elements coherently gives the array factor
+
+    AF(theta) = sum over n of w_n e^{j n k d sin(theta)},  k = 2 pi / lambda
+
+At broadside every term is +1 and they add to N: a strong main lobe. Away from
+broadside the phases spread out and partly cancel, forming sidelobes. With 8
+elements the first null falls at about 14.5 degrees, so the beam is about 29
+degrees wide, and the first sidelobe sits about 13 dB below the main lobe.
+
+### Reading the pattern: nulls, beamwidth, and steering
+
+The first null of a uniform array falls at
+
+    sin(theta_null) = lambda / (N d)
+
+so more elements, or wider spacing, both narrow the beam. To listen at a chosen
+angle you phase-shift each element to undo the delay the wave picked up crossing
+the array — the weights become a steering vector and the main lobe follows. That
+is how the radar scans angles to find a target.
+
+### Common mistake
+
+Wider spacing is not always better. It narrows the main lobe but risks grating
+lobes that look exactly like the real lobe, so the array cannot trust where it
+points. Half-wavelength spacing is the sweet spot.
+
+Also, only the *relative* phase between neighbouring elements carries direction;
+the absolute phase at any one element depends on the total path and tells you
+nothing about angle.
+
+### Checkpoint answers
+
+**Why does an off-broadside wave reach the elements at different times, and how
+does that become an angle?** The wave travels an extra d*sin(theta) to each
+successive element, so it arrives later and with a phase shift between
+neighbouring elements. Because that shift depends on sin(theta), it encodes the
+angle. Summing the elements coherently peaks where they line up, revealing the
+direction.
+
+**What happens if you double the spacing to lambda?** The inter-element phase
+step doubles, the main lobe narrows, and the pattern begins to fold over — the
+phase reaches a whole cycle inside the visible range, so grating lobes appear
+and an incoming direction is no longer unambiguous. The extra lobes come from
+the phase wrapping exactly a full turn at other angles, making those directions
+look identical to the true main lobe.
+
+### Closing the loop
+
+**How a line of antennas turns a time difference into an angle.** A wave from
+theta travels d*sin(theta) farther to each successive element, arriving at a
+different time and phase. The angle is recovered from the phase difference
+between elements, and the array factor peaks where the elements line up.
+
+**What the spacing is and why half a wavelength.** Elements are d apart; the
+standard is lambda/2, where the phase step pi*sin(theta) stays within plus or
+minus pi over the visible range, giving one unambiguous main lobe. Wider spacing
+narrows the beam but risks grating lobes.
+
+**How the phase step forms the steering vector.** The step is
+(2 pi d/lambda) sin(theta), and the steering vector stacks one phase per
+element: a(theta) = [1, e^{j Delta_phi}, ..., e^{j (N-1) Delta_phi}]. For the
+baseline target the step was 61.6 degrees.
+
+**Why the array factor has a main lobe and sidelobes.** Summing the elements
+grows to N at broadside and falls where phases spread and cancel; the central
+hump is the main lobe and the smaller humps are the sidelobes. With 8 elements
+the first null is at 14.5 degrees.
+
+**When and why grating lobes appear.** Past half-wavelength spacing the phase
+step can reach a full 2 pi inside the visible range, adding false main lobes at
+other angles. For d = 1.5 lambda they sat at plus or minus 41.8 degrees. The
+array cannot tell these from the true lobe, which is why half-wavelength spacing
+is standard.
+
+If you can retell these five answers, you know how an array measures direction —
+the coordinate that lets a radar point at a target in angle as well as range and
+velocity.

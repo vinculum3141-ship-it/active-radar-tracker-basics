@@ -1184,3 +1184,120 @@ The learner turned a stream of noisy range and velocity detections into a
 smooth, recursively-updated track, by balancing a model prediction against each
 new measurement through a Kalman gain derived from how much the filter trusts
 each source.
+
+---
+
+## Chapter 07 — Array Geometry and Beam Patterns
+
+### Chapter purpose
+
+Give the learner the third measurement coordinate — angle — by replacing a
+single antenna with a uniform linear array. This is the bridge from the
+time/velocity processing of the earlier notebooks into the spatial processing
+that later notebooks (DOA, interference, beam steering) build on.
+
+### Teaching goal in one sentence
+
+The learner builds an 8-element ULA, derives the inter-element phase step from
+geometry, forms the steering vector and array factor, and reads a beam pattern
+with its main lobe, sidelobes, and grating lobes.
+
+### What the trainer should emphasize
+
+- A single antenna cannot measure direction; an array measures the phase
+  difference between elements.
+- The extra path between elements is `d * sin(theta)`; that is the whole
+  geometry.
+- Half-wavelength spacing is the standard because it avoids grating lobes.
+- The array factor is a coherent sum whose peak is the main lobe and whose
+  residual humps are the sidelobes.
+- Steering is just applying conjugate steering-vector weights; the main lobe
+  follows.
+
+### Suggested presentation flow
+
+#### 1. Bridge from Notebook 06
+
+Remind the learner that range and velocity come from time processing along fast
+and slow time. Pose the missing piece: one antenna has no idea of direction.
+Introduce the array as a way to convert a *path difference* into an angle.
+
+#### 2. Build the geometry with pictures, not matrices
+
+Draw the line of elements and a wavefront arriving at angle theta. Show that
+the extra path to each successive element is `d * sin(theta)`. Keep it
+diagrammatic before any complex numbers appear. Matrices are the last step, not
+the first.
+
+#### 3. Drive the phase step from the path difference
+
+Have the learner compute the inter-element phase `2 pi d sin(theta) / lambda`
+for the baseline 20-degree target at half-wavelength spacing and see the clean
+61.6 degrees. This is the concrete number that makes the steering vector feel
+real.
+
+#### 4. Sum the elements to get the pattern
+
+Show that adding the element phases gives N at broadside and falls away off-
+broadside. Plot the normalized |array factor| and point to the main lobe and
+sidelobes. Use the -13 dB sidelobe and the 14.5-degree first null as the
+readable landmarks.
+
+#### 5. Steer without re-deriving
+
+Let the learner apply steering weights and watch the main lobe move to the
+target's angle. Emphasise that steering is just multiplying by the conjugate
+steering vector — the same pattern, pointing somewhere else.
+
+#### 6. Make grating lobes a consequence, not a footnote
+
+Ask what happens if the spacing grows, then show d = 1.5 lambda with the
+grating lobes at plus or minus 41.8 degrees. Connect it to the phase wrapping
+and to why half a wavelength is the default.
+
+### Likely learner questions and answers
+
+#### Why does the phase step use sin(theta) and not theta?
+
+Because the extra path across a gap depends on the projection of the spacing
+onto the direction of arrival, which is `d * sin(theta)`. At broadside the wave
+crosses the line perpendicularly and the step is zero; at endfire it is
+maximal.
+
+#### Why is the first sidelobe at about -13 dB and not smaller?
+
+For a uniform (unweighted) array the first sidelobe is fixed near -13.3 dB; it
+does not shrink with N. More elements make the main lobe narrower and push the
+sidelobes closer, but they do not lower the nearest sidelobe. Lowering
+sidelobes requires tapering the element weights, which is a later notebook.
+
+#### Is wider spacing always better?
+
+No. It narrows the main lobe but, past half a wavelength, introduces grating
+lobes that are indistinguishable from the real main lobe. The learner should
+finish knowing that half-wavelength spacing is a deliberate compromise, not an
+arbitrary default.
+
+#### Where do the grating lobes come from exactly?
+
+They come from the phase step reaching a full 2 pi within the visible angle
+range: at those angles the sum coherently adds again just as at broadside. The
+spacing pushes a full phase cycle into the visible region, and a false main
+lobe appears at the fold.
+
+### Delivery notes
+
+- Keep the number of elements small (8) so the pattern is easy to interpret;
+  the N section is a stretch, not the main lesson.
+- Use geometry language (path difference, time of arrival) before matrix
+  language (array factor).
+- Keep the plot central; the beam pattern is the payoff visual of the notebook.
+- Let the grating-lobe case be a discovery the learner triggers by varying the
+  spacing, rather than a fact announced upfront.
+
+### One-sentence close
+
+The learner converted the path difference between the elements of an 8-element
+line array into an inter-element phase step, formed a steering vector, and read
+the resulting beam pattern — main lobe, sidelobes, and the grating lobes that
+half-wavelength spacing exists to avoid.

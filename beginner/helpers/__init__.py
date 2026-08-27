@@ -1,5 +1,11 @@
 """Beginner notebook helpers."""
 
+from .array import (
+    array_factor,
+    first_null_angle_deg,
+    inter_element_phase_rad,
+    steering_vector,
+)
 from .channel import add_echo, awgn, single_target_channel
 from .constants import RADAR_CONSTANTS, BaselineRadarSpec, baseline_spec
 from .doppler import (
@@ -33,13 +39,16 @@ __all__ = [
     "RADAR_CONSTANTS",
     "BaselineRadarSpec",
     "add_echo",
+    "array_factor",
     "awgn",
     "baseline_spec",
     "build_pulse_stack",
     "delay_samples_for_range",
     "doppler_frequency_hz",
     "duty_cycle",
+    "first_null_angle_deg",
     "instantaneous_frequency_hz",
+    "inter_element_phase_rad",
     "lfm_chirp",
     "matched_filter",
     "predict",
@@ -51,6 +60,7 @@ __all__ = [
     "run_kalman_track",
     "single_target_channel",
     "state_transition_matrix",
+    "steering_vector",
     "update",
     "velocity_from_doppler",
     "wavelength_m",
