@@ -1505,3 +1505,90 @@ The interferer is gone; the target is preserved.
 If you can retell these five answers, you can point an array and deliberately
 silence a jammer while keeping the target — the sharpest tool in the beamforming
 kit.
+
+## Chapter 10 — Integration and Portfolio Artifacts
+
+### What you should be able to explain
+
+- How the whole chain fits together, from waveform to range, velocity, angle, and null.
+- Where each earlier notebook contributes to the final system.
+- How the stages share one scene and one set of helpers, so their numbers agree.
+- How the final artifacts are produced and exported, including saving the portfolio figure.
+- How to tell the entire radar story end to end in your own words.
+
+### The whole chain in one scene
+
+Notebook 10 does not add new physics - it joins the pieces you built one at a
+time into one coherent pipeline and gathers the results into a single portfolio
+artifact. A shared scene (target at 1000 m moving at 20 m/s, with an interferer
+at -30 degrees) flows through every stage, so the numbers all stay consistent.
+
+### Restoring delay, Doppler, and angle
+
+The snag in earlier notebooks - that the matched filter, the range-Doppler map,
+and the beam all plain-normalize their own strongest peak - is resolved here by
+reusing the packaged helpers on one scene. Each stage is a short cell that calls
+the helper its own notebook built, so the range read by the matched filter, the
+velocity read by the range-Doppler map, and the angle read by the DOA scan all
+agree without hand-tuning the normalisation.
+
+### The range measurement (Notebook 4)
+
+Feed the echo to the matched filter. The chirp compresses into a sharp peak whose
+position is the two-way delay, converted to range. With a 5 MHz bandwidth the
+range resolution is about 30 m, and the baseline target at 1000 m reads back at
+997 m.
+
+### The range-Doppler map (Notebook 5)
+
+Repeat over the 64 pulses with the target moving. The slow-time FFT turns the
+echo's phase drift into a velocity axis, producing a range-Doppler map with
+range on one axis and velocity on the other; the target stands out at
+(1000 m, 20 m/s).
+
+### The beam, the DOA scan, and the null (Notebooks 7-9)
+
+The same array that compressed the echo in range is now used in angle. The array
+factor shows the main lobe and sidelobes of the 8-element half-wavelength beam;
+the Bartlett scan of the covariance finds the target's direction at 20 degrees;
+and steering plus LCMV weights drive the interferer down from -18.6 dB (steer
+only) to about -319 dB, while the target is held at 0 dB.
+
+### The portfolio figure and the export
+
+The final cell gathers four panels - waveform, range-Doppler map, beam-null
+overlay, and DOA scan - onto one figure, then saves it to a PNG on disk. That one
+figure is the beginner-track portfolio artifact: range, velocity, direction, and
+interference rejection all on one page.
+
+### Common mistake
+
+Treating the stages as independent boxes that happen to share a plot. They are
+not independent - they share one scene and one set of helpers, and the numbers
+must stay consistent: the same delay gives the same range whether read by the
+matched filter or the map, and the same 20-degree angle appears in the beam, the
+DOA scan, and the null. Also remember the null is only as good as the constraint:
+you must know the interferer's direction (via a DOA scan) before you can null it.
+
+### Checkpoint answers
+
+**How a transmitted chirp becomes range, velocity, and direction.** The chirp is
+compressed by the matched filter into a peak whose delay gives range (Notebook 4).
+The phase drift across the slow-time pulses gives the Doppler velocity (Notebook
+5). The delay differences across the array give the angle, found by scanning the
+array factor or a spatial spectrum (Notebooks 7-8), and the same angle is used to
+steer and null (Notebook 9).
+
+**Which notebook introduced each piece.** The chirp came from Notebook 1, the
+matched filter from Notebook 4, the range-Doppler map from Notebook 5, the Kalman
+track from Notebook 6, the steering vector from Notebook 7, the Capon scan from
+Notebook 8, and the LCMV null from Notebook 9.
+
+### Closing the loop
+
+The five answers from the opening now line up: a single scene flows through the
+stages, each stage reuses the helper its own notebook built, the numbers agree
+across range, velocity, and angle, the artifacts are gathered and exported, and
+you can retell the story in one breath - transmit, echo, compress for range, FFT
+for velocity, scan for direction, steer and null to hide a jammer. If you can
+defend that sentence, you command the whole chain.

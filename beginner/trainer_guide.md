@@ -1523,3 +1523,103 @@ The learner chose weights that point the main lobe at the target and drive a dee
 null on a strong interferer, applied them before the matched filter, and saw the
 interferer fall to the noise floor in the range-Doppler map while the target held
 its true level.
+
+## Chapter 10 — Integration and Portfolio Artifacts
+
+### Chapter purpose
+
+Close the beginner track by joining the pieces into one coherent pipeline and
+producing the final portfolio artifact. The learner runs the whole chain on a
+shared scene - waveform, range, velocity, angle, and adaptive null - then gathers
+the results onto a single figure and exports it. This is the final story review.
+
+### Teaching goal in one sentence
+
+The learner runs the full radar chain on one scene, explains where every earlier
+notebook fits, and produces a single portfolio figure (waveform, range-Doppler
+map, beam-null overlay, and DOA scan) plus a PNG export.
+
+### What the trainer should emphasize
+
+- This notebook adds no new physics; it is a recap that runs the chain on one scene.
+- Every stage reuses the helper its own notebook built, so all numbers stay consistent.
+- The shared scene (1000 m, 20 m/s target; interferer at -30 deg) ties the stages together.
+- The portfolio figure is the deliverable - one image telling the whole story.
+- The trainer should ask the learner to explain the whole chain in their own words.
+
+### Suggested presentation flow
+
+#### 1. Frame it as the final story review
+
+State that this is a recap, not new content, and that the learners already own
+every piece. Their job is to place each stage in the system and produce one
+artifact that shows the whole chain.
+
+#### 2. Run the chain stage by stage
+
+Step through the short code cells, each calling a packaged helper built in an
+earlier notebook: the waveform, the matched-filter range peak (997 m), the
+range-Doppler map target (1000 m, 20 m/s), the beam and DOA scan (20 deg), and
+the steering + LCMV null (interferer from -18.6 dB to -319 dB, target held at
+0 dB). Point out that the numbers carry over consistently.
+
+#### 3. Build the portfolio figure
+
+Show how the four panels - waveform, range-Doppler map, beam-null overlay, and
+DOA scan - land on one figure, then save it to a PNG. Emphasise that this single
+image is the beginner-track portfolio artifact.
+
+#### 4. Ask for the story in the learner's own words
+
+This is the key deliverable. Ask each learner to explain the full chain: how a
+transmitted chirp becomes a range, a velocity, a direction, and a nulled scene.
+Encourage them to name which notebook introduced each stage.
+
+#### 5. Close with the map of the track
+
+Review where every notebook fits (1-2 waveform and channel, 3 noise, 4 range, 5
+velocity, 6 tracking, 7-8 angle, 9 nulling, 10 integration) so the whole course
+closes as one connected system.
+
+### Likely learner questions and answers
+
+#### Which stage gives the same numbers in two different places?
+
+Range. The matched-filter peak reads 997 m, and the range-Doppler map places the
+target at about 1000 m - the same delay converted to range two ways, now
+consistent because both reuse the same helper and scene.
+
+#### How is the direction and the null connected?
+
+The DOA scan finds the 20-degree target and would also find the -30-degree
+interferer (Notebook 8). That direction becomes the constraint for the LCMV null
+(Notebook 9). Integration means finding the direction first, then nulling it.
+
+#### Is the portfolio figure pre-built?
+
+Roughly - the panels are just the earlier plots on one figure. The value is that
+the learner produced them consistently and can explain each one, which is what
+makes it a portfolio artifact rather than a screenshot.
+
+#### How much of the chain should I memorise?
+
+Less than it feels. If you can retell the one-sentence story - transmit, echo,
+compress for range, FFT for velocity, scan for angle, steer and null - and point
+to which notebook each step came from, you have command of the course.
+
+### Delivery notes
+
+- Keep the tone affirming: this is the reward notebook where the pieces snap
+  together. Let the learners drive the explanations.
+- Do not dwell on implementation; focus on the "where is each stage and why does
+  the number agree" story.
+- The portfolio figure and the narrated walk-through are the assessment - prefer
+  a spoken retelling over written notes.
+- Use the chapter map to remind learners how far they have come across the track.
+
+### One-sentence close
+
+The learner ran the full radar chain on one shared scene, named where every
+earlier notebook fits, and produced a single exported portfolio figure - the
+waveform, the range-Doppler map, the DOA direction, and the adaptive null - that
+tells the beginner radar story from transmitter to jammer silence.
