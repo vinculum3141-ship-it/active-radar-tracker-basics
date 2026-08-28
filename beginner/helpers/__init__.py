@@ -33,6 +33,7 @@ from .math import (
     range_resolution_from_pulse_width,
     wavelength_m,
 )
+from .steering import lcmv_weights, steering_weights
 from .waveforms import (
     instantaneous_frequency_hz,
     lfm_chirp,
@@ -55,6 +56,7 @@ __all__ = [
     "first_null_angle_deg",
     "instantaneous_frequency_hz",
     "inter_element_phase_rad",
+    "lcmv_weights",
     "lfm_chirp",
     "matched_filter",
     "mvdr_spectrum",
@@ -69,6 +71,7 @@ __all__ = [
     "single_target_channel",
     "state_transition_matrix",
     "steering_vector",
+    "steering_weights",
     "update",
     "velocity_from_doppler",
     "wavelength_m",

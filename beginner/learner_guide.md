@@ -1379,3 +1379,129 @@ scene holds only the interferer.
 
 If you can retell these five answers, you understand how a radar turns its array
 into a direction-finder that stays trustworthy even with loud neighbours.
+
+## Chapter 9 — Beam Steering and Adaptive Nulling
+
+### What you should be able to explain
+
+- What the array weights do, and how steering points the main lobe at the target.
+- How an LCMV constraint forces a null at the interferer's angle.
+- How deep that null is, and why steering alone cannot provide it.
+- Why the null is applied before the matched filter.
+- How an adaptive null removes the interferer from the range-Doppler map while preserving the target.
+
+### Combining the array is choosing weights
+
+Every way of using the array reduces to one weight vector w, one complex gain
+per element. The combined output is
+
+    y = w^H x
+
+where x is the snapshot at one moment. The beam pattern you drew in Notebook 07
+is just |w^H a(theta)|^2 — how strongly this weighting responds to a wave from
+each angle. So pointing the array and nulling an interferer are the same act:
+choosing w.
+
+### Steering the beam at the target
+
+To listen to the target at 20 degrees, choose weights w = a(20)/N — the target's
+own steering vector, scaled to unit response. A wave from 20 degrees then adds
+coherently across the elements (the main lobe points there), while a wave from
+another angle falls into the sidelobes. The main lobe peaks exactly at 20
+degrees, but the response at the interferer's -30 degrees is only about -18.6 dB
+down: it still leaks through a sidelobe.
+
+### Why steering alone cannot reject the interferer
+
+Steering points the beam but imposes no constraint to reject other directions.
+At -30 degrees the response is only -18.6 dB below the main lobe, so an
+interferer 30 dB stronger than the target arrives about 30 - 18.6 = 11 dB above
+the target even though you aimed straight at the target. Pointing is not
+rejection.
+
+### Forcing a null: the LCMV constraint
+
+Collect the steering vectors of the target and interferer into a constraint
+matrix C = [a(20), a(-30)] and demand
+
+    C^H w = [1, 0]
+
+meaning "respond with gain 1 to the target and gain 0 to the interferer". The
+linear-constrained minimum-variance (LCMV) choice satisfies this while also
+minimising output power:
+
+    w = C (C^H C)^{-1} f,   f = [1, 0]
+
+This is constraint-driven nulling: you state the null angle directly instead of
+scanning for it, as with Capon. The constraint check came out exactly [1, 0], the
+response at the target was 0 dB, and the response at -30 degrees fell to about
+-319 dB — a null limited only by numerical precision, versus the -18.6 dB that
+steering alone left.
+
+### Why the null happens before the matched filter
+
+The null is a *spatial* operation (which direction a wave came from), while the
+matched filter is a *temporal* one (how far away it is). Apply the spatial
+weights to the raw array snapshot first, cancelling the interference in angle;
+then range-compress and Doppler-process the clean signal that remains. Nulling
+after pulse compression would try to cancel a mixed signal and would not be clean.
+
+### The payoff in the range-Doppler map
+
+With steering-only weights, the 30 dB-stronger interferer leaked through the
+sidelobe and inflated both Doppler bins at the target's range, muddling the map.
+After the LCMV null, the interferer's own bin fell back to the noise floor (1471
+down to about 376, the same as the interferer-free reference) while the target's
+bin matched its clean, no-interference level (422 against 429). The interferer is
+gone and the target is preserved at exactly its true strength.
+
+### Common mistake
+
+A common mistake is to think steering toward the target should be enough. It is
+not: steering has no constraint to reject other directions, so it leaves
+sidelobes a strong interferer punches through. Rejection requires an explicit
+null, which is exactly what the LCMV constraint adds.
+
+Another is to apply the null after pulse compression. The null is a spatial
+operation on the array snapshot; the matched filter is a temporal one. Cancel in
+space first, then range- and Doppler-process what remains.
+
+### Checkpoint answers
+
+**Why does steering toward the target not remove a strong interferer that sits
+off to the side?** Steering sets unit response at the target but puts no
+constraint on other directions. The beam keeps sidelobes, and at -30 degrees the
+response is only -18.6 dB below the main lobe, so an interferer 30 dB stronger
+still arrives roughly 11 dB above the target.
+
+**What does the LCMV constraint C^H w = [1, 0] demand, and what does it do to the
+beam at -30 degrees?** It demands the weights respond with gain 1 to the target's
+steering vector and gain 0 to the interferer's. At -30 degrees the beam response
+collapses to about -319 dB, a deep null, while staying at 0 dB at the target.
+
+### Closing the loop
+
+**What the weights do and how steering points the lobe.** Every use of the array
+is a weight vector w. Steering picks w = a(target)/N so a wave from the target
+adds coherently and the main lobe points there.
+
+**How an LCMV constraint forces a null.** You put the target and interferer
+steering vectors into C and demand C^H w = [1, 0]. Solving w = C (C^H C)^{-1} f
+picks the weights that keep the target at full gain and set the interferer to zero.
+
+**How deep the null is and why steering cannot give it.** The LCMV null sat at
+about -319 dB versus the -18.6 dB sidelobe steering left. Steering only points;
+it has no constraint to reject other directions.
+
+**Why the null happens before the matched filter.** The null is spatial (angle),
+the matched filter is temporal (range). Cancel the interference in angle first,
+then range- and Doppler-process the clean signal.
+
+**How the null removes the interferer from the range-Doppler map.** Before, the
+interferer inflated both Doppler bins at the target's range. After the null, its
+bin fell to the noise floor while the target's matched its interferer-free level.
+The interferer is gone; the target is preserved.
+
+If you can retell these five answers, you can point an array and deliberately
+silence a jammer while keeping the target — the sharpest tool in the beamforming
+kit.

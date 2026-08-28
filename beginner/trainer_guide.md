@@ -1414,3 +1414,112 @@ The learner turned the array into a direction finder — reading angles from a
 scanned spatial spectrum — and learned that when close targets blur together, or
 a loud interferer threatens to mask the target, the adaptive Capon scan sees
 what the conventional Bartlett scan cannot.
+
+## Chapter 09 — Beam Steering and Adaptive Nulling
+
+### Chapter purpose
+
+Let the learner turn beamforming from passive observation into a deliberate
+design choice: point the array at the target with steering weights, then force a
+deep null on a strong interferer with LCMV constraints, and verify the payoff in
+a range-Doppler map. This is the practical culmination of the array work from
+Notebooks 07 and 08.
+
+### Teaching goal in one sentence
+
+The learner chooses array weights that both steer the main lobe at the target and
+null a loud interferer, applies them before the matched filter, and shows the
+interferer disappearing from the range-Doppler map while the target is preserved.
+
+### What the trainer should emphasize
+
+- Every use of the array is a weight vector w; steering and nulling are the same act.
+- Steering points the beam but leaves sidelobes; a strong interferer punches through.
+- LCMV demands C^H w = [1, 0]: unit response on the target, zero on the interferer.
+- The null is spatial and must be applied before the (temporal) matched filter.
+- In the RD map the target is preserved at its true level while the interferer's bin falls to noise.
+
+### Suggested presentation flow
+
+#### 1. Recast weights as the whole game
+
+Open by showing that combining the array is always y = w^H x. Everything —
+pointing, scanning, nulling — is just picking w. This reframes the earlier
+notebooks as special choices and prepares the learner to "design" a weight.
+
+#### 2. Steer first, then expose the shortfall
+
+Build steering weights toward the target and show the main lobe at 20 degrees.
+Ask what happens to the interferer: the answer, -18.6 dB sidelobe, sets up the
+need for a null. Emphasise that pointing is not rejection.
+
+#### 3. Introduce LCMV as a constraint, not a formula first
+
+State what you want in words: "respond at full gain to the target, nothing to the
+interferer", then write C^H w = [1, 0]. Derive w = C (C^H C)^{-1} f as the
+minimal-power way to satisfy it. Verify C^H w = [1, 0] on the numbers.
+
+#### 4. Show the null depth as the payoff
+
+Overlay the steering-only and LCMV beam patterns. The -319 dB null at -30 degrees
+versus the -18.6 dB sidelobe is the cleanest single figure of the notebook.
+
+#### 5. Move to the RD map, keeping the order explicit
+
+Build the array scene with a target and a strong interferer, plus a target-only
+reference. Apply steering-only weights (muddled map) and LCMV weights (interferer
+gone). Stress that the weights act before the matched filter because the null is
+spatial and pulse compression is temporal.
+
+#### 6. Read the before/after table together
+
+The target bin after nulling matches the no-interference reference, while the
+interferer bin falls to the noise floor. This is the "target remains visible"
+criterion from the playbook, shown quantitatively.
+
+### Likely learner questions and answers
+
+#### Why is the target's bin bigger "before" than after?
+
+Before, the strong interferer leaks through the beam's sidelobe and adds energy
+into the target's range-Doppler bin, inflating the reading. After the null, that
+leaked energy is removed and the target returns to its true level — which is why
+the "after" value matches the no-interference reference.
+
+#### Why not use Capon from Notebook 08 instead of LCMV here?
+
+Capon scans for nulls automatically from a sample covariance, which is great when
+you do not know the interferer's direction. LCMV lets you specify the null angle
+directly with a hard constraint. This notebook's goal is to make the null a
+deliberate choice, so LCMV is the cleaner teaching tool; both rely on the same
+spatial-null idea.
+
+#### Does the null hurt the target?
+
+No. The constraint fixes unit response at the target's angle, and the beam
+response there stays 0 dB. The RD map confirms it: the target bin after equals
+the no-interference reference.
+
+#### How many nulls can the array support?
+
+An 8-element array can satisfy as many constraints as it has degrees of freedom —
+up to about 7 or 8, though with many constraints the weights trade off sensitivity
+and the pattern distorts. The stretch lets the learner discover where it breaks.
+
+### Delivery notes
+
+- Lead with the "weights are the whole game" framing; it makes the notebook feel
+  like design rather than computation.
+- Let the learner predict the -18.6 dB leakage before you reveal it, then let them
+  anticipate the fix.
+- Pull the RD-map demonstration because the plot and the table tell the story;
+  avoid drowning in per-cell numbers.
+- Keep the control (target-only) scene so "target preserved" is verified against a
+  true reference, not assumed.
+
+### One-sentence close
+
+The learner chose weights that point the main lobe at the target and drive a deep
+null on a strong interferer, applied them before the matched filter, and saw the
+interferer fall to the noise floor in the range-Doppler map while the target held
+its true level.
