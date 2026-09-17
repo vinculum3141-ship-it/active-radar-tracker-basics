@@ -1,0 +1,155 @@
+[[slnc 800]] Direction of Arrival and Interference. [[slnc 600]]
+
+This lesson turns an antenna array's beam pattern into an angle measurement. We will scan the possible directions, see why a conventional scan can blur two nearby sources, and learn how an adaptive scan can reveal a weak target beside strong interference.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+Notebook 07 built a line of antennas and showed how incoming angle creates a pattern of phase across the elements. The array could point its listening beam. Now we ask where an actual echo came from. [[slnc 350]]
+
+By the end, you should be able to explain how repeated array snapshots become a spatial spectrum, what a Bartlett scan measures, why two close sources blur together, how a Capon scan sharpens the angle estimate, and how it keeps a weak target visible beside a much stronger interferer.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+We have measured range from echo delay, velocity from phase changes across pulses, and a stable track from repeated noisy detections. The array adds spatial information. Its elements receive the same incoming wave with different phases, depending on the direction of arrival. [[slnc 350]]
+
+The last lesson showed how to create a beam that listens in a chosen direction. This lesson sweeps that listening direction across the visible field. A peak in the resulting spatial spectrum tells us where a source is. [[slnc 350]]
+
+Our baseline uses eight antenna elements separated by half a wavelength. The target sits at 20 degrees from broadside. Later we add an interferer at minus 30 degrees.
+
+[[slnc 800]] Begin with array snapshots. [[slnc 600]]
+
+At one instant, every antenna element records a complex echo value. Collect those eight values into a snapshot: one complex number per element. [[slnc 350]]
+
+The values contain the source's phase progression across the array, plus receiver noise. If there are several incoming sources, their contributions add at each antenna. One snapshot can be noisy, so we collect many. [[slnc 350]]
+
+This lesson uses 2,000 snapshots for its main scans. Repeated observations give a steadier description of which element signals move together and how their phases relate.
+
+[[slnc 800]] Covariance captures the spatial pattern. [[slnc 600]]
+
+For each snapshot, compare every element's complex value with every other element's value. Then average those comparisons over the snapshots. The result is an eight-by-eight sample covariance matrix, called R. [[slnc 350]]
+
+An entry of R describes the average relationship between one pair of antennas. The diagonal entries describe power at individual elements. The off-diagonal entries preserve the relative phase and correlation across the array. [[slnc 350]]
+
+R gathers the information both direction-finding methods need. It does not name an angle by itself. To find the angle, we compare its spatial pattern with the phase pattern expected from each candidate direction.
+
+[[slnc 800]] Scan the candidate angles. [[slnc 600]]
+
+Imagine pointing the array's listening beam to minus 90 degrees, then stepping through all angles to plus 90 degrees. At each angle, we know the steering vector: the phase pattern a wave from that direction would place on the eight elements. [[slnc 350]]
+
+We calculate a response for each candidate angle and plot response against angle. This is a spatial spectrum. A peak means the recorded array data agrees strongly with a source arriving from that direction. [[slnc 350]]
+
+Unlike a time-frequency spectrum, the horizontal axis here is physical direction. The peak location is a direction-of-arrival estimate.
+
+[[slnc 800]] Bartlett points a fixed beam and reads the power. [[slnc 600]]
+
+The first method is the Bartlett scan, also called conventional or delay-and-sum beamforming. For each candidate angle, it aligns the array with that angle's steering vector, combines the elements, and measures the output power. [[slnc 350]]
+
+In compact notation, the Bartlett power is the steering vector's conjugate transpose, times R, times the steering vector. The equation is a weighted power measurement. Its physical meaning is simple: point the fixed beam, then ask how much signal power it hears. [[slnc 350]]
+
+With one target at 20 degrees, the Bartlett spectrum has a peak at 20 degrees. The scan correctly names the target's arrival direction.
+
+[[slnc 800]] Two nearby targets expose the fixed beam's limit. [[slnc 600]]
+
+Now place a second target at 30 degrees. The sources are only 10 degrees apart. The eight-element array's conventional beam is fairly broad. In notebook 07, its first nulls were about 14.5 degrees to either side of the beam centre, a total null-to-null width near 29 degrees. [[slnc 350]]
+
+Each target produces a broad Bartlett response. Those responses overlap heavily. Instead of two distinct peaks at 20 and 30 degrees, the notebook's scan shows one wide bump between them. [[slnc 350]]
+
+The problem is not that the scan searched too coarsely. A finer list of trial angles cannot make the physical beam narrower. The fixed array aperture limits how well Bartlett separates these two sources.
+
+[[slnc 800]] Capon adapts the combining weights. [[slnc 600]]
+
+The second method is Capon, also called M V D R: minimum variance distortionless response. Its weights are chosen anew for each look angle. [[slnc 350]]
+
+The rule has two parts. Keep unit response to a wave from the direction being tested. At the same time, choose the weights that minimize power arriving from other directions. [[slnc 350]]
+
+This means that when we look toward one source, the beamformer can place deep rejection in the directions of other sources. It uses the covariance R to work out where unwanted energy lies. [[slnc 350]]
+
+The Capon spatial spectrum can be written as one divided by the steering vector's conjugate transpose, times the inverse of R, times the steering vector. The inverse covariance makes the response adaptive rather than a fixed beam pattern.
+
+[[slnc 800]] Capon separates the 20- and 30-degree sources. [[slnc 600]]
+
+Run the two-source scene through both methods. Bartlett gives one merged bump. Capon gives two sharper peaks: one near 20 degrees and one near 30 degrees. [[slnc 350]]
+
+The added detail does not come from extra antennas. Both scans use the same eight elements and the same snapshots. Capon uses the measured spatial relationships in R to suppress competing energy while keeping the tested direction intact. [[slnc 350]]
+
+That extra resolving power has a cost. Capon needs a reliable covariance estimate and a stable inverse. Too few snapshots can make its sharp-looking result untrustworthy.
+
+[[slnc 800]] Read the two spectra side by side. [[slnc 600]]
+
+Picture two plots over the same range of angles. The Bartlett curve rises into one broad hill between the two sources. It cannot tell whether the hill contains one target or two. [[slnc 350]]
+
+The Capon curve rises into two separate, narrow peaks. Their positions identify the two directions. [[slnc 350]]
+
+The comparison shows the difference between a conventional fixed response and an adaptive response informed by the observed scene. Sharp peaks are useful, but only when the covariance was estimated from enough good data.
+
+[[slnc 800]] A strong interferer changes the problem. [[slnc 600]]
+
+Next, keep the weak target at 20 degrees and add a loud interferer at minus 30 degrees. Its signal is 20 decibels stronger in power than the target's signal. [[slnc 350]]
+
+The interferer is far away in angle, but its conventional beam response spreads into other directions through sidelobes. In the Bartlett scan, that leaked power dominates the display. The peak near the weak target is buried. [[slnc 350]]
+
+If we trusted only the Bartlett spectrum, we might conclude that the scene contains the interferer and miss the actual target. This is masking: a real return becomes difficult to distinguish under a stronger neighbour's response.
+
+[[slnc 800]] Capon keeps the weak target visible. [[slnc 600]]
+
+At the target's 20-degree look angle, Capon chooses weights that preserve a signal from 20 degrees while strongly rejecting the interferer at minus 30 degrees. The interferer's power is not allowed to spill across the target's part of the scan as freely. [[slnc 350]]
+
+The interferer can still appear as a strong peak when the scan looks at its own direction. But when the scan looks toward the target, the adaptive weights place a deep null toward the interferer. The target's separate peak survives near 20 degrees. [[slnc 350]]
+
+This is the practical benefit of adaptive spatial filtering. The radar can keep a weaker direction visible even when a brighter reflector or jammer is present elsewhere in the scene.
+
+[[slnc 800]] Compare before and after interference. [[slnc 600]]
+
+With only the 20-degree target present, both Bartlett and Capon show a peak at 20 degrees. Neither has trouble with that simple scene. [[slnc 350]]
+
+After adding the strong minus-30-degree interferer, the results diverge. Bartlett's broad fixed response masks the weak 20-degree target. Capon confines the strong source more tightly and retains a separate target peak. [[slnc 350]]
+
+That four-way comparison matters more than one impressive-looking plot. It shows what changed when interference arrived, and which method preserved the information we cared about.
+
+[[slnc 800]] Reliable covariance needs enough snapshots. [[slnc 600]]
+
+The covariance R is estimated from a finite collection of snapshots. If there are too few, random variation can dominate the estimate. Inverting a poor estimate can make Capon's spectrum unstable, with false or shifting peaks. [[slnc 350]]
+
+Our main examples use 2,000 snapshots. The notebook's stretch comparison drops to just eight snapshots, the same count as the antenna elements. That is a warning case: there may not be enough independent information to trust the covariance inverse. [[slnc 350]]
+
+The lesson is not that Capon always wins. It wins here because the array data are sufficient to estimate the spatial relationships it needs. More adaptive power demands more dependable measurements.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+The first mistake is to think a finer angle grid alone will separate close sources. Sampling a broad Bartlett bump at more points still leaves a broad bump. Resolving them calls for a larger physical aperture or a method that uses the data adaptively. [[slnc 350]]
+
+The second mistake is to think Capon simply removes the interferer from the whole scene. It does not. At each look angle, it preserves that direction and suppresses the others. The interferer remains visible at its own angle; it is rejected when we look toward the target. [[slnc 350]]
+
+The third mistake is to trust every narrow Capon peak. A poorly estimated covariance can create misleading structure. Check that the snapshot count and data quality support the inverse before interpreting small details.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: how does a spatial spectrum become an angle measurement? [[slnc 600]]
+
+The array records complex snapshots. Averaging their element-by-element relationships gives the covariance R. We compare R with the steering vector expected at each trial angle. Peaks in the scan reveal likely arrival directions. [[slnc 350]]
+
+Second: what does Bartlett do, and why do close targets blur? [[slnc 600]]
+
+Bartlett points a fixed beam at each angle and reads its power. The beam's response is broad enough that sources at 20 and 30 degrees overlap, leaving one merged peak in this eight-element example. [[slnc 350]]
+
+Third: how does Capon improve the estimate? [[slnc 600]]
+
+It chooses adaptive weights that keep unit response to the tested direction while reducing power from other directions. With a good covariance estimate, the 20- and 30-degree sources appear as two separate peaks. [[slnc 350]]
+
+Fourth: why can an interferer mask the target in Bartlett? [[slnc 600]]
+
+The interferer at minus 30 degrees is 20 decibels stronger in power. Its broad conventional response leaks into other angles and buries the weaker 20-degree target feature. [[slnc 350]]
+
+Fifth: how does Capon recover the target? [[slnc 600]]
+
+When looking at 20 degrees, Capon preserves the target direction and places strong rejection toward the interferer. The weak target's peak remains visible, even though the strong interferer still appears at its own angle.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+This lesson turned the antenna array into a direction-measuring instrument. Complex snapshots were combined into a sample covariance, and a spatial scan translated the array's phase relationships into peaks at arrival angles. [[slnc 350]]
+
+Bartlett gave the simple conventional scan. It found one isolated target but merged two targets 10 degrees apart, and a strong interferer masked a weaker target. [[slnc 350]]
+
+Capon used the covariance adaptively. In the notebook's well-sampled examples, it separated the nearby sources and preserved the weak target beside interference. Its price is the need for enough reliable snapshots. [[slnc 350]]
+
+We can now measure range, velocity, and direction, while recognizing when a loud neighbour may hide a target. The next lesson uses these ideas to steer beams and place adaptive nulls more deliberately.

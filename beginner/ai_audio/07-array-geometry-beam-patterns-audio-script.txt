@@ -1,0 +1,155 @@
+[[slnc 800]] Array Geometry and Beam Patterns. [[slnc 600]]
+
+This lesson explains how a line of antenna elements gives the radar a sense of direction. We will follow one incoming wave across the array, watch its phase change from element to element, and see how the array forms a beam.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+We can already estimate a target's range and radial velocity. But a range alone places the target somewhere on a circle around the radar. It does not say which direction to look. [[slnc 350]]
+
+By the end, you should be able to explain how arrival time differs across a line of antennas, why half-wavelength spacing is useful, how phase differences form a steering vector, why a beam pattern has a main lobe and sidelobes, and how grating lobes can make direction ambiguous.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+The earlier lessons built the transmitted waveform, recovered a weak echo, estimated range and velocity, and combined noisy detections into a stable track. [[slnc 350]]
+
+Now we add angle. The target can be at the correct range and velocity yet still lie in many possible directions. A single antenna cannot compare arrival times across space. Several antennas placed along a line can. [[slnc 350]]
+
+This lesson builds the geometry and the way the array listens. The next lesson will use those ideas to estimate an actual direction of arrival and examine interference.
+
+[[slnc 800]] Picture a line of antenna elements. [[slnc 600]]
+
+A uniform linear array contains identical antenna elements placed along a straight line, with the same gap between neighbours. We call that gap the element spacing, d. [[slnc 350]]
+
+Our teaching array has eight elements. They lie along a horizontal line. The first element is at one end, and every following element is another distance d along that line. [[slnc 350]]
+
+Broadside is the direction straight out from the line, perpendicular to the array. We call broadside zero degrees. Directions to either side have positive or negative angles from broadside.
+
+[[slnc 800]] An angled wave reaches the elements at different times. [[slnc 600]]
+
+Imagine a broad, nearly flat wavefront travelling toward the array. If it arrives from broadside, it reaches every element at almost the same instant. Its path to each element is the same length. [[slnc 350]]
+
+If it arrives from an angle, one element is slightly closer to the approaching wavefront. The next element receives that same wave a little later. Across one gap, the extra path length is d times the sine of the arrival angle. [[slnc 350]]
+
+The extra path is tiny, but the carrier wave is sensitive to fractions of a wavelength. A path difference becomes a phase difference. That relative phase, not the absolute phase at one antenna, carries the direction information.
+
+[[slnc 800]] Start with the wavelength. [[slnc 600]]
+
+The radar carrier is 2.45 gigahertz. Its wavelength is about 12.2 centimeters. That is the physical distance covered by one full cycle of the carrier. [[slnc 350]]
+
+The baseline array places its elements half a wavelength apart, about 6.1 centimeters. This is close enough that the phase change between adjacent elements stays within one half-turn in either direction for visible arrival angles. [[slnc 350]]
+
+If the wave comes from broadside, the extra path across a gap is zero. Near the edge of the visible field, the extra path can approach the whole 6.1-centimeter gap.
+
+[[slnc 800]] Convert path difference into a phase step. [[slnc 600]]
+
+One full wavelength of extra travel corresponds to one full turn of phase: 360 degrees, or two pi radians. [[slnc 350]]
+
+The phase step between neighbouring elements is therefore two pi times the element spacing divided by wavelength, multiplied by the sine of the arrival angle. With half-wavelength spacing, that simplifies to pi times the sine of the angle. [[slnc 350]]
+
+For the baseline target at 20 degrees from broadside, the sine is about 0.342. The phase step is about 1.07 radians, or 61.6 degrees, from one element to the next. [[slnc 350]]
+
+Picture a clock hand at every antenna. Moving one element along the line advances that hand by about 62 degrees. Moving two elements advances it by about twice that amount. This regular stepping is the signature of the target's direction.
+
+[[slnc 800]] The steering vector records the phase pattern. [[slnc 600]]
+
+We gather the complex signal from each element into one list called the steering vector. Its first entry has a reference phase of zero. Its second entry advances by one phase step. Its third advances by two steps. The pattern continues across all eight elements. [[slnc 350]]
+
+The entries are complex numbers because each one must retain both amplitude and phase. This is familiar from Doppler: keeping the in-phase and quadrature parts lets us see how a signal rotates. [[slnc 350]]
+
+The steering vector answers a physical question. If a wave arrives from a chosen angle, what relative phase should appear at each antenna? Different angles produce different phase patterns.
+
+[[slnc 800]] Combine the elements to form a beam. [[slnc 600]]
+
+The radar can multiply each element's signal by a chosen complex weight and add the results. This is coherent combining. The result depends on the wave's arrival angle. [[slnc 350]]
+
+Start with equal weights, so we do not deliberately steer the array. A wave from broadside reaches the elements with matching phases. All eight contributions add together. The response is strong. [[slnc 350]]
+
+Turn away from broadside and the phase advances across the line. The eight contributions no longer point in the same direction on the complex plane. Some cancel one another, and the response weakens. [[slnc 350]]
+
+The response plotted against angle is called the array factor, or beam pattern. It shows which directions the array hears strongly and which it suppresses.
+
+[[slnc 800]] Read the main lobe and sidelobes. [[slnc 600]]
+
+The tallest central part of the unsteered pattern is the main lobe. It points at broadside, where the elements add most strongly. [[slnc 350]]
+
+Move away from the centre and the response falls to a first null: a direction where the weighted signals cancel almost completely. Beyond that null, smaller humps appear. These are sidelobes, caused by incomplete cancellation at other angles. [[slnc 350]]
+
+Sidelobes matter because the array still hears signals arriving outside the main listening direction. A strong unwanted signal entering through a sidelobe can still affect the radar. [[slnc 350]]
+
+The main lobe tells us where the array is most sensitive. The nulls and sidelobes tell us how sharply it separates that direction from the rest of the scene.
+
+[[slnc 800]] Beamwidth describes angular selectivity. [[slnc 600]]
+
+For eight elements at half-wavelength spacing, the first nulls fall at about minus 14.5 and plus 14.5 degrees from broadside. That makes the main lobe about 29 degrees wide between its first nulls. [[slnc 350]]
+
+Adding more elements extends the physical array. The main lobe narrows, so the radar can distinguish directions that lie closer together. [[slnc 350]]
+
+Wider element spacing also narrows the beam, but that apparent benefit comes with a dangerous tradeoff. The phase pattern may repeat for different visible angles. We will return to that shortly.
+
+[[slnc 800]] Steer the beam toward a chosen angle. [[slnc 600]]
+
+Equal weights make the main lobe face broadside. To listen at another angle, the radar changes the phase weight applied at each antenna. [[slnc 350]]
+
+Suppose the target lies at 20 degrees. Its echo arrives with a 61.6-degree phase step across each neighbouring pair. The radar applies the opposite phase step in its combining weights. That cancels the incoming progression, so all eight weighted echo values line up and add strongly. [[slnc 350]]
+
+The main lobe has now moved from broadside to 20 degrees. By trying different steering angles and looking for a strong combined response, the radar can determine where the echo came from. [[slnc 350]]
+
+This is beam steering: changing the listening direction electronically, without physically turning the antenna array.
+
+[[slnc 800]] Why half-wavelength spacing is the safe choice. [[slnc 600]]
+
+Phase repeats after a full turn. If two different arrival directions create the same phase step after wrapping, the array can confuse them. [[slnc 350]]
+
+With half-wavelength spacing, the adjacent-element phase step stays between minus pi and plus pi across the visible range. That gives a unique phase pattern for each ordinary arrival angle, apart from the two endfire boundary directions. [[slnc 350]]
+
+Smaller spacing remains unambiguous, but the array is physically shorter and its beam is broader. Larger spacing can produce a narrower main lobe, but it permits repeated phase patterns and can produce extra beam peaks, especially when the beam is steered. Half a wavelength is a practical general compromise.
+
+[[slnc 800]] Grating lobes are false copies of the main beam. [[slnc 600]]
+
+Now spread the same eight elements one and a half wavelengths apart. That is three times the earlier gap. [[slnc 350]]
+
+At this spacing, an off-broadside wave can pick up a full 360-degree phase turn between neighbours. After wrapping, that step looks like zero phase difference. The array combines it as strongly as a broadside wave. [[slnc 350]]
+
+The beam pattern therefore shows additional full-strength peaks at about minus 41.8 and plus 41.8 degrees. These are grating lobes. They are not merely small sidelobes; they look like copies of the main lobe. [[slnc 350]]
+
+If a strong echo appears in one of those directions, the array cannot identify the true direction from that phase pattern alone. This is angular aliasing, much like the velocity aliasing we saw when Doppler exceeded the slow-time sampling limit.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+The first mistake is to assume that wider spacing always gives a better beam. It can narrow the central peak, but a repeated full-strength peak destroys confidence in which direction is real. Narrower is only useful when the direction remains unambiguous. [[slnc 350]]
+
+The second mistake is to focus on the absolute phase at one antenna. That phase also depends on the target's total path length. Direction comes from the phase difference between neighbouring elements. [[slnc 350]]
+
+The third mistake is to treat a sidelobe and a grating lobe as the same thing. A sidelobe is a smaller response left by incomplete cancellation. A grating lobe is an ambiguity peak that can match the main beam's strength.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: how does a line of antennas turn arrival timing into angle? [[slnc 600]]
+
+An angled wave travels a slightly different path to each successive element. Across one gap, the extra path is element spacing times the sine of the arrival angle. That path difference creates a relative phase step, and the step reveals the direction. [[slnc 350]]
+
+Second: why use half-wavelength spacing? [[slnc 600]]
+
+It keeps the phase step from wrapping into an ambiguous repeated pattern across the useful field of view, while giving a reasonably narrow beam. At 2.45 gigahertz, the wavelength is about 12.2 centimeters and the half-wavelength gap is about 6.1 centimeters. [[slnc 350]]
+
+Third: what is the steering vector? [[slnc 600]]
+
+It is the list of complex phases expected across the array for one arrival angle. The first element is the reference. Every next element adds another phase step. For a 20-degree target here, that step is about 61.6 degrees. [[slnc 350]]
+
+Fourth: why does the array factor have a main lobe and sidelobes? [[slnc 600]]
+
+At the listening angle, the weighted element signals line up and add strongly, making the main lobe. Away from it, phase differences cause cancellation. Incomplete cancellation makes smaller sidelobes. For this eight-element unsteered array, the first nulls sit about 29 degrees apart. [[slnc 350]]
+
+Fifth: when do grating lobes appear? [[slnc 600]]
+
+They appear when spacing and steering allow two visible directions to produce the same wrapped phase pattern. With a gap of one and a half wavelengths, the notebook's unsteered pattern has full-strength grating lobes at about plus and minus 41.8 degrees.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+An antenna array adds direction to the radar's range and velocity measurements. A wave arriving from an angle crosses the elements with a regular path difference. That path difference becomes a phase step, and the phase steps across the array form a steering vector. [[slnc 350]]
+
+By weighting and summing the element signals, the radar creates an array factor: a beam pattern with a strong main lobe, nulls, and smaller sidelobes. Electronic phase weights can steer the main lobe toward a chosen direction. [[slnc 350]]
+
+Half-wavelength spacing keeps that directional pattern reliably distinguishable across the visible field. Excessively wide spacing can create grating lobes that imitate the true beam. [[slnc 350]]
+
+The array now points where it listens. The next lesson will turn beam scanning into an angle estimate and show how interference can hide a target.

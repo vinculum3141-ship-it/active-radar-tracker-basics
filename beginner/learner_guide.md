@@ -1,7 +1,7 @@
 # Learner Guide
 
 This document is for you. It walks through the radar concepts introduced in
-Notebooks 00 through 03 at a slower pace, with more background and physical
+Notebooks 00 through 10 at a slower pace, with more background and physical
 intuition than the notebooks can fit between code cells.
 
 Each chapter opens with the same learning objectives as its notebook, walks

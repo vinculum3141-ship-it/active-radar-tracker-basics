@@ -1,0 +1,143 @@
+[[slnc 800]] Doppler and the Range-Doppler Map. [[slnc 600]]
+
+This lesson adds velocity to the radar picture. We already know how to measure where a target is. Now we will use a sequence of pulses to measure how fast it is moving toward or away from the radar.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+The matched filter gave us a sharp peak whose delay revealed range. But one range peak, from one pulse, cannot tell us whether the target is moving. For velocity, the radar must compare the echo across many pulses. [[slnc 350]]
+
+By the end, you should be able to explain the difference between fast time and slow time, why a moving target's echo phase advances from pulse to pulse, how an F F T across pulses reveals Doppler frequency, how Doppler becomes radial velocity, and why the baseline 40-meter-per-second target appears at the wrong speed.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+We began by connecting pulse timing to distance. We built the transmitted waveform, followed it through the channel, pulled its weak echo out of noise with a matched filter, and converted the measured delay into range. [[slnc 350]]
+
+Now we keep that range-processing chain and add a second measurement axis. A batch of 64 ordinary pulses will become a two-dimensional picture showing both range and velocity.
+
+[[slnc 800]] Fast time and slow time. [[slnc 600]]
+
+A pulse radar runs on two clocks. [[slnc 350]]
+
+Fast time is the rapid sampling inside one pulse repetition interval. Here, the receiver samples at 20 megahertz. A sample's position inside the receive window tells us when the echo arrived, so fast time carries range. [[slnc 350]]
+
+Slow time advances once per transmitted pulse. Here, one pulse repetition interval lasts one millisecond, so slow time is sampled at a pulse repetition frequency of 1,000 hertz. A slow-time sample does not mean one fast receiver sample. It means one entire pulse later. [[slnc 350]]
+
+Range lives within a pulse, along fast time. Velocity lives across pulses, along slow time.
+
+[[slnc 800]] The pulse stack is a two-dimensional grid. [[slnc 600]]
+
+Place the received buffer from each pulse on a new row. With 64 pulses, we obtain a stack containing 64 rows. Each row is one moment in slow time. [[slnc 350]]
+
+The columns are fast-time samples. Each column corresponds to a particular echo delay and therefore to a particular range bin. [[slnc 350]]
+
+One cell in this grid is the echo value at one range bin, on one pulse. The row tells us which pulse. The column tells us which range. [[slnc 350]]
+
+That value must be complex. It has an in-phase part and a quadrature part, which we can picture as horizontal and vertical coordinates on a rotating pointer. Keeping both parts preserves the echo's phase. That changing phase is what reveals Doppler.
+
+[[slnc 800]] Why a moving target changes the echo phase. [[slnc 600]]
+
+Over a short group of pulses, a target at about 1,000 meters remains in nearly the same range bin. Its distance does change, but not enough to move the matched-filter peak visibly from one bin to another. [[slnc 350]]
+
+The carrier wave is much more sensitive. Between pulses, the target moves a small fraction of a wavelength. That changes the round-trip path length and makes the next echo return at a different point in the carrier's cycle. [[slnc 350]]
+
+For an approaching target, the complex echo rotates by a steady amount from pulse to pulse. For a stationary target, its phase stays still. For a moving target, the phase keeps turning. The faster the turn, the larger the Doppler frequency.
+
+[[slnc 800]] Build the 64-pulse stack. [[slnc 600]]
+
+We first use a target approaching at 20 meters per second. At a carrier frequency of 2.45 gigahertz, the wavelength is about 12.2 centimeters. The target's two-way Doppler frequency is about 327 hertz. [[slnc 350]]
+
+Every pulse receives the same delayed chirp at approximately the same fast-time location. But before placing that echo into the next row, we rotate its complex phase by the amount accumulated during one pulse repetition interval. [[slnc 350]]
+
+Looking down the target's range column, the real and imaginary parts swing smoothly through a sinusoidal pattern. Across all 64 pulses, the complex echo completes about 21 rotations. This visible rotation is the Doppler signal.
+
+[[slnc 800]] Compress every pulse into range. [[slnc 600]]
+
+Next, apply the matched filter separately to every row. Each raw received buffer becomes a range profile with a sharp peak near 1,000 meters. [[slnc 350]]
+
+The result is still a two-dimensional stack. The rows are still pulses in slow time. The columns are now compressed range bins rather than raw fast-time samples. [[slnc 350]]
+
+At the target's range bin, the peak remains at nearly the same location in every row, while its complex phase continues to rotate from row to row. Range compression has concentrated the echo without discarding the phase information needed for velocity.
+
+[[slnc 800]] Turn phase rotation into Doppler frequency. [[slnc 600]]
+
+Select the target's range bin and read its complex value down the 64 rows. This gives one sample per pulse of the rotating echo. [[slnc 350]]
+
+An F F T asks which rotation rate best explains that sequence. It transforms the slow-time samples from pulse number into Doppler frequency. A steady phase advance becomes a peak in the Doppler spectrum. [[slnc 350]]
+
+Because slow time is sampled at the 1,000-hertz pulse repetition frequency, its spectrum runs from minus 500 hertz to plus 500 hertz. The 20-meter-per-second target produces a peak near 327 hertz, safely inside that interval.
+
+[[slnc 800]] Convert Doppler into velocity. [[slnc 600]]
+
+The Doppler relationship is: Doppler frequency equals two times radial velocity, divided by wavelength. The factor of two comes from the two-way journey. A change in target distance affects the path on the way from radar to target and again on the return. [[slnc 350]]
+
+Solving for velocity gives: velocity equals Doppler frequency times wavelength, divided by two. The detected peak near 327 hertz therefore becomes approximately 20 meters per second, matching the target we placed in the scene. [[slnc 350]]
+
+This is radial velocity. It measures only the part of the target's speed directed along the line between the radar and the target. Sideways travel does not directly create this Doppler shift.
+
+[[slnc 800]] Build the range-Doppler map. [[slnc 600]]
+
+So far, we took a slow-time F F T at one chosen range bin. Now repeat that F F T at every range bin. [[slnc 350]]
+
+The result is a range-Doppler map. One axis is range. The other is radial velocity. The brightness of each cell shows how much echo power belongs to that particular combination of range and velocity. [[slnc 350]]
+
+Our single target appears as one bright blob near 1,000 meters and 20 meters per second. The map combines the matched filter's fast-time range measurement with the slow-time F F T's velocity measurement. [[slnc 350]]
+
+Two targets can overlap in range yet appear as separate blobs if they move at different velocities. They can also share a velocity yet remain separate in range. The two axes give the radar more power to separate a scene.
+
+[[slnc 800]] Velocity resolution. [[slnc 600]]
+
+The 64 pulses are processed together as one coherent group. This group is called a coherent processing interval, or C P I. With one millisecond between pulses, 64 pulses span 64 milliseconds. [[slnc 350]]
+
+The length of this observation controls how finely the radar can distinguish Doppler frequencies. Here, adjacent Doppler bins correspond to a velocity spacing of about 0.96 meters per second. [[slnc 350]]
+
+Two targets at the same range whose radial speeds differ by less than roughly one meter per second may merge into one Doppler response. Collecting more coherent pulses gives a longer observation and finer velocity resolution, provided the scene remains coherent.
+
+[[slnc 800]] Velocity ambiguity. [[slnc 600]]
+
+Resolution is not the only limit. Slow time is sampled at 1,000 hertz, so the highest Doppler frequency that can be named uniquely is half of that rate: plus or minus 500 hertz. [[slnc 350]]
+
+At this wavelength, plus or minus 500 hertz corresponds to an unambiguous velocity interval of approximately plus or minus 30.6 meters per second. A target moving faster than that does not disappear. Its sampled phase rotation becomes indistinguishable from a slower rotation inside the allowed interval. This is aliasing. [[slnc 350]]
+
+Now we switch from the 20-meter-per-second teaching example to the shared baseline target moving at 40 meters per second. Its true Doppler frequency is about 654 hertz. That lies beyond the plus-500-hertz limit. [[slnc 350]]
+
+The sampled data wraps the Doppler frequency into the negative side of the spectrum. The range-Doppler map reports the target at about minus 21 meters per second. The target is shown at the wrong speed and even the wrong direction, although its range remains close to 1,000 meters.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+The first common mistake is to mix up the two sampling rates. Fast time is sampled at 20 megahertz inside a pulse repetition interval and builds the range axis. Slow time is sampled at the 1,000-hertz pulse repetition frequency across pulses and builds the velocity axis. [[slnc 350]]
+
+The second mistake is to look only at echo magnitude across the pulse stack. A moving target's magnitude can stay nearly constant from pulse to pulse. The information is in the changing complex phase. If the in-phase and quadrature components are discarded, the Doppler rotation is discarded with them. [[slnc 350]]
+
+The third mistake is to assume that the largest displayed velocity is the fastest target the radar can measure. It is the edge of the unambiguous interval. A faster target can fold back into the map and imitate a slower target moving in a different direction.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: what is the difference between fast time and slow time? [[slnc 600]]
+
+Fast time is the rapid sequence of receiver samples within one pulse repetition interval. Echo position along fast time becomes range. Slow time advances from one pulse to the next. Phase rotation along slow time becomes Doppler and velocity. [[slnc 350]]
+
+Second: why does a moving target's echo phase advance? [[slnc 600]]
+
+The target moves slightly between pulses, changing the two-way path length by a fraction of the carrier wavelength. Each new echo therefore returns at a different carrier phase. A steady change in path length produces a steady phase rotation. [[slnc 350]]
+
+Third: how does the F F T reveal Doppler? [[slnc 600]]
+
+At one range bin, take one complex echo sample from each pulse. An F F T across those slow-time samples separates different phase-rotation rates. A moving target creates a peak at its Doppler frequency. [[slnc 350]]
+
+Fourth: how does Doppler become velocity? [[slnc 600]]
+
+Multiply Doppler frequency by wavelength and divide by two. Near 2.45 gigahertz, a Doppler peak of about 327 hertz corresponds to a radial velocity of approximately 20 meters per second. [[slnc 350]]
+
+Fifth: why does the 40-meter-per-second target wrap? [[slnc 600]]
+
+Its 654-hertz Doppler frequency exceeds the plus-or-minus-500-hertz interval allowed by the 1,000-hertz slow-time sampling rate. The sampled phase therefore aliases, and the map reports approximately minus 21 meters per second instead of plus 40.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+A pulse radar has two measurement clocks. Fast time measures echo delay within each receive window and gives range. Slow time observes complex echo phase across repeated pulses and gives Doppler velocity. [[slnc 350]]
+
+We built a 64-pulse stack, matched-filtered every row into range, and then applied an F F T down the rows at every range bin. The result was a range-Doppler map: a two-dimensional picture showing where a target is and how fast it is moving radially. [[slnc 350]]
+
+The 64-millisecond coherent processing interval gave a velocity resolution of about 0.96 meters per second. The 1,000-hertz pulse repetition frequency limited unambiguous velocity to about plus or minus 30.6 meters per second. The 40-meter-per-second baseline target exceeded that limit and wrapped to the wrong velocity. [[slnc 350]]
+
+Range and velocity are now both measurable. The next lesson will take noisy range and velocity detections and smooth them over time into a stable track.

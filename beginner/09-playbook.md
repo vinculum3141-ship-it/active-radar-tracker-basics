@@ -6,9 +6,8 @@ notebooks can be written quickly, consistently, and in the right order.
 
 The rule is simple: build the notebooks around the physics and learning goals
 first, and only use code as the demonstration vehicle. Shared notebook
-functionality lives directly under `beginner/` in a small helper structure.
+functionality lives directly under `beginner/helpers/` in a small helper structure.
 
-Shared notebook functionality lives directly under `beginner/helpers/` in a small helper structure.
 ---
 
 ## 1. Purpose

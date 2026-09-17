@@ -1,0 +1,121 @@
+[[slnc 800]] Integration and Portfolio Artifacts. [[slnc 600]]
+
+This is the closing lesson of the beginner radar track. We are not adding a new piece of physics. We are putting the pieces in order and making one portfolio figure that shows what each part contributes. [[slnc 350]]
+
+The figure has four panels: a transmitted chirp, a range-Doppler result, a beam with an interference null, and a direction-of-arrival scan. Together, they tell the radar story from transmission to controlled listening.
+
+[[slnc 800]] Five questions for the final lesson. [[slnc 600]]
+
+How do range-Doppler and spatial filtering fit in the same processing chain? Where did each earlier notebook contribute? Which baseline values are shared? How do we save the results as a portfolio artifact? And can we explain the whole chain in physical language, without relying on code? [[slnc 350]]
+
+The notebook uses linked demonstrations with shared parameters. It does not pass one complete simulated data cube through every stage. That distinction helps us read each panel honestly while still seeing how the stages would cooperate in a full system.
+
+[[slnc 800]] A consistent baseline anchors the recap. [[slnc 600]]
+
+The carrier is 2.45 gigahertz. The chirp spans five megahertz of bandwidth and lasts 20 microseconds. Sampling runs at 20 megahertz. Pulses repeat every one millisecond, and the Doppler example uses 64 pulses. [[slnc 350]]
+
+The target range is one thousand metres. The moving-target example uses a speed of 20 metres per second. The spatial demonstrations put the target at plus 20 degrees and the interferer direction at minus 30 degrees. [[slnc 350]]
+
+These choices let us compare stage outputs without quietly changing the underlying scale or geometry.
+
+[[slnc 800]] The full processing chain. [[slnc 600]]
+
+Start with a known waveform. The channel delays, weakens, and alters the returning echo. A matched filter turns delay into a sharp range feature. Across repeated pulses, phase change becomes Doppler velocity. A tracker can smooth noisy measurements over time. [[slnc 350]]
+
+With several antenna elements, relative phase across the array adds direction. A direction scan can identify where energy arrives. Steering weights then point the array toward the target, while a constrained null can reject an interferer from another angle. [[slnc 350]]
+
+The processing order matters because each result uses a different physical signature: delay for range, pulse-to-pulse phase for velocity, and element-to-element phase for direction.
+
+[[slnc 800]] First artifact: the chirp. [[slnc 600]]
+
+The waveform panel shows the real part of a linear frequency-modulated chirp over 20 microseconds. Its instantaneous oscillation rate changes across the pulse. That frequency sweep is what the matched filter later recognizes. [[slnc 350]]
+
+The chirp contains 400 samples at the chosen 20-megahertz sampling rate. With five megahertz of bandwidth, the ideal range-resolution scale is about 30 metres. The waveform is the deliberate signal we send, so every later measurement can compare an echo with something known.
+
+[[slnc 800]] Second artifact: a range peak. [[slnc 600]]
+
+Place a copy of the chirp after a two-way travel delay corresponding to a target near one thousand metres. The matched filter slides the known chirp across the received signal and measures where they align. [[slnc 350]]
+
+Instead of a long echo waveform, we get a compact peak at the target's delay. Converting that delay to distance gives the range estimate. Sampling can place the peak on a nearby discrete range bin, so read the result as approximately one thousand metres, not as an infinitely precise distance. [[slnc 350]]
+
+This is the range result introduced earlier in the track. It becomes one axis of the range-Doppler map.
+
+[[slnc 800]] Third artifact: velocity across pulses. [[slnc 600]]
+
+Repeat the echo over 64 pulses while the target moves at 20 metres per second. The target's phase advances from pulse to pulse. A slow-time Fourier transform measures the rate of that phase change. [[slnc 350]]
+
+The range-Doppler map now places energy near one thousand metres and positive 20 metres per second. Range came from delay within each pulse. Velocity came from phase evolution across pulses. The two coordinates describe one moving return in this demonstration. [[slnc 350]]
+
+The tracker's job is different again: it would combine repeated noisy detections into a smoother estimate over time. That stage is part of the full chain even though it is not one of the final figure's four panels.
+
+[[slnc 800]] Fourth artifact: the array adds angle. [[slnc 600]]
+
+Eight antennas at half-wavelength spacing form the spatial instrument. Their beam pattern has a main lobe, nulls, and sidelobes. A wave from plus 20 degrees produces a specific progression of phase across those eight elements. [[slnc 350]]
+
+The notebook constructs a covariance estimate for a plus-20-degree source and runs a Bartlett direction scan. The spatial spectrum peaks near that angle. This angle calculation is a separate demonstration using the same array geometry, not an angle read directly from the earlier range-Doppler data. [[slnc 350]]
+
+In a full radar, the range-Doppler detection and array snapshot would be connected so that all coordinates refer to the same return.
+
+[[slnc 800]] Fifth artifact: steer and place a null. [[slnc 600]]
+
+Steering weights make the array respond fully to the plus-20-degree target. But the steered beam still has sidelobes. The earlier lesson showed why a strong source at minus 30 degrees can leak through. [[slnc 350]]
+
+The constrained weights keep unit response at plus 20 degrees and force zero response at minus 30 degrees in the ideal array model. The beam-pattern overlay shows both curves. Target gain stays at zero decibels relative to unity, while the interferer direction becomes a deep null. [[slnc 350]]
+
+That overlay shows the spatial design. It does not claim that this notebook has rerun the interfered range-Doppler scene from notebook 09.
+
+[[slnc 800]] The four-panel portfolio figure. [[slnc 600]]
+
+The final figure puts waveform, range-Doppler map, beam-and-null overlay, and direction scan on one page. Read each panel as evidence for one stage of the processing chain. The chirp is what we send. The range-Doppler map shows delay and movement. The scan names an angle. The null overlay shows how the array can reject a known competing direction. [[slnc 350]]
+
+This is a portfolio summary, not a single raw-data output. Its value is that someone can point to each panel and explain the physical measurement or design decision behind it.
+
+[[slnc 800]] Save an artifact that can be shared. [[slnc 600]]
+
+The notebook saves the composite figure as a P N G file named radar portfolio dot P N G. It then checks that the file exists and reports its size. [[slnc 350]]
+
+That small export step matters. A plot that appears only in a temporary notebook session is harder to inspect, compare, or present. A saved image can be placed in a report or portfolio. The editable slide deck and narrated video we are making for this lesson provide two further ways to explain the same work.
+
+[[slnc 800]] Where the earlier notebooks fit. [[slnc 600]]
+
+The opening lessons established the radar idea, waveform, power budget, and echo channel. The matched-filter lesson turned delay into range. The Doppler lesson used repeated pulses for velocity. The Kalman lesson showed how to smooth a sequence of detections. [[slnc 350]]
+
+The array lessons added geometry and direction. The direction-of-arrival lesson compared a conventional scan with an adaptive one. The beam-steering lesson then chose weights that preserve a target and null an interferer. [[slnc 350]]
+
+This final notebook reuses their helpers and gathers selected results. No panel is magic: each is a compact result of a method we built earlier.
+
+[[slnc 800]] Two integration mistakes to avoid. [[slnc 600]]
+
+First, do not treat four panels with common labels as proof that one data cube flowed through every algorithm. Here the calculations are linked by baseline choices, but some panels are separate simulations. A true end-to-end test would carry the same received array data through range, Doppler, angle, and nulling. [[slnc 350]]
+
+Second, do not choose a null angle without a source for that direction. A direction scan, or another angle estimate, must tell the array where the interferer is. The null works because its constraint names a physical arrival direction.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: how do the results fit? [[slnc 600]]
+
+A waveform returns through a channel. Matched filtering locates range, and pulse-to-pulse phase gives velocity. Array phase gives direction, which steering and nulling can use to keep a target visible beside interference. [[slnc 350]]
+
+Second: what did the earlier notebooks contribute? [[slnc 600]]
+
+Each supplied one physical idea and one reusable helper, from chirp construction to matched filtering, Doppler processing, tracking, direction scanning, and constrained array weights. [[slnc 350]]
+
+Third: what is shared here? [[slnc 600]]
+
+The demonstrations reuse the same carrier, pulse settings, target range, and array geometry where relevant. They are consistent examples, though not one continuous simulated dataset. [[slnc 350]]
+
+Fourth: how are the results delivered? [[slnc 600]]
+
+The notebook gathers four plots into a portfolio figure and saves it as a P N G. The presentation adds a guided visual explanation and a timed narration. [[slnc 350]]
+
+Fifth: can we tell the story plainly? [[slnc 600]]
+
+Send a known chirp. Find its delay for range. Watch its phase across pulses for velocity. Compare phase across antennas for direction. Then choose array weights to hear the target and suppress a known interferer.
+
+[[slnc 800]] The beginner track in one picture. [[slnc 600]]
+
+The four-panel artifact is a map of what we learned: waveform, range and velocity, direction, and controlled rejection. It shows how a radar turns physical changes in an echo into measurements, then uses those measurements to choose how it listens. [[slnc 350]]
+
+The final distinction is worth keeping. This notebook is a coherent portfolio recap made from linked demonstrations. A future end-to-end simulation could connect every panel to one shared array data cube and test the whole chain under the same noise and interference. [[slnc 350]]
+
+For now, the beginner goal is achieved if you can explain what each stage observes, what it computes, and why the next stage needs it.

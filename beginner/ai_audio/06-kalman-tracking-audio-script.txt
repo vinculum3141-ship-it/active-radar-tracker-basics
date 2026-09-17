@@ -1,0 +1,171 @@
+[[slnc 800]] Kalman Tracking. [[slnc 600]]
+
+This lesson turns a stream of noisy range and velocity detections into one smooth, continuously updated track.
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+The range-Doppler map gave us one bright blob showing a target's range and radial velocity. But that blob is only one measurement. A new map produces another measurement, and noise makes the reported position and speed wobble from one reading to the next. [[slnc 350]]
+
+By the end, you should be able to explain why one noisy detection is not enough, what the predict step does, what the update step does, how the filter balances trust in the model and the sensor, and why the resulting track is smoother than the raw measurements.
+
+[[slnc 800]] Where we are in the radar story. [[slnc 600]]
+
+We began with a transmitted waveform. We followed its echo through the channel, recovered it with a matched filter, measured range from delay, and measured velocity from phase changes across repeated pulses. [[slnc 350]]
+
+Notebook 05 processed 64 pulses together as one coherent processing interval, or C P I. One C P I lasts 64 milliseconds. At the end of each interval, the radar produces a fresh range and velocity detection. [[slnc 350]]
+
+Notebook 06 connects those individual detections through time. The output is no longer a collection of isolated snapshots. It is a track: the radar's best continuously updated estimate of where the target is and where it is going.
+
+[[slnc 800]] One noisy measurement is not enough. [[slnc 600]]
+
+The example target begins near 1,000 meters and has a constant radial speed of 20 meters per second. We observe it for 50 coherent processing intervals, or about 3.2 seconds. [[slnc 350]]
+
+Every 64 milliseconds, the detector reports a range and a velocity. The simulated range readings have a typical spread of about 5 meters. The velocity readings have a typical spread of about 1.5 meters per second. [[slnc 350]]
+
+Plot the readings through time and they dance around the true path. One measured range can easily be several meters away from the target's actual range. If a tracking system reacted fully to every new point, it would chase noise instead of following the target.
+
+[[slnc 800]] Truth, measurement, and estimate. [[slnc 600]]
+
+It helps to separate three different things. [[slnc 350]]
+
+The true trajectory is where the target really is. In a simulation we know this line, but a real radar never does. [[slnc 350]]
+
+The measurement is what the sensor reports. It contains useful information, but it is disturbed by noise. [[slnc 350]]
+
+The estimate is the filter's best answer after combining what it expected with what the sensor just observed. The goal is not to reproduce every noisy measurement. The goal is to stay close to the unknown true trajectory.
+
+[[slnc 800]] Blend a prediction with a measurement. [[slnc 600]]
+
+A simple average is not enough. The target is travelling, so its range genuinely changes between measurements. Averaging old positions would make the reported track lag behind. [[slnc 350]]
+
+The Kalman filter instead uses two sources of information. First, a model predicts where the target should be now. Second, the newest sensor measurement says where the target appears to be now. [[slnc 350]]
+
+Neither source is trusted completely. The model is smooth but imperfect. The measurement is direct but noisy. The filter weighs them according to their uncertainty and places the new estimate between them.
+
+[[slnc 800]] The state is what the filter thinks it knows. [[slnc 600]]
+
+The filter stores its current best estimate in a state vector. Here, the state contains two numbers: range and velocity. [[slnc 350]]
+
+The filter also stores a covariance matrix called P. We can think of P as an uncertainty envelope around the state. Large values mean the filter is unsure. Small values mean its estimate has become more precise. [[slnc 350]]
+
+The state answers: where do I think the target is, and how fast do I think it is travelling? The covariance answers: how confident am I in that answer?
+
+[[slnc 800]] Two settings describe what can go wrong. [[slnc 600]]
+
+Process noise, called Q, describes imperfections in the model. A target may accelerate, turn, or fail to maintain exactly the same speed. A larger Q tells the filter that its prediction can become wrong quickly. [[slnc 350]]
+
+Measurement noise, called R, describes uncertainty in the sensor readings. A larger R tells the filter that the new detections are less reliable. [[slnc 350]]
+
+We do not directly choose how much to move toward each measurement. We describe the uncertainty in the model and the sensor. The filter then calculates the appropriate balance.
+
+[[slnc 800]] Step one: predict. [[slnc 600]]
+
+The predict step uses the model before looking at the next measurement. If the current range is r, the velocity is v, and the elapsed time is delta t, the predicted range is r plus v times delta t. The predicted velocity remains v. [[slnc 350]]
+
+In this lesson, delta t is 64 milliseconds. At 20 meters per second, the expected change in range during one interval is about 1.28 meters. [[slnc 350]]
+
+This calculation is written with a transition matrix called F. The matrix notation is compact, but the physical idea is familiar: start from the previous range and advance it by distance equals speed times time. [[slnc 350]]
+
+Prediction also expands the uncertainty. Time has passed without a new observation, and the constant-velocity model may not be perfect. The filter therefore carries the covariance forward and adds the process uncertainty Q.
+
+[[slnc 800]] Step two: compare prediction and measurement. [[slnc 600]]
+
+When the new detection arrives, subtract the prediction from the measurement. This difference is called the innovation. [[slnc 350]]
+
+If the predicted range is 1,010 meters and the sensor reports 1,014 meters, the innovation is plus 4 meters. The measurement is telling the filter that the target may be farther away than expected. [[slnc 350]]
+
+The innovation is not accepted in full automatically. First the filter must decide how trustworthy that difference is.
+
+[[slnc 800]] The Kalman gain decides how far to move. [[slnc 600]]
+
+The Kalman gain, called K, is calculated from the prediction uncertainty and the measurement uncertainty. It acts like a trust control. [[slnc 350]]
+
+When the prediction is uncertain and the sensor is reliable, the gain moves closer to one. The estimate follows more of the measurement. [[slnc 350]]
+
+When the prediction is precise and the sensor is noisy, the gain moves closer to zero. The estimate remains nearer to the prediction. [[slnc 350]]
+
+The gain can also take intermediate values. A gain of 0.4 means the filter accepts 40 percent of the difference between prediction and measurement. It does not choose between model and sensor. It blends them.
+
+[[slnc 800]] Step two continued: update. [[slnc 600]]
+
+The update step adds the weighted innovation to the predicted state. New estimate equals prediction plus Kalman gain times measurement minus prediction. [[slnc 350]]
+
+After the update, the covariance becomes smaller. A fresh observation has supplied new information, so the filter is less uncertain than it was immediately after prediction. [[slnc 350]]
+
+This creates a repeating rhythm. Predict the target forward and let uncertainty grow. Compare with the new detection. Update the state and let uncertainty shrink.
+
+[[slnc 800]] Run the cycle for every detection. [[slnc 600]]
+
+One prediction followed by one update processes one C P I. Repeat the same pair of steps for all 50 measurements and the individual estimates join into a track. [[slnc 350]]
+
+The Kalman filter is recursive. It does not need to store and recalculate the entire measurement history. It carries only the latest state and covariance into the next step. Those two objects summarize what the earlier measurements have taught it. [[slnc 350]]
+
+This makes the method well suited to a radar that must keep updating while new detections arrive.
+
+[[slnc 800]] The filtered track is steadier. [[slnc 600]]
+
+Compare the three traces. The true trajectory is a clean line known only in the simulation. The raw measurements form a noisy scatter around it. The filtered estimate follows a much smoother path close to the truth. [[slnc 350]]
+
+In this run, the raw range measurements have a root-mean-square error of about 4.76 meters. The filtered range error falls to about 1.84 meters. [[slnc 350]]
+
+The raw velocity error is about 1.30 meters per second. The filtered velocity error falls to about 0.59 meters per second. [[slnc 350]]
+
+The filter improves the estimate because random measurement errors do not push the track around freely. Each reading is checked against a physically reasonable prediction.
+
+[[slnc 800]] Trust changes as the track develops. [[slnc 600]]
+
+The Kalman gain is recalculated at every step. It is not a fixed smoothing number. [[slnc 350]]
+
+At the beginning, the filter has little history and its covariance is large. The range gain starts near 0.45, so the first measurements have a strong influence. [[slnc 350]]
+
+As detections accumulate, the state becomes more certain. The range gain settles near 0.13. The filter still listens to every new measurement, but it no longer lets one noisy point pull the track as far away from its established path.
+
+[[slnc 800]] What happens when the trust settings change. [[slnc 600]]
+
+Increase R, the measurement uncertainty, and the filter trusts the sensor less. The gain becomes smaller, the track becomes smoother, and the estimate leans more heavily on the model. If R is too large, the filter may ignore useful changes in the measurements. [[slnc 350]]
+
+Decrease R too far and the filter treats noisy detections as highly reliable. The gain becomes larger, and the track begins to chase the measurement scatter. [[slnc 350]]
+
+Increase Q, the process uncertainty, and the filter trusts its constant-velocity model less. It responds more readily when the target changes its behaviour, but the estimate can become less smooth. [[slnc 350]]
+
+Q and R therefore describe a tradeoff. The tracker must be steady enough to reject noise and responsive enough to follow real changes.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+The first mistake is to describe a Kalman filter as a moving average. A moving average looks backward across old measurements and tends to lag a travelling target. The Kalman filter predicts the target forward before blending in the newest reading. [[slnc 350]]
+
+The second mistake is to tune the Kalman gain directly as a fixed constant. The gain is derived at every step from P, Q, and R. We describe uncertainty; the filter calculates the gain. [[slnc 350]]
+
+The third mistake is to assume that smoother always means better. A perfectly smooth line can be badly wrong if the model ignores a real acceleration or turn. A useful tracker balances stability with responsiveness.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: why is one noisy detection not enough? [[slnc 600]]
+
+One detection may be several meters or several meters per second away from the true value. Reacting fully to it would make the track chase sensor noise. A sequence of detections, combined with a movement model, gives a more reliable estimate. [[slnc 350]]
+
+Second: what does the predict step do? [[slnc 600]]
+
+It advances range and velocity through the elapsed time using the constant-velocity model. It also grows the covariance because the prediction is not certain. [[slnc 350]]
+
+Third: what does the update step do? [[slnc 600]]
+
+It compares the new measurement with the prediction, weighs that difference with the Kalman gain, corrects the predicted state, and reduces the covariance. [[slnc 350]]
+
+Fourth: how does the filter balance model and sensor? [[slnc 600]]
+
+It compares their uncertainties. Reliable measurements and an uncertain prediction produce a larger gain. Noisy measurements and a precise prediction produce a smaller gain. [[slnc 350]]
+
+Fifth: why is the filtered track smoother? [[slnc 600]]
+
+The estimate combines information across many detections while the predict step keeps pace with the target. Random errors are restrained, but genuine changes can still influence the state.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+The Kalman filter turns noisy range and velocity detections into a stable track. It carries a state containing range and velocity, together with a covariance describing uncertainty. [[slnc 350]]
+
+Every step has two halves. Prediction advances the state with a physical model and grows uncertainty. Update uses the newest detection to correct the prediction and reduce uncertainty. The Kalman gain determines the size of that correction from the relative trust in model and sensor. [[slnc 350]]
+
+The result is a continuously updated estimate that is much steadier than any individual detection. Range and velocity are no longer isolated snapshots. They have become a coherent track through time. [[slnc 350]]
+
+The remaining lessons will add angle information and explore how interference affects this growing picture of the radar scene.

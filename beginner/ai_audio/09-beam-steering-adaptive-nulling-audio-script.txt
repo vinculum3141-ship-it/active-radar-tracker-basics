@@ -1,0 +1,115 @@
+[[slnc 800]] Beam Steering and Adaptive Nulling. [[slnc 600]]
+
+The previous lesson found arrival directions in an array scan. Now we use those directions to choose how the array listens. We point the beam toward a target at plus 20 degrees, then place a deliberate null toward an interferer at minus 30 degrees. Finally, we watch what that choice does to a range-Doppler map. [[slnc 350]]
+
+The physical question is simple: can we keep the target while silencing a much louder echo from another direction?
+
+[[slnc 800]] What this lesson teaches. [[slnc 600]]
+
+We will answer five questions. What do the array weights do? Why does steering alone leave interference? How does a constrained weight vector make a null? Why must the null be applied before the matched filter? And what changes in the range-Doppler map after cancellation? [[slnc 350]]
+
+The same eight antenna elements carry us through the whole lesson. The target is at plus 20 degrees. The interferer is at minus 30 degrees and, in the full echo scene, its transmitted signal is 30 decibels stronger in power.
+
+[[slnc 800]] The scene has direction, range, and velocity. [[slnc 600]]
+
+Both returns come from a range of one thousand metres. The target moves at plus eight metres per second. The interferer appears at minus eight metres per second. That gives them the same range bin but different Doppler bins. [[slnc 350]]
+
+This choice makes the test easy to read. If the spatial null works, the interferer's Doppler feature should collapse while the target feature stays. Range processing alone cannot separate the two by distance because their ranges are the same.
+
+[[slnc 800]] Combining the array means choosing weights. [[slnc 600]]
+
+Each antenna supplies one complex value at a given instant. Give each element a complex weight and add the weighted values. The result is one combined signal. Written compactly, y equals w conjugate transpose times x. [[slnc 350]]
+
+The weight vector contains eight complex gains, one per antenna. Their phases decide which incoming wavefronts line up in the sum. Their amplitudes can also change the response. [[slnc 350]]
+
+For any arrival angle, the beam response is the squared magnitude of w conjugate transpose times that angle's steering vector. Pointing a main lobe and cutting a null are both ways of choosing w.
+
+[[slnc 800]] Steering points the main lobe at the target. [[slnc 600]]
+
+Start with the target's steering vector at plus 20 degrees. Divide it by eight, the number of elements, so the target direction has unit response. The phases now compensate for the target wave's arrival steps across the array. Its contributions add coherently. [[slnc 350]]
+
+If we scan this weight vector's response against angle, the main lobe peaks at plus 20 degrees. Waves from many other directions combine less strongly. But a steered beam still has sidelobes.
+
+[[slnc 800]] A sidelobe lets the strong interferer through. [[slnc 600]]
+
+At minus 30 degrees, the steering-only beam responds about 18.6 decibels below its response to the target. That sounds like substantial attenuation. But the interferer's input power is 30 decibels above the target's. [[slnc 350]]
+
+Subtracting the beam attenuation leaves the interferer roughly 11.4 decibels above the target at the beamformer output, before differences from the later processing and noise. The exact range-Doppler bin heights need not equal that simple calculation, but the reason for leakage is plain. [[slnc 350]]
+
+Steering chooses where to listen most strongly. It does not demand silence at minus 30 degrees.
+
+[[slnc 800]] Two constraints define the null. [[slnc 600]]
+
+Put the steering vector for plus 20 degrees and the steering vector for minus 30 degrees into a matrix called C. Then state the required responses: one for the target, zero for the interferer. In compact form, C conjugate transpose times w equals the vector one, zero. [[slnc 350]]
+
+The first constraint keeps full target gain. The second forces a spatial null at the interferer's angle. With eight elements and these two independent constraints, several weight choices can satisfy them. The notebook uses the minimum-norm solution for this white-noise model. [[slnc 350]]
+
+It writes the weights as C, times the inverse of C conjugate transpose C, times the desired-response vector. This is the constrained nulling form used in the lesson. In a general coloured-noise setting, a full L C M V design would also use the noise covariance.
+
+[[slnc 800]] The beam pattern shows the difference. [[slnc 600]]
+
+Overlay the steering-only and constrained patterns. At plus 20 degrees, both keep the target response at zero decibels relative to unit gain. At minus 30 degrees, steering alone leaves the roughly minus 18.6 decibel sidelobe. The constrained pattern drops to an extremely deep null. [[slnc 350]]
+
+The notebook may print a value around minus 319 decibels at that one angle. That is a floating-point precision floor, not a physical promise of 319 decibels of real-world rejection. The useful fact is that the model's zero-response constraint drives the interferer far below the steering-only level.
+
+[[slnc 800]] Spatial cancellation comes before pulse compression. [[slnc 600]]
+
+The array weights act on all eight raw element signals at each fast-time sample. First, combine the elements so the unwanted direction cancels. Then run the matched filter on each resulting pulse, and then form the range-Doppler map. [[slnc 350]]
+
+This order matches the physical information. Angle lives in the differences between antennas. Range lives in echo delay. Doppler lives in how phase changes across pulses. The essential rule is to keep the separate antenna channels until the spatial weights have been applied. Matched filtering each channel separately before beamforming would also work mathematically, but a single prematurely mixed channel has lost the phase pattern needed for the null.
+
+[[slnc 800]] The steering-only range-Doppler map. [[slnc 600]]
+
+Now build the target and interferer echoes at the same one-thousand-metre range. Their velocities have opposite signs. Add the same receiver-noise realization to a clean target-only reference and to the target-plus-interferer scene. [[slnc 350]]
+
+Combine the interfered scene using steering-only weights. The target is in the plus-eight-metres-per-second Doppler bin. The interferer leaks through a sidelobe into its minus-eight-metres-per-second bin. Both sit at the same range, so the map shows a competing bright return even though the main lobe points at the target.
+
+[[slnc 800]] The nulled range-Doppler map. [[slnc 600]]
+
+Repeat with the same array data, but use the constrained weights. The target direction still has unit response. The minus-30-degree direction has zero response in the ideal array model. We apply those weights before matched filtering. [[slnc 350]]
+
+The interferer's feature now falls back near the noise floor in its Doppler bin. The target's feature remains near the level of the clean target-only reference. We changed the spatial combination, not the target, its range, or its velocity.
+
+[[slnc 800]] Compare the two Doppler bins. [[slnc 600]]
+
+Focus on the one-thousand-metre range bin. Before nulling, the minus-eight-metres-per-second bin is large because it contains leaked interferer energy. After nulling, that bin drops toward the target-only noise reference. [[slnc 350]]
+
+The plus-eight-metres-per-second target bin changes little. After nulling, it remains very close to its clean, target-only reference. This before-and-after comparison is stronger evidence than a beam-pattern plot alone. It shows that the null improves the downstream measurement we care about.
+
+[[slnc 800]] Common mistakes. [[slnc 600]]
+
+First, steering toward the target does not guarantee rejection elsewhere. A sidelobe that is 18.6 decibels down still passes a source whose input power is 30 decibels higher. A deliberate zero-response constraint solves a different problem from pointing the main lobe. [[slnc 350]]
+
+Second, the very deep computed null belongs to an ideal steering model and floating-point arithmetic. Real calibration error, angle error, and changing interference can make practical rejection shallower. [[slnc 350]]
+
+Third, apply the spatial weights while the eight element signals are still separate. This notebook does that before matched filtering. Filtering all eight channels separately and then beamforming is also valid; collapsing them into one mixed channel first is not.
+
+[[slnc 800]] Closing the loop. [[slnc 600]]
+
+First: what do the weights do? [[slnc 600]]
+
+One complex gain per antenna controls how waves from each direction add or cancel. Steering weights align the plus-20-degree target and put the main lobe there. [[slnc 350]]
+
+Second: why is steering alone insufficient? [[slnc 600]]
+
+The steered pattern retains sidelobes. At minus 30 degrees, the roughly minus-18.6-decibel response still passes enough of a 30-decibel-stronger interferer to compete with the target. [[slnc 350]]
+
+Third: how does the constrained null work? [[slnc 600]]
+
+The two constraints require gain one at the target and zero at the interferer. The notebook's minimum-norm weights satisfy both in the ideal array model. [[slnc 350]]
+
+Fourth: why before the matched filter? [[slnc 600]]
+
+Direction is encoded across the antenna elements. We must use that spatial pattern before collapsing the channels and processing echo delay. [[slnc 350]]
+
+Fifth: what happens in range-Doppler? [[slnc 600]]
+
+The interferer's negative-velocity bin falls toward the noise floor after nulling, while the positive-velocity target bin remains close to the clean reference.
+
+[[slnc 800]] Summary. [[slnc 600]]
+
+We moved from finding arrival angles to choosing the array's response. Steering weights pointed the main lobe at the plus-20-degree target. A constrained weight vector kept that target response while placing a null toward the minus-30-degree interferer. [[slnc 350]]
+
+The beam-pattern comparison explained why the null matters: steering attenuated the interferer but left enough sidelobe leakage for a much stronger source. Applying the null to the raw array channels before matched filtering removed that leakage from the range-Doppler result while preserving the target. [[slnc 350]]
+
+The final notebook can now bring the full chain together: waveform, channel, detection, range, Doppler, tracking, angle, and interference control.

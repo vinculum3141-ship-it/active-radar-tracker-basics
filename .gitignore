@@ -221,6 +221,7 @@ __marimo__/
 out/*
 !out/.gitkeep
 
-# AI audio narration recordings (generated locally via macOS say)
+# AI audio narration recordings and editable decks (generated locally via macOS say / PPTX)
 beginner/ai_audio/*.mp4
+beginner/ai_audio/*.pptx
 .codex_tmp/
