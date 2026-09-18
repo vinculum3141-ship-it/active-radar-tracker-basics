@@ -1,3 +1,10 @@
+"""Shared plotting utilities for the beginner radar notebooks.
+
+The helper functions here enforce a consistent visual style so the notebooks stay
+readable and the plots remain comparable across chapters. They are intentionally
+small and educational rather than a full plotting framework.
+"""
+
 from __future__ import annotations
 
 import matplotlib.pyplot as plt

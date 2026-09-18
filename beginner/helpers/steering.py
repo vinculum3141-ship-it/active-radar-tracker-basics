@@ -1,3 +1,10 @@
+"""Beam steering and constrained adaptive nulling helpers.
+
+These functions show the direct connection between a desired look direction and
+its weight vector. The same ideas are then extended to LCMV nulling, where a
+beam is pointed at the target while nulls are placed on the interferers.
+"""
+
 from __future__ import annotations
 
 import numpy as np

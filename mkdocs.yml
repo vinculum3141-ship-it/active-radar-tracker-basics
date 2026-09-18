@@ -1,0 +1,48 @@
+site_name: Active Radar Tracker Basics
+site_description: Beginner radar learning track with notebooks, helpers, and guide material.
+docs_dir: docs
+site_url: ""
+repo_url: https://github.com/your-org/active-radar-tracker-basics
+repo_name: active-radar-tracker-basics
+
+nav:
+  - Home: index.md
+  - Trainer:
+      - README: trainer/README.md
+      - Lab Solutions: trainer/lab-solutions.md
+      - Quiz Answers: trainer/quiz-answers.md
+      - Rubrics: trainer/rubrics.md
+  - Publication: publication.md
+  - Helper scripts for beginner notebooks: helper-api.md
+  - Training Docs:
+      - Overview: training/00-overview.md
+      - Physics: training/01-physics.md
+      - Architecture: training/02-architecture.md
+      - Hardware: training/03-hardware.md
+      - Python Discipline: training/04-python-discipline.md
+      - Roadmap: training/05-roadmap.md
+      - Training: training/06-training.md
+      - Glossary: training/07-glossary.md
+      - Extensions: training/08-extensions.md
+      - Automotive: training/08a-ext-automotive.md
+      - Counterdrone: training/08b-ext-counterdrone.md
+      - Airport Surveillance: training/08c-ext-airport-surveillance.md
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - toc:
+      permalink: true
+
+plugins:
+  - search

@@ -1,3 +1,11 @@
+"""Simple Kalman filtering helpers for the beginner tracking notebooks.
+
+This module is intentionally compact: it demonstrates the core predict/update
+cycle for a constant-velocity target. The goal is to make the state-estimation
+logic readable so learners can see the measurement update, covariance evolution,
+and target tracking flow without a large production stack.
+"""
+
 from __future__ import annotations
 
 import numpy as np

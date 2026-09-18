@@ -2,9 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+"""Baseline radar values used across the beginner notebooks.
+
+These values are intentionally simple and consistent so the notebooks can teach
+with a single shared scene. Every chapter reuses the same target range, pulse
+width, carrier, and array setup unless the notebook explicitly overrides it.
+"""
+
 
 @dataclass(frozen=True)
 class BaselineRadarSpec:
+    """A small, single-source specification for the beginner radar narrative."""
+
     fc_hz: float = 2.45e9
     bandwidth_hz: float = 5e6
     pulse_width_s: float = 20e-6

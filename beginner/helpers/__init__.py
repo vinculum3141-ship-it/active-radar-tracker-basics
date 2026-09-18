@@ -1,4 +1,19 @@
-"""Beginner notebook helpers."""
+"""Beginner-local helper package for the radar learning notebooks.
+
+These helpers keep the notebook code readable while still showing the real
+physics in a direct, classroom-friendly form. Each module focuses on one radar
+concept: the baseline values, the waveform math, the channel model, the Doppler
+stack, the array geometry, and the adaptive beamforming logic.
+
+The intended pattern is simple:
+
+- use the helper functions for repeated notebook logic,
+- keep the calculations explicit in the notebook cells,
+- and keep the physics names consistent with the written guide.
+
+The package is intentionally small and deliberately beginner-oriented: the goal is
+clarity and teachability, not a production-grade radar API.
+"""
 
 from .array import (
     array_factor,

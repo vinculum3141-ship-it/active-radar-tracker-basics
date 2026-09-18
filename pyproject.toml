@@ -13,7 +13,7 @@ dependencies = [
 radar = "radar.cli:main"
 
 [dependency-groups]
-dev = ["pytest", "ruff"]
+dev = ["pytest", "ruff", "mkdocs", "mkdocs-material"]
 
 [build-system]
 requires = ["hatchling"]

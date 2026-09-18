@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""Core one-dimensional math helpers for the beginner radar notebooks.
+
+This module contains the small formulas students see repeatedly: wavelength,
+duty cycle, delay conversion, and the simple range-resolution relationships.
+"""
+
 import numpy as np
 
 from .constants import RADAR_CONSTANTS, BaselineRadarSpec

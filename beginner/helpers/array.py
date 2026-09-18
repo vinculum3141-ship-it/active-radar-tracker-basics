@@ -1,3 +1,11 @@
+"""Array geometry and steering helpers for the beginner radar notebooks.
+
+This module keeps the array math explicit: each element contributes a phase
+shift tied to the extra path length from the incoming plane wave. That makes it
+straightforward to teach steering vectors, beam pointing, and the relationship
+between array spacing and null locations.
+"""
+
 from __future__ import annotations
 
 import numpy as np

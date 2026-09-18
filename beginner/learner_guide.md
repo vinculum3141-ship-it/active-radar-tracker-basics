@@ -12,6 +12,45 @@ notebook to fill in the gaps.
 For every chapter, the notebook is the place to run code and see output. This
 guide is the place to understand why the code works.
 
+This guide exists to carry the ideas that are hard to hold in one notebook cell:
+why the assumptions are valid, what the signal is really doing, and how the
+physics turns into the algebra and then into the plots. If a notebook answers
+"what do I compute?", this guide answers "why is this the right computation?"
+and "what would go wrong if I misunderstood the model?".
+
+### How to read this guide
+
+Think of the notebook and the guide as a pair of complementary tools.
+
+- The notebook is the lab: you run the code, plot the outputs, and see the
+  signals move.
+- The guide is the explanation: it tells you what the waveforms mean, why the
+  equations are the right ones, and where the assumptions matter.
+
+The best way to use the material is to read the guide chapter before or just
+after the matching notebook, then return to the code and explain the result in
+plain language. A good student explanation sounds like this: "The chirp is long
+for energy but wide in bandwidth for resolution, so the matched filter can
+compress it without losing sensitivity." That is the kind of sentence this guide
+is designed to help you build.
+
+### The learning arc at a glance
+
+The learner path is deliberately staged:
+
+1. Start with timing and range.
+2. Add waveform design and matched-filter gain.
+3. Add attenuation, noise, and detection.
+4. Add motion through Doppler and range-Doppler.
+5. Add tracking and state estimation.
+6. Add spatial direction using arrays and beamforming.
+7. Add adaptive rejection of interference.
+8. Join the whole chain into a complete radar narrative.
+
+That arc is important. You are not learning isolated formulas. You are learning
+one coherent story: transmit a pulse, recover the echo, estimate range and
+velocity, locate direction, and reject interference while tracking the target.
+
 ---
 
 ## Chapter 0 — Radar Intuition and Baseline Parameters
@@ -36,6 +75,13 @@ That is the whole idea. Transmit, listen, time the return. Every complication in
 radar signal processing exists to make that basic measurement more reliable, more
 precise, or useful at greater range. But the foundation is always the same:
 turn a delay into a distance.
+
+The important intuition is that radar is not measuring a target by looking at it
+like a camera does. It is measuring a very precise timing problem. The radar
+sends a pulse, waits for a reflection, and asks: how long did that echo take to
+come back? Once you know the round-trip time, the target range is not an image
+of the world — it is a computed consequence of the travel time and the speed of
+light.
 
 ### Why the radar must listen
 
@@ -151,6 +197,30 @@ cycle and listens for the other 98 percent.
 dividing by the sampling rate, then to range using R = c * delay / 2. The
 notebook's calculation cell shows this chain with real numbers, and the helper
 functions package it for reuse in later notebooks.
+
+### Optional stretch challenge
+
+Try the same calculation with a longer PRI and a shorter listening window. What
+happens to the duty cycle? Does the radar spend more time transmitting or more
+time listening? Explain the trade-off in plain language using the concepts of
+pulse width, PRI, and range measurement.
+
+### Answer
+
+```python
+pulse_width = 20e-6
+pri_short = 1e-3
+pri_long = 5e-3
+
+for pri in [pri_short, pri_long]:
+    duty_cycle = pulse_width / pri
+    print(f"PRI={pri:.3e} s -> duty cycle={duty_cycle:.4f}")
+```
+
+This shows that increasing the PRI makes the duty cycle smaller, not larger. The
+radar spends a smaller fraction of each cycle transmitting and a larger fraction
+listening. That is why a longer PRI typically helps range measurement: it gives
+the echo more time to return before the next pulse.
 
 ---
 
@@ -332,6 +402,37 @@ compression factor — the long chirp is squeezed by roughly 100x into a sharp
 peak. It measures how much work the chirp does compared to a plain pulse of the
 same length.
 
+### Optional stretch challenge
+
+Compare the rectangular pulse and the chirp with the same pulse width and the
+same target. Estimate the approximate resolution for each one and explain why the
+chirp wins even though its pulse length stays the same. If you can, repeat the
+same thought experiment with a longer chirp bandwidth and describe how the
+resolution changes.
+
+### Answer
+
+```python
+c = 299_792_458
+pulse_width = 20e-6
+bandwidth = 5e6
+
+range_resolution_rect = c * pulse_width / 2
+range_resolution_chirp = c / (2 * bandwidth)
+print(f"Rectangular pulse: {range_resolution_rect/1000:.2f} km")
+print(f"Chirp: {range_resolution_chirp/1000:.3f} km")
+
+# Try a wider chirp: 10 MHz
+bandwidth_wider = 10e6
+range_resolution_chirp_wider = c / (2 * bandwidth_wider)
+print(f"Wider chirp: {range_resolution_chirp_wider/1000:.3f} km")
+```
+
+The chirp wins because the key quantity is bandwidth, not pulse length alone. A
+plain pulse has a resolution near c * tau / 2; a chirp has a resolution near c /
+(2B), so increasing the bandwidth makes the range cell smaller even if the pulse
+length stays constant.
+
 ---
 
 ## Chapter 2 — The Radar Equation
@@ -384,6 +485,13 @@ where:
 
 The R⁴ in the denominator is the key. Doubling the range does not halve the
 received power — it reduces it by a factor of 16.
+
+This is the single most important reason radar is difficult. The range loss is
+not linear, it is geometric and round-trip. The signal leaves the radar,
+spreads over a sphere, bounces off a target, and spreads again on the way back.
+The system therefore loses power in a way that is brutal at long range, and the
+signal processing methods that follow in the notebooks are designed directly to
+recover information from that weak return.
 
 ### The 1 / R⁴ dependence
 
@@ -442,6 +550,28 @@ received power by a factor of 16, which is 10 * log10(16) ≈ 12 dB.
 effect of the radar equation with plausible system parameters. The exact value
 depends on the specific radar and target, but −40 dB is a realistic ballpark
 for a 1000-metre target.
+
+### Optional stretch challenge
+
+Pick one range value such as 200 m, 1000 m, and 5000 m and compute the
+received-power ratio relative to a reference target. When you compare the
+results, explain why the 1 / R⁴ law matters so much more at longer ranges than
+at short ranges.
+
+### Answer
+
+```python
+reference_range = 200
+ranges = [200, 1000, 5000]
+
+for R in ranges:
+    ratio = (reference_range / R) ** 4
+    print(f"Range={R} m -> received power ratio relative to 200 m = {ratio:.3e}")
+```
+
+This makes the effect very clear: the received power falls with the fourth power
+of range, so moving from 200 m to 1000 m is a huge loss even before you count
+other system terms. That is why range is the hardest challenge in radar design.
 
 ---
 
@@ -609,6 +739,13 @@ they do not line up, the contributions cancel and the sum stays small.
 The result is a new signal — the matched-filter output — that peaks wherever an
 echo is present. The peak location corresponds to the echo delay, and the peak
 height reflects the total energy accumulated across the pulse length.
+
+This is the most important conceptual step in the beginner track: the radar does
+not simply measure the strongest sample, it measures the strongest match between
+a known transmit waveform and a received signal. That is why the matched filter
+is the natural tool for weak echoes buried in noise. The code is not doing a
+mysterious trick; it is measuring alignment between a template and the signal,
+which is exactly what a radar should do when it knows the pulse it transmitted.
 
 ### Correlation by hand
 
@@ -778,6 +915,12 @@ The result is a steady phase advance across slow time. Extract the complex echo
 at the target's range bin from every pulse and the real and imaginary parts
 draw out a sinusoid whose frequency is the Doppler shift. Magnitude stays flat;
 phase is where the motion lives.
+
+This is a critical point that students often miss: a moving target does not
+necessarily change the *power* of the echo much, but it changes the phase from
+pulse to pulse. If you look only at magnitude, you miss the motion. Radar
+velocity is therefore not a magnitude problem; it is a phase problem. Once you
+understand that, the whole Doppler story becomes much easier to follow.
 
 ### From phase advance to Doppler frequency
 
@@ -1128,6 +1271,12 @@ A wave from direction theta travels an extra path
 from one element to the next. That is the whole geometry: the angle is buried
 in how much farther each element is from the target.
 
+This is the point where radar becomes spatial rather than temporal. A single
+antenna gives you a distance measurement; a line of antennas lets you compare
+phase across positions and recover direction. The radar is no longer asking only
+"how long did the echo take?" It is now asking "from which angle did that echo
+arrive?" That is the leap from a scalar measurement to a directional estimate.
+
 ### Why element spacing is half a wavelength
 
 The spacing d is a trade-off. Wider spacing makes the phase difference grow
@@ -1155,6 +1304,12 @@ It is one complex number per element — the pattern of echo phases the array
 records for a wave from theta. For the baseline 20-degree target at half-
 wavelength spacing, Delta_phi came to about 61.6 degrees and the extra path per
 gap was about 2.1 cm (0.17 wavelengths).
+
+The steering vector is the key turning point in array processing. It is not just a
+mathematical convenience; it is the exact phase template that the radar uses to
+ask: "how much does this incoming angle resemble the direction I am steering
+toward?" The radar does not guess the angle from a single element. It compares the
+whole array pattern to a candidate direction and finds the best match.
 
 ### The array factor and the beam pattern
 
@@ -1307,6 +1462,12 @@ degrees. It sees what Bartlett cannot. The price is that Capon needs a reliable
 estimate of R and its inverse — with too few snapshots that inverse is unstable
 and Capon invents spurious peaks.
 
+The conceptual difference is important: Bartlett answers "how much total energy
+is in this look direction?" Capon answers "what weights let me pass the signal
+from this direction while suppressing everything else?" That is a different and
+stronger question, and it is exactly why Capon can resolve close targets while a
+simple beam scan cannot.
+
 ### A strong interferer can mask the target
 
 Now the problem is not two weak targets but one weak target and one very loud
@@ -1410,6 +1571,12 @@ coherently across the elements (the main lobe points there), while a wave from
 another angle falls into the sidelobes. The main lobe peaks exactly at 20
 degrees, but the response at the interferer's -30 degrees is only about -18.6 dB
 down: it still leaks through a sidelobe.
+
+This is the cleanest way to frame the next idea: steering is a pointing action,
+not a rejection action. It tells the array to listen in one direction, but it
+does not tell it to suppress the other direction. The beam can still leak power
+through sidelobes, and that is exactly why a strong interferer can survive a
+beam that is otherwise aimed correctly.
 
 ### Why steering alone cannot reject the interferer
 
@@ -1592,3 +1759,23 @@ across range, velocity, and angle, the artifacts are gathered and exported, and
 you can retell the story in one breath - transmit, echo, compress for range, FFT
 for velocity, scan for direction, steer and null to hide a jammer. If you can
 defend that sentence, you command the whole chain.
+
+---
+
+## Final learner summary
+
+If you step back from the equations, the whole course has one simple plot:
+radar starts with a pulse, measures a delay, extracts a Doppler phase, measures
+angle from spatial differences, and then makes decisions under uncertainty.
+
+That is why the sequence matters. You first learn to hear a target in one
+dimension, then in two dimensions, then in three dimensions of information.
+Range is time-of-flight. Velocity is phase drift across pulses. Angle is phase
+spread across the array. Filtering, tracking, and adaptive nulling are what make
+those measurements usable when the world is noisy, moving, and cluttered.
+
+The notebooks give you the direct implementation; this guide gives you the
+mental model. If you can explain the chain in one paragraph, you are ready to
+build from it rather than only copy it. That is the real goal of the beginner
+track: not memorising formulas, but understanding the sequence of ideas so you
+can reason from first principles whenever the radar scenario changes.

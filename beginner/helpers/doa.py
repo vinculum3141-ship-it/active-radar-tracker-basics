@@ -1,3 +1,11 @@
+"""Direction-of-arrival and adaptive beamforming helpers.
+
+These functions intentionally mirror the classroom progression from a simple
+Bartlett spectrum to the adaptive MVDR spectrum. The point is to show learners
+that spatial filtering is not magic: it is a covariance-based weighting problem
+built from steering vectors and measured array data.
+"""
+
 from __future__ import annotations
 
 import numpy as np
