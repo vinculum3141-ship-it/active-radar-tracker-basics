@@ -1,24 +1,24 @@
 # Beginner radar notebook story
 
-> This site is intentionally focused on the beginner notebook track and its helper reference. The wider course material remains in the repository, but this published page is meant to support the learning path, not to stand in for a broad public API or a full production platform.
+This page follows the beginner notebook path and the helper reference that sits alongside it. It is intentionally small and teaching-focused. It is not a formal public API and it is not a broad production platform. It is a learning path: one radar, built step by step, with the math kept visible.
 
 The beginner notebooks tell one continuous story: a radar is built layer by layer, from a simple pulse to a system that can detect a target, estimate its motion, sense its direction, and reject interference.
 
-This is not a collection of unrelated exercises. It is a single narrative arc in which each chapter adds one missing piece of the radar system.
+This is not a set of disconnected exercises. It is one narrative arc in which each chapter adds one missing piece of the radar system.
 
 ## The story begins with a pulse
 
 The first idea is simple but important: radar does not transmit continuously. It sends a short burst and then listens for the echo. That gap between transmission and reception is the measurement of range.
 
-The notebooks begin by making that idea concrete. In the early chapters, students work with the basic pulse and then move to the chirp, which carries the same energy but spreads it over time in a controlled way. The benefit is subtle but powerful: a long pulse gives more energy, while the chirp's frequency sweep gives the signal enough structure to resolve targets sharply.
+The notebooks begin by making that idea concrete. In the early chapters, students work with the basic pulse and then move to the chirp, which carries the same energy but spreads it over time in a controlled way. The benefit is subtle but powerful: a long pulse gives more energy, and the chirp's frequency sweep gives the signal enough structure to resolve targets sharply.
 
-By the time the learner reaches the range chapter, the message is clear: the radar echo is weak, delayed, and buried in noise, and the signal-processing step is what makes the measurement possible.
+By the time the learner reaches the range chapter, the point is clear: the echo is weak, delayed, and buried in noise, and the signal processing step is what makes the measurement possible.
 
 ## The echo comes back, but it is weak
 
-The next part of the story introduces the channel model. The target reflection arrives later than the transmitted pulse, it is attenuated by path loss, and it is mixed with noise. In the beginner track, this is where the physical reality of radar becomes visible: the strongest signal is not always the relevant one, and the signal you want may be tiny compared with the rest of the received waveform.
+The next part of the story introduces the channel model. The target reflection arrives later than the transmitted pulse, it is attenuated by path loss, and it is mixed with noise. This is where the physical reality of radar becomes visible: the strongest signal is not always the relevant one, and the signal you want may be tiny compared with the rest of the received waveform.
 
-This is the point where matched filtering enters the story. The radar knows the waveform it sent, and it uses that knowledge to slide the template across the signal and find where the echo aligns. The result is a strong, narrow peak at the target delay, and the measurement of range becomes explicit.
+This is also where matched filtering enters the story. The radar knows the waveform it sent, and it uses that knowledge to slide the template across the signal and find where the echo aligns. The result is a strong, narrow peak at the target delay, and the range estimate becomes explicit.
 
 ## Velocity enters the story next
 
@@ -32,7 +32,7 @@ This is a major milestone in the story, because it turns the radar from a rangin
 
 The next layer is tracking. In real radar operation, detections are noisy and imperfect. A target can jump around from one estimate to the next, and the measurements are not always perfectly trustworthy.
 
-The Kalman filter gives the learner a way to balance the prediction and the measurement. It smooths the noisy track and keeps the estimate coherent over time. At this point the story is no longer just about detecting a target; it is about maintaining a stable understanding of where that target is moving.
+The Kalman filter gives the learner a way to balance prediction and measurement. It smooths the noisy track and keeps the estimate coherent over time. At this point the story is no longer only about detecting a target; it is about maintaining a stable understanding of where that target is moving.
 
 ## The radar then learns direction
 
@@ -50,7 +50,7 @@ The learner sees how to form a beam toward the target while placing a null towar
 
 ## The full picture in one arc
 
-The beginner narrative ends with a single integrated view: a chirp is transmitted, compressed into range, converted into Doppler across pulses, stabilized with a tracking filter, and then interpreted with array processing to determine direction. The final result is a coherent radar story in which each layer builds on the previous one.
+The beginner narrative ends with a single integrated view: a chirp is transmitted, compressed into range, converted into Doppler across pulses, stabilized with a tracking filter, and then interpreted with array processing to determine direction. The result is a coherent radar story in which each layer builds on the previous one.
 
 The arc is intentionally simple to follow:
 
