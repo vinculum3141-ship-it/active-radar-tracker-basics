@@ -7,6 +7,17 @@ An **active radar target tracker**: a pulse-Doppler radar simulation in Python
 interference nulling. Sim-first — no hardware required; SDR hardware is
 documented as an optional swap-in.
 
+## Beginner notebook quick path
+
+If you are starting with the beginner learning track, use this order:
+
+1. Start with the story in [beginner/00-intro-story.md](beginner/00-intro-story.md).
+2. Read the deeper conceptual explanations in [beginner/learner_guide.md](beginner/learner_guide.md).
+3. Run the matching notebook files in [beginner/notebooks](beginner/notebooks).
+4. Use the helper reference in [docs/helper-api.md](docs/helper-api.md) when you want the notebook-support API quick lookup.
+
+The notebooks remain the primary lab experience. The guide explains the "why", and the helper docs provide the fast reference for the small support functions used in the examples.
+
 ## Docs
 
 | Doc | What it covers |
