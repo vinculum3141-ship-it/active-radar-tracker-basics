@@ -217,6 +217,16 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+.DS_Store
+**/.DS_Store
+beginner/00-intro-story.md
+radar_portfolio.png
+beginner/ai_audio/
+beginner/recordings/
+beginner/narrative_scripts/
+beginner/slide_deck/
+beginner/timing_files/
+
 # Generated artifacts - out/ is tracked only via .gitkeep
 out/*
 !out/.gitkeep
