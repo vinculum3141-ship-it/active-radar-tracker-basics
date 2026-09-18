@@ -36,6 +36,23 @@ Use this map when you are working chapter by chapter:
 
 If you are unsure where to start, begin with `constants` and `math`. Those are the baseline helpers used across most notebooks.
 
+## Helper cheat sheet
+
+Use this as the fastest lookup table for the beginner notebooks.
+
+| Need | Module | Typical notebook use |
+| --- | --- | --- |
+| Shared baseline parameters | `constants` | Chapter 00 onward |
+| Range, delay, resolution, wavelength | `math` | 00, 02, 04, 05 |
+| Pulses, chirps, matched filtering | `waveforms` | 01, 04, 05 |
+| Echoes, attenuated return, AWGN | `channel` | 03, 05, 10 |
+| Doppler and range-Doppler | `doppler` | 05 |
+| Array geometry and beam pattern | `array` | 07, 08, 09 |
+| Spatial spectra and DOA | `doa` | 08, 09 |
+| Beam steering and adaptive nulling | `steering` | 07, 09 |
+| Tracking state prediction and update | `kalman` | 06, 10 |
+| Shared notebook plotting | `plotting` | 10 and other visuals |
+
 ## Helper modules and what they do
 
 ### `constants`
