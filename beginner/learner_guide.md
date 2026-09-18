@@ -20,6 +20,17 @@ and "what would go wrong if I misunderstood the model?".
 
 ### How to read this guide
 
+This guide is meant for self-paced study. The notebook is the lab: you run the code and watch the signals move. This guide is the explanation: it helps you understand why the signal model, the equations, and the interpretation are the right ones.
+
+For each chapter, the useful questions are the same:
+
+- What is the learner supposed to understand by the end of this chapter?
+- What is the main physical idea behind the calculation?
+- What common mistake should I avoid?
+- What should I be able to explain in plain language after the notebook?
+
+Use this guide before or right after the matching notebook. The goal is not to duplicate the notebook, but to help the learner connect the equations to the physical story and to the practical radar intuition.
+
 Think of the notebook and the guide as a pair of complementary tools.
 
 - The notebook is the lab: you run the code, plot the outputs, and see the

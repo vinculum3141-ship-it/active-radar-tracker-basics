@@ -37,13 +37,11 @@ explains the reasoning, and the helper package keeps the code readable without h
 
 - [Helper scripts for beginner notebooks](../docs/helper-api.md) - documentation for the reusable helper functions
 - [Learner guide](./learner_guide.md) - deeper conceptual explanations for the course
-- [Trainer guide](./trainer_guide.md) - instructor-facing notes and delivery flow
 - [Publication roadmap](./publication-roadmap.md) - publication and rollout planning
 
 ## Suggested layout
 
 - `beginner/helpers/` - reusable notebook helpers
 - `beginner/00-*.ipynb` through `beginner/10-*.ipynb` - learner notebooks
-- `beginner/trainer_guide.md` - trainer guide with chapter notes
-- `beginner/learner_guide.md` - learner guide with deeper explanations
-- `beginner/09-playbook.md` - trainer build plan
+- `beginner/learner_guide.md` - conceptual guide for self-paced study
+- `beginner/09-playbook.md` - internal development notes and release planning

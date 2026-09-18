@@ -87,8 +87,7 @@ cell does not click, or when they want the full story before running the code.
 ### Audience
 
 - The reader is the learner, not the trainer.
-- The trainer guide tells you *how to teach*; the learner handbook tells you
-  *what the concept means*.
+- The learner handbook explains *what the concept means* in a self-paced format.
 
 ### Required structure per chapter
 
@@ -109,17 +108,16 @@ cell does not click, or when they want the full story before running the code.
 - Do not introduce new equations or helper functions that the notebook does not
   use. If the notebook calls `matched_filter`, the handbook explains what
   correlation means; it does not redefine the helper.
-- Do not duplicate the trainer guide. If a point is about *how to teach* rather
-  than *what the concept means*, it belongs in the trainer guide, not the
-  handbook.
+- Do not duplicate any live-teaching notes. If a point is about *how to teach* rather
+  than *what the concept means*, it should stay out of the learner handbook.
 
 ### Cross-referencing convention
 
 - When the handbook discusses a computation, point to the specific notebook cell:
   "See the calculation cell in Notebook 04" or "In the correlation-by-hand cell..."
-- When the trainer guide discusses a concept, point to the handbook:
-  "The full derivation is in the learner handbook, Chapter 03, §Correlation by hand."
-- This keeps the three layers connected without duplicating content.
+- When supporting notes discuss a concept, point to the learner handbook for the
+  deeper explanation.
+- This keeps the learning layers connected without duplicating content.
 
 ### Build order rule
 
@@ -181,12 +179,11 @@ The fastest way to build the notebook set is to work in layers.
 - Build Notebook 2 through Notebook 9 in dependency order.
 - Finish with the integration notebook and portfolio artifact notebook.
 
-### Layer F — trainer package
+### Layer F — supporting chapter notes
 
-- Write trainer notes for each notebook.
-- Add anticipated learner confusions.
-- Add suggested timing and pacing.
-- Add checkpoint answers and expected observations.
+- Capture likely learner confusions for each notebook.
+- Add chapter-level checkpoints and expected observations.
+- Keep the notes focused on learner understanding, not live teaching delivery.
 
 ### Layer G — learner handbook
 
@@ -202,12 +199,12 @@ The fastest way to build the notebook set is to work in layers.
 - Check that every notebook has a clear beginning, middle, and end.
 - Check that every notebook teaches one new idea.
 - Check that every notebook links back to the glossary and physics docs.
-- Check that the trainer notes are enough to present the lesson without
-  reverse-engineering the notebook.
+- Check that the supporting chapter notes are enough to orient the learner
+  without reverse-engineering the notebook.
 - Check that every learner handbook chapter references the correct notebook cells
   and respects the 2–3× prose ratio.
-- Check that the trainer guide references the learner handbook where deeper
-  explanation is available.
+- Check that the learner guide references the relevant notebook content wherever
+  deeper explanation is useful.
 
 ---
 
@@ -562,7 +559,7 @@ revisiting the structure halfway through.
 
 Publish-to-web setup (for example GitHub Pages, Quarto, Jupyter Book, or an
 nbconvert-based docs pipeline) should be done only after the notebook content
-and trainer guide chapters are stable.
+and learner-guide chapters are stable.
 
 Why this is deferred:
 
@@ -576,4 +573,4 @@ When the beginner track is complete, add a final publishing stage:
 2. Choose the publishing toolchain.
 3. Generate a browsable documentation site.
 4. Add GitHub Pages deployment.
-5. Verify that notebook links, Colab links, and trainer guide chapter links all work.
+5. Verify that notebook links, Colab links, and learner-guide chapter links all work.

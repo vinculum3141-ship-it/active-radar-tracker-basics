@@ -5,7 +5,6 @@ between:
 
 - the notebook-driven learning path,
 - the conceptual companion guide,
-- the trainer notes,
 - and the reusable helper package.
 
 ## Publication goals
@@ -23,7 +22,6 @@ The published site should help a learner do the following:
 - Home page: project overview and radar story
 - Beginner track: chapter list and notebook narrative
 - Learner guide: conceptual explanations and checkpoint summaries
-- Trainer guide: teaching notes and pacing advice
 - Helper API: the shared functions and their purpose
 
 ## Build status
