@@ -6,6 +6,8 @@ The goal is not to be a formal public API. The goal is to help a learner quickly
 
 ## What these helpers are for
 
+These helper modules are notebook support utilities for the beginner track. They are intentionally simple teaching aids.
+
 The helper scripts keep the notebook code readable while keeping the math transparent.
 They are intentionally narrow and focused on specific radar concepts:
 
