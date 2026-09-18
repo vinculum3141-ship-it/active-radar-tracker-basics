@@ -1,26 +1,11 @@
-# Active Radar Tracker Basics
+# Beginner Helper Reference
 
-This site is the public documentation layer for the beginner radar learning track. It brings
- together the course narrative, helper documentation, and publication materials for GitHub Pages.
+> This site is intentionally limited to the helper script documentation for the beginner notebook track. Other course material remains in the repo, but it is not part of the published reference surface for now.
 
-The editable source material for the course still lives in the project-level beginner folder,
-while this docs site exists to present a clean published view of the work.
+These helpers are support code for the notebooks. They are intentionally narrow and teaching-focused, and they are not meant to represent the later production/public API.
 
-## Learning path
+## Contents
 
-1. Read the overview and course narrative.
-2. Work through the beginner notebooks in order.
-3. Use the learner guide to unpack the important ideas.
-4. Reuse the helper package when the same formula appears across chapters.
-5. Publish the material as a guided learning site once the narrative is stable.
+- [Helper scripts](helper-api.md) — the reference documentation for the beginner notebook utilities
 
-## Core materials
-
-- The beginner source materials live in the project-level beginner folder and are intended to be used alongside the published course docs.
-- The helper scripts section documents the reusable Python support code for the notebooks.
-- The publication page captures the release and hosting plan for the site.
-
-## Intended audience
-
-This course is designed for learners who want to understand the radar basics from
-first principles without skipping the math and the signal story.
+Additional training and narrative material can be added later as needed, but for now this site is intentionally limited to the helper reference only.
