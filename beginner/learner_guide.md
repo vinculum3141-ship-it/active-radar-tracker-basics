@@ -62,6 +62,60 @@ That arc is important. You are not learning isolated formulas. You are learning
 one coherent story: transmit a pulse, recover the echo, estimate range and
 velocity, locate direction, and reject interference while tracking the target.
 
+### What each chapter is trying to teach
+
+The course is designed to build one idea at a time. Use this map as a quick
+orientation before you read a chapter or after you finish it.
+
+- Chapter 0 — Radar Intuition and Baseline Parameters: learn that pulse radar is a
+  timing problem before it is a signal-processing problem. The key idea is that
+  delay becomes range, and the biggest beginner mistake is to treat the pulse
+  repetition interval as if it were the same as the transmit pulse.
+- Chapter 1 — Pulse Generation and Chirp Intuition: learn that a plain pulse is
+  limited by its width, while a chirp uses bandwidth to break that trade-off.
+  The key idea is that long pulse energy and fine range resolution can coexist,
+  and the common mistake is to think that a chirp is simply a longer pulse.
+- Chapter 2 — The Radar Equation: learn why the echo is so weak. The key idea is
+  the round-trip 1 / R^4 law, and the common mistake is to forget that the
+  range loss is geometric and happens on both the outbound and return paths.
+- Chapter 3 — Channel Model and Echoes: learn how a transmitted signal becomes a
+  delayed, attenuated, noisy return. The key idea is that the channel adds the
+  real-world complications, and the common mistake is to think the target echo is
+  already perfect by the time it is received.
+- Chapter 4 — Matched Filtering and Range Estimation: learn how the radar turns
+  a known transmit waveform into a precise target delay estimate. The key idea is
+  that correlation is a template-alignment test, and the common mistake is to
+  confuse a wide pulse with a narrow range measurement.
+- Chapter 5 — Doppler and the Range-Doppler Map: learn that motion shows up as
+  phase change across pulses. The key idea is that range lives in fast time and
+  velocity in slow time, and the common mistake is to expect one pulse to carry
+  all motion information.
+- Chapter 6 — Kalman Tracking: learn that repeated measurements are noisy and
+  should be smoothed over time. The key idea is prediction plus update, and the
+  common mistake is to believe the newest measurement alone is always the best
+  estimate.
+- Chapter 7 — Array Geometry and Beam Patterns: learn that phase differences
+  between array elements encode direction. The key idea is that spatial phase is
+  what turns an array into a directional sensor, and the common mistake is to
+  ignore the role of element spacing and the grating-lobe effect.
+- Chapter 8 — Direction of Arrival and Interference: learn that spatial spectra
+  and adaptive methods separate targets and jammers. The key idea is that a
+  strong interferer can mask a weak target, and the common mistake is to assume a
+  naive beam scan is sufficient in cluttered scenes.
+- Chapter 9 — Beam Steering and Adaptive Nulling: learn how a radar places a
+  main lobe on the target while placing a null on the interferer. The key idea
+  is that steering is not just pointing; it is deliberately shaping the response,
+  and the common mistake is to treat the beamformer as purely geometric.
+- Chapter 10 — Integration and Portfolio Artifacts: learn how the full radar
+  story fits into one coherent system. The key idea is that the final result is
+  not a new physics model but an assembled view of the whole pipeline, and the
+  common mistake is to think the final notebook adds a new concept instead of
+  connecting the earlier ones.
+
+This is the chapter logic of the whole beginner track. Read the guide with that
+map in mind: each chapter adds one missing piece, and the final notebooks are not
+separate topics but the same radar story seen from different angles.
+
 ---
 
 ## Chapter 0 — Radar Intuition and Baseline Parameters
