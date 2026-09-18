@@ -1,5 +1,7 @@
 # Beginner
 
+[![Open GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Docs-2F6F5C?style=for-the-badge&logo=github)](https://your-org.github.io/active-radar-tracker-basics/)
+
 This folder is the editable source for the beginner radar learning track. It contains the
 notebooks, the learner and trainer narrative content, and the shared helper code.
 

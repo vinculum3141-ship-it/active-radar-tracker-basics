@@ -1,5 +1,7 @@
 # active-radar-tracker-basics
 
+[![Open GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Docs-2F6F5C?style=for-the-badge&logo=github)](https://your-org.github.io/active-radar-tracker-basics/)
+
 An **active radar target tracker**: a pulse-Doppler radar simulation in Python
 (NumPy/SciPy) and GNU Radio, with phased-array beamforming and adaptive
 interference nulling. Sim-first — no hardware required; SDR hardware is
