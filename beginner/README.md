@@ -13,16 +13,19 @@ Shared functionality used by multiple notebooks belongs in `beginner/helpers/`.
 
 ## The beginner radar story
 
-The notebooks in this track tell one continuous story: a radar is built layer by layer,
-from a simple pulse to a system that can detect a target, estimate its motion, sense its
-direction, and reject interference.
+This is the stable entry page for the beginner track. The story stays here so the learning flow
+is not tied to a temporary draft document that may later be moved into a presentation.
 
-The arc is intentionally staged. We begin with a pulse and the idea of measuring range by
-listening for an echo. Once that timing problem is understood, the next step is signal design:
-why a chirp is useful, how matched filtering increases sensitivity, and how the echo becomes a
-clear range measurement. After that, the learner adds motion through Doppler processing and
-tracks the target with a Kalman filter. The final stages move into spatial sensing and adaptive
-nulling, where the radar learns angle and separates a desired signal from a stronger interferer.
+The notebooks in this track tell one continuous story: a radar is built layer by layer, from a
+simple pulse to a system that can detect a target, estimate its motion, sense its direction, and
+reject interference.
+
+The arc is intentionally staged. We begin with a pulse and the idea of measuring range by listening
+for an echo. Once that timing problem is understood, the next step is signal design: why a chirp
+is useful, how matched filtering increases sensitivity, and how the echo becomes a clear range
+measurement. After that, the learner adds motion through Doppler processing and tracks the target
+with a Kalman filter. The final stages move into spatial sensing and adaptive nulling, where the
+radar learns angle and separates a desired signal from a stronger interferer.
 
 The whole path is meant to feel like one coherent build: transmit a pulse, recover the echo,
 estimate range and velocity, locate direction, and then keep the track stable in a noisy scene.

@@ -9,14 +9,14 @@ documented as an optional swap-in.
 
 ## Beginner notebook quick path
 
-If you are starting with the beginner learning track, use this order:
+Start here for the beginner track:
 
-1. Start with the beginner orientation in [beginner/README.md](beginner/README.md).
+1. Read the beginner orientation in [beginner/README.md](beginner/README.md).
 2. Read the deeper conceptual explanations in [beginner/learner_guide.md](beginner/learner_guide.md).
 3. Run the matching notebook files in [beginner/notebooks](beginner/notebooks).
-4. Use the helper reference in [docs/helper-api.md](docs/helper-api.md) when you want the notebook-support API quick lookup.
+4. Use the helper reference in [docs/helper-api.md](docs/helper-api.md) for the notebook-support utilities.
 
-The notebooks remain the primary lab experience. The beginner guide explains the "why", and the helper docs provide the fast reference for the small support functions used in the examples.
+The notebooks remain the primary lab experience. The beginner guide explains the "why", and the helper docs provide the quick lookup for the small teaching-support functions used in the examples.
 
 ## Docs
 
