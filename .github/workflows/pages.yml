@@ -2,7 +2,7 @@ name: Deploy MkDocs site to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, radar-tracker-notebooks]
   workflow_dispatch:
 
 permissions:
