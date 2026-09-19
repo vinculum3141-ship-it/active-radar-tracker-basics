@@ -52,7 +52,7 @@ With one target at 20 degrees, the Bartlett spectrum has a peak at 20 degrees. T
 
 Now place a second target at 30 degrees. The sources are only 10 degrees apart. The eight-element array's conventional beam is fairly broad. In notebook 07, its first nulls were about 14.5 degrees to either side of the beam centre, a total null-to-null width near 29 degrees. [[slnc 350]]
 
-Each target produces a broad Bartlett response. Those responses overlap heavily. Instead of two distinct peaks at 20 and 30 degrees, the notebook's scan shows one wide bump between them. [[slnc 350]]
+Each target produces a broad Bartlett response. Those responses overlap heavily. Instead of two distinct peaks at 20 and 30 degrees, the notebook's scan shows one wide bump centred near 25 degrees. [[slnc 350]]
 
 The problem is not that the scan searched too coarsely. A finer list of trial angles cannot make the physical beam narrower. The fixed array aperture limits how well Bartlett separates these two sources.
 
@@ -68,7 +68,7 @@ The Capon spatial spectrum can be written as one divided by the steering vector'
 
 [[slnc 800]] Capon separates the 20- and 30-degree sources. [[slnc 600]]
 
-Run the two-source scene through both methods. Bartlett gives one merged bump. Capon gives two sharper peaks: one near 20 degrees and one near 30 degrees. [[slnc 350]]
+Run the two-source scene through both methods. Bartlett gives one merged bump. Capon gives two sharper peaks: in the notebook, one near 22.4 degrees and one near 27.7 degrees. [[slnc 350]]
 
 The added detail does not come from extra antennas. Both scans use the same eight elements and the same snapshots. Capon uses the measured spatial relationships in R to suppress competing energy while keeping the tested direction intact. [[slnc 350]]
 
@@ -86,7 +86,7 @@ The comparison shows the difference between a conventional fixed response and an
 
 Next, keep the weak target at 20 degrees and add a loud interferer at minus 30 degrees. Its signal is 20 decibels stronger in power than the target's signal. [[slnc 350]]
 
-The interferer is far away in angle, but its conventional beam response spreads into other directions through sidelobes. In the Bartlett scan, that leaked power dominates the display. The peak near the weak target is buried. [[slnc 350]]
+The interferer is far away in angle, but its conventional beam response spreads into other directions through sidelobes. In the Bartlett scan, that leaked power dominates the display. In the notebook, the weak target's feature sits about 15.7 decibels below the interferer's peak and drifts off its true angle. The peak near the weak target is buried. [[slnc 350]]
 
 If we trusted only the Bartlett spectrum, we might conclude that the scene contains the interferer and miss the actual target. This is masking: a real return becomes difficult to distinguish under a stronger neighbour's response.
 

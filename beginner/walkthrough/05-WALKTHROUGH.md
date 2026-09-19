@@ -1,0 +1,577 @@
+# Walkthrough — 05: Doppler and the Range-Doppler Map
+
+This is a cell-by-cell walkthrough of `beginner/notebooks/05-*.ipynb`. Every notebook cell is reproduced verbatim; the annotation paragraphs explain the code, the physics, and the result. Each figure output is inlined where it appears in the notebook.
+
+---
+
+# 05 — Doppler and the Range-Doppler Map
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vinculum3141-ship-it/active-radar-tracker-basics/blob/radar-tracker-notebooks/beginner/notebooks/05-doppler-range-doppler.ipynb)
+
+## What this notebook teaches
+
+So far you have measured *where* a target is (range) with the matched filter. A radar can also measure *how fast* the target is moving toward or away from you. That measurement is Doppler, and it turns the pulses you already send into a velocity reading.
+
+By the end of this notebook, you should be able to explain:
+
+- the difference between fast time and slow time,
+- why a moving target's echo phase advances from pulse to pulse,
+- how an FFT across pulses turns that phase advance into a Doppler frequency,
+- how the Doppler frequency maps to a radial velocity,
+- and why the baseline 40 m/s target wraps to a wrong speed.
+
+Keep these five questions in mind as you work through the cells. A dedicated section at the end answers each one directly.
+
+## Setup and baseline values
+
+The shared helpers give you one waveform (the chirp), the matched filter, and the baseline radar parameters. This notebook adds three new ideas on top: fast time, slow time, and the Doppler phase they reveal.
+
+### Notebook cell 4 · code
+```python
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_URL = "https://github.com/vinculum3141-ship-it/active-radar-tracker-basics.git"
+BRANCH_NAME = "radar-tracker-notebooks"
+REPO_DIR = Path("/content/active-radar-tracker-basics")
+
+in_colab = "google.colab" in sys.modules
+
+if in_colab and not REPO_DIR.exists():
+    subprocess.run(
+        ["git", "clone", "--branch", BRANCH_NAME, "--single-branch", REPO_URL, str(REPO_DIR)],
+        check=True,
+    )
+
+if in_colab:
+    os.chdir(REPO_DIR)
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", "."], check=True)
+
+    repo_root = os.path.abspath(".")
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+
+    print(f"Ready in Colab from {REPO_DIR}")
+else:
+    repo_root = Path.cwd().resolve()
+    for candidate in [repo_root, *repo_root.parents]:
+        if (candidate / "beginner").exists() and (candidate / "pyproject.toml").exists():
+            repo_root = candidate
+            break
+    repo_root = str(repo_root)
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+    print(f"Running locally from {repo_root}")
+```
+
+**Executed output:**
+
+```
+Running locally from /Users/ruby/Projects/active-radar-tracker-basics
+```
+
+**What this cell does — Prepare the environment.**
+
+The same door as every notebook in this course. In Colab this cell clones the repository, installs the beginner package, and steps into the workspace. Running locally it locates the repo root, puts it on the import path, and prints where you are working.
+
+Run this cell once. Every following cell expects it to have run.
+
+### Notebook cell 5 · code
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+from beginner.helpers import baseline_spec
+from beginner.helpers import (
+    lfm_chirp,
+    matched_filter,
+    delay_samples_for_range,
+    range_from_delay_samples,
+)
+from beginner.helpers.doppler import (
+    doppler_frequency_hz,
+    velocity_from_doppler,
+    build_pulse_stack,
+    range_doppler_map,
+)
+from beginner.helpers.math import wavelength_m
+from beginner.helpers.plotting import apply_notebook_style
+
+np.random.seed(42)
+apply_notebook_style()
+radar_spec = baseline_spec()
+radar_spec
+```
+
+**Executed output:**
+
+```
+BaselineRadarSpec(fc_hz=2450000000.0, bandwidth_hz=5000000.0, pulse_width_s=2e-05, pri_s=0.001, fs_hz=20000000.0, n_pulses=64, target_range_m=1000.0, target_velocity_mps=40.0, snr_db=20.0, target_angle_deg=20.0, interferer_angle_deg=-30.0)
+```
+
+**What this cell does — Setup: the Doppler helpers.**
+
+Imports now reach into beginner.helpers.doppler: doppler_frequency_hz, velocity_from_doppler, build_pulse_stack, and range_doppler_map, alongside the waveform and matched-filter tools. The seed is fixed at 42 so the noise and every number in the lesson are reproducible.
+
+Everything in this notebook lives between two clocks: fast time inside one PRI, slow time once per pulse.
+
+## Teach it directly first
+Before we call the reusable helper, we do the core calculation here by hand so the physics stays visible. The helper is the same idea packaged for reuse later in the course; it is not a replacement for understanding the math.
+This notebook keeps the direct implementation visible at the first encounter, then reuses the helper as the clean, repeated version.
+
+## Where we are in the story
+
+Notebook 04 ended with a matched filter that pulls a noisy echo into a sharp peak. That peak tells you the echo's *delay*, which is range. But a single peak cannot tell you whether the target is moving. To learn velocity, you need many pulses, so you can watch the echo's phase change from one pulse to the next.
+
+This notebook is the first major milestone: it turns a batch of 64 ordinary pulses into a two-dimensional picture of range *and* velocity.
+
+## Fast time versus slow time
+
+Within a single PRI, you sample the receive window rapidly at 20 MHz. That is **fast time**: the axis you used in every earlier notebook, where a sample index maps to a time-of-arrival and hence a range.
+
+But a radar transmits one pulse per PRI, thousands of times per second. If you collect the echoes of many pulses and index them by *which* pulse they came from, you get a second, much slower clock: **slow time**. Each slow-time tick is one PRI, or 1 ms here.
+
+Two targets can be hard to separate in fast time (they overlap in range) and easy to separate in slow time (their phases rotate at different rates). That is the point of this notebook: range lives in fast time, velocity lives in slow time.
+
+## The pulse stack is a two-dimensional grid
+
+Putting many pulses together makes a 2D array. It is worth being precise about its two axes, because everything from here reuses them.
+
+- **Rows are slow time.** Each row is one pulse, indexed by pulse number. Slow time advances once per PRI — that is, once per pulse, at the 1000 Hz PRF. The row index is what you will FFT across to get Doppler.
+- **Columns are fast time.** Each column is one range bin — a particular fast-time sample inside the receive window, mapped to a distance. The column index carries range.
+
+So a **range bin** is a fast-time column (a range cell), while **once per PRI** is how the slow-time *rows* are sampled. They are two different axes, not two names for the same thing. A single cell of the stack, at (pulse k, range bin r), is one sampled value of the echo at that range, on that pulse.
+
+One more thing must be said about that value: it is now a **complex number**. In earlier notebooks you worked with the real waveform as it might appear on a single wire. To see Doppler you must track the carrier's *phase*, which needs both the in-phase and quadrature parts — the real and imaginary components. The chirp you built in Notebook 01 is already complex, so each cell carries a real part and an imaginary part. That is why the stack is built `dtype=complex`: the phase, the thing that moves, only exists if you keep both parts.
+
+## Build a pulse stack: the echo phase advances
+
+A moving target at range R produces an echo that arrives at the same fast-time delay in every PRI (over a short observation it barely moves). What changes is the *phase* of that echo: each round trip is a little shorter (or longer) because the target moved, so the carrier wave returns at a slightly different phase.
+
+Here we build the received signal for all 64 pulses. Every pulse gets the same delayed echo, but with a phase that rotates by 2*pi*fd*PRI from one pulse to the next, where fd is the Doppler frequency. The result is a **pulse stack**: 64 rows, one per pulse, each row a fast-time buffer.
+
+Before we use the helper functions, let us work through the Doppler calculation explicitly so the physics is visible in the notebook itself.
+
+The two quantities we must compute are:
+
+- the wavelength from the carrier frequency, $\lambda = c / f_c$, and
+- the Doppler frequency from the target velocity, $f_d = 2v / \lambda$.
+
+That is the heart of velocity estimation in pulse radar: the target's motion changes the phase from pulse to pulse, and the Doppler frequency is just the rate of that phase change.
+
+### Notebook cell 11 · code
+```python
+# Explicit Doppler calculation before the helper-based version.
+c_mps = 299_792_458.0
+carrier_frequency_hz = radar_spec.fc_hz
+target_velocity_mps = 20.0
+
+manual_wavelength_m = c_mps / carrier_frequency_hz
+doppler_hz = 2.0 * target_velocity_mps / manual_wavelength_m
+phase_step_per_pulse_rad = 2.0 * np.pi * doppler_hz * radar_spec.pri_s
+
+print(f"Carrier wavelength: {manual_wavelength_m:.4f} m")
+print(f"Target velocity: {target_velocity_mps:.1f} m/s")
+print(f"Manual Doppler frequency: {doppler_hz:.1f} Hz")
+print(f"Phase advance per PRI: {phase_step_per_pulse_rad:.2f} rad")
+print(f"This is the rotation we will see in the slow-time complex echo.")
+```
+
+**Executed output:**
+
+```
+Carrier wavelength: 0.1224 m
+Target velocity: 20.0 m/s
+Manual Doppler frequency: 326.9 Hz
+Phase advance per PRI: 2.05 rad
+This is the rotation we will see in the slow-time complex echo.
+```
+
+**What this cell does — Doppler by hand.**
+
+The two quantities that drive everything: wavelength = c/fc = 0.1224 m, and the Doppler frequency fd = 2v/lambda = 326.9 Hz for a 20 m/s target. Each PRI advances the echo's phase by 2*pi*fd*PRI = 2.05 radians - a slow, steady rotation.
+
+That 2.05 radians per millisecond is the physical signal of velocity. Nothing else in the echo changes; only this phase rotation carries the speed.
+
+### Notebook cell 12 · code
+```python
+# Build the chirp and the per-pulse Doppler phase rotation, by hand.
+pulse_len = int(round(radar_spec.pulse_width_s * radar_spec.fs_hz))
+chirp = lfm_chirp(pulse_len, radar_spec.bandwidth_hz, radar_spec.pulse_width_s, radar_spec.fs_hz)
+
+n_delay = delay_samples_for_range(radar_spec.target_range_m, radar_spec.fs_hz)
+attenuation_linear = 10.0 ** (-40.0 / 20.0)
+
+# Carrier wavelength and the Doppler frequency for a 20 m/s approach.
+lam = wavelength_m(radar_spec.fc_hz)
+velocity_mps = 20.0
+fd_hz = 2.0 * velocity_mps / lam
+
+n_pulses = radar_spec.n_pulses
+pri_s = radar_spec.pri_s
+
+fast_len = n_delay + pulse_len
+stack = np.zeros((n_pulses, fast_len), dtype=complex)
+for k in range(n_pulses):
+    phase = np.exp(1j * 2.0 * np.pi * fd_hz * k * pri_s)
+    stack[k, n_delay : n_delay + pulse_len] = attenuation_linear * chirp * phase
+
+print(f"lambda      = {lam:.4f} m")
+print(f"Doppler for {velocity_mps:.0f} m/s = {fd_hz:.1f} Hz")
+print(f"Stack shape = {stack.shape}  ({n_pulses} pulses x {fast_len} fast-time samples)")
+```
+
+**Executed output:**
+
+```
+lambda      = 0.1224 m
+Doppler for 20 m/s = 326.9 Hz
+Stack shape = (64, 533)  (64 pulses x 533 fast-time samples)
+```
+
+**What this cell does — Build the pulse stack.**
+
+The 64-pulse stack built explicitly: each row is one PRI's fast-time buffer, and the echo at samples 133 to 532 is multiplied by exp(j*2*pi*fd*k*PRI), rotating a little further on every pulse. Shape (64, 533). The chirp is complex, so the stack is too - the phase movement only exists because we keep real and imaginary parts.
+
+Rows are slow time (which pulse), columns are fast time (range). This is the two-dimensional grid the range-Doppler map comes from.
+
+## What the phase advance looks like
+
+The plot shows the echo at the target's fast-time range bin extracted from every pulse. As slow time advances (pulse index on the x-axis), the complex echo swings through a sinusoid at the Doppler frequency. A stationary target would sit still; a moving target rotates.
+
+That rotation is the unit of Doppler. Counting how fast the phase goes around is how you recover velocity.
+
+### Notebook cell 14 · code
+```python
+# Extract the complex echo at the target's range bin across all pulses.
+# The raw echo occupies samples n_delay .. n_delay + pulse_len; we take a point
+# in the middle of it. (The matched filter will later concentrate this to the
+# single peak you derived in Notebook 04.)
+range_bin = n_delay + pulse_len // 2
+slow_time_samples = stack[:, range_bin]  # one complex number per pulse
+
+pulse_idx = np.arange(n_pulses)
+fig, ax = plt.subplots(figsize=(10, 3))
+ax.plot(pulse_idx, slow_time_samples.real, color="#1b9e77", label="Real part")
+ax.plot(pulse_idx, slow_time_samples.imag, color="#d95f02", label="Imaginary part")
+ax.set_xlabel("Pulse index (slow time)")
+ax.set_ylabel("Echo at target range bin")
+ax.set_title(f"Echo phase advances across slow time at {fd_hz:.0f} Hz (target {velocity_mps:.0f} m/s)")
+ax.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+
+print(f"The echo completes about {fd_hz * pri_s * n_pulses:.1f} full rotations over {n_pulses} pulses.")
+```
+
+**Executed output:**
+
+```
+<Figure size 1000x300 with 1 Axes>
+The echo completes about 20.9 full rotations over 64 pulses.
+```
+
+![Notebook output](assets/05/fig_cell14_0.png)
+
+**What this cell does — Phase advance, made visible.**
+
+Take the complex echo at the target's range bin from each of the 64 pulses and the rotation becomes a sinusoid: real (green) and imaginary (orange) parts swing out of step as slow time advances. A stationary target would sit still here; a moving target rotates.
+
+The math agrees with the picture: at 327 Hz across 64 one-millisecond pulses, the echo completes about 20.9 full rotations. Counting those rotations is how velocity is recovered.
+
+## Compress every pulse into a range profile
+
+Notebook 04's matched filter turns one noisy echo into a sharp peak. Applying it to *every* pulse in the stack gives 64 range profiles - one per pulse. Stacking them keeps the same shape as the pulse stack, but now each fast-time sample is a compressed range bin rather than raw signal.
+
+Range resolution now lives in fast time (the matched-filter peak's width), while Doppler lives in slow time. The range-Doppler map combines both.
+
+### Notebook cell 16 · code
+```python
+# Matched-filter every pulse to get a stack of range profiles.
+profiles = np.array([matched_filter(stack[k], chirp) for k in range(n_pulses)])
+print(f"Range profiles shape = {profiles.shape}")
+
+# The matched-filter output is longer than the fast-time buffer (full mode).
+peak_bin = np.argmax(np.abs(profiles[0]))
+print(f"Compressed peak at fast-time bin {peak_bin} (delay = {peak_bin - (pulse_len - 1)} samples)")
+```
+
+**Executed output:**
+
+```
+Range profiles shape = (64, 932)
+Compressed peak at fast-time bin 532 (delay = 133 samples)
+```
+
+**What this cell does — Compress every pulse.**
+
+Now the matched filter from Notebook 04 runs on each of the 64 rows, producing 64 range profiles of shape (64, 932). Each profile's compressed peak sits at fast-time bin 532 - a 133-sample delay, the same 996.8 m range estimate as before.
+
+Range now lives in fast time (the peak's position), velocity in slow time (the phase rotation). The rest of the notebook combines the two.
+
+## The FFT across pulses: from phase to velocity
+
+The echo's phase advances at fd cycles per second. If you take the fast Fourier transform of the slow-time samples at one range bin, you get a peak at exactly fd. That is the Doppler spectrum: a bump sitting at the target's Doppler frequency.
+
+Each slow-time tick is one PRI, so the **slow-time sampling rate is the PRF** (1000 Hz here). An FFT across pulses therefore measures frequencies from -PRF/2 to +PRF/2, as you saw in Notebook 01 for a time-domain signal, but now sampled once per PRI.
+
+To turn a Doppler frequency into a speed, invert fd = 2v/lambda: v = fd * lambda / 2.
+
+### Notebook cell 18 · code
+```python
+# FFT the slow-time samples at the target's range bin.
+nfft = 512  # zero-pad for a smooth spectrum
+slow_fft = np.fft.fftshift(np.fft.fft(slow_time_samples, nfft))
+doppler_axis = np.fft.fftshift(np.fft.fftfreq(nfft, pri_s))
+
+peak_fd = doppler_axis[np.argmax(np.abs(slow_fft))]
+peak_vel = velocity_from_doppler(peak_fd, radar_spec.fc_hz)
+
+fig, ax = plt.subplots(figsize=(10, 3))
+ax.plot(doppler_axis, np.abs(slow_fft), color="#7570b3", linewidth=1.0)
+ax.axvline(peak_fd, color="#d95f02", linestyle="--", linewidth=1)
+ax.set_xlabel("Doppler frequency (Hz)")
+ax.set_ylabel("|FFT|")
+ax.set_title("Doppler spectrum at the target range bin")
+plt.tight_layout()
+plt.show()
+
+print(f"Detected Doppler = {peak_fd:.1f} Hz  ->  velocity {peak_vel:.1f} m/s (true {velocity_mps:.0f} m/s)")
+```
+
+**Executed output:**
+
+```
+<Figure size 1000x300 with 1 Axes>
+Detected Doppler = 326.2 Hz  ->  velocity 20.0 m/s (true 20 m/s)
+```
+
+![Notebook output](assets/05/fig_cell18_0.png)
+
+**What this cell does — FFT across pulses: the Doppler spectrum.**
+
+Sample the slow-time complex echo once per PRI and FFT across pulses: the 327 Hz rotation becomes a peak in the Doppler spectrum. Zero-padding to 512 bins smooths the bump. The detected peak at 326.2 Hz maps through v = fd*lambda/2 to 20.0 m/s - the true speed.
+
+The slow-time sampling rate is the PRF, 1000 Hz here, so the FFT axis runs from -500 to +500 Hz. This is exactly how the radar converts rotation to speed.
+
+## The range-Doppler map
+
+Doing the slow-time FFT at *every* fast-time bin, not just the target's, produces a two-dimensional map: range along one axis, velocity along the other. Each cell's brightness is the echo power for that range-and-velocity combination.
+
+The result is a heatmap with a single bright blob at the target's range and velocity. This is how a pulse radar displays a scene: one glance shows where targets are *and* how fast they are moving, and separate blobs mean separate targets that might overlap in either axis alone.
+
+### Notebook cell 20 · code
+```python
+# Slow-time FFT at every range bin -> the range-Doppler map.
+_, velocity_axis, rdm = range_doppler_map(profiles, pri_s, radar_spec.fc_hz)
+
+range_axis = range_from_delay_samples(
+    np.arange(profiles.shape[1]) - (pulse_len - 1), radar_spec.fs_hz
+)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+im = ax.imshow(
+    rdm,
+    aspect="auto",
+    origin="lower",
+    extent=[range_axis[0], range_axis[-1], velocity_axis[0], velocity_axis[-1]],
+    cmap="viridis",
+)
+ax.axhline(0, color="white", linewidth=0.6, linestyle=":")  # zero-velocity line
+ax.set_xlabel("Range (m)")
+ax.set_ylabel("Velocity (m/s)")
+ax.set_title("Range-Doppler map: one target at 1000 m, 20 m/s")
+plt.colorbar(im, ax=ax, label="|Echo power|")
+plt.tight_layout()
+plt.show()
+```
+
+**Executed output:**
+
+```
+<Figure size 900x500 with 2 Axes>
+```
+
+![Notebook output](assets/05/fig_cell20_0.png)
+
+**What this cell does — The range-Doppler map.**
+
+Run that slow-time FFT at every range bin and stack the results: one heatmap with range on one axis and velocity on the other. A single bright blob sits at 1000 m and +20 m/s - the target's position and speed in one glance.
+
+This is the classic pulse-radar display. Separate blobs mean separate targets, even if they overlap in range or velocity alone.
+
+## Velocity resolution and ambiguity
+
+Just as in range, the Doppler estimate has limits. Two of them matter here.
+
+The radar processes a batch of pulses together as one coherent group. That batch is the **CPI** (coherent processing interval), and its length is set by how many pulses you collect: here the baseline uses N = 64 pulses (the `n_pulses` setting), so one CPI lasts N*PRI = 64 ms.
+
+**Velocity resolution.** Within one CPI the slow-time FFT has 64 samples (one per pulse), so it can tell apart frequencies separated by about one bin. That becomes a velocity resolution of delta_v = lambda / (2 N PRI) about 0.96 m/s for our 64 pulses. Two targets whose speeds differ by less than that look like one.
+
+**Velocity ambiguity.** Slow time samples once per PRI, at the PRF of 1000 Hz. Just as sampling fast time at fs limits the highest frequency you can name, sampling slow time at the PRF limits the highest Doppler you can name uniquely to +-PRF/2 = +-500 Hz, i.e. +-30.6 m/s. A target faster than that **aliases** to a wrong, lower speed.
+
+The baseline target moves at 40 m/s - faster than 30.6 m/s. Its Doppler of 654 Hz is beyond 500 Hz, so it folds over and is reported at the wrong velocity. Let's see it.
+
+### Notebook cell 22 · code
+```python
+# Baseline target moves at 40 m/s, which exceeds the unambiguous limit.
+fast_velocity_mps = radar_spec.target_velocity_mps  # 40 m/s
+fd_fast = doppler_frequency_hz(fast_velocity_mps, radar_spec.fc_hz)
+
+stack_fast = build_pulse_stack(chirp, n_pulses, pri_s, fd_fast, n_delay, attenuation_linear)
+profiles_fast = np.array([matched_filter(stack_fast[k], chirp) for k in range(n_pulses)])
+_, velocity_axis_fast, rdm_fast = range_doppler_map(profiles_fast, pri_s, radar_spec.fc_hz)
+
+peak_v = velocity_axis_fast[np.unravel_index(np.argmax(rdm_fast), rdm_fast.shape)[0]]
+
+print(f"True velocity     = {fast_velocity_mps:.0f} m/s  -> Doppler {fd_fast:.0f} Hz")
+print(f"Unambiguous limit = +/-{np.max(np.abs(velocity_axis_fast)):.1f} m/s")
+print(f"Reported velocity = {peak_v:.1f} m/s")
+
+fig, ax = plt.subplots(figsize=(9, 5))
+im = ax.imshow(
+    rdm_fast,
+    aspect="auto",
+    origin="lower",
+    extent=[range_axis[0], range_axis[-1], velocity_axis_fast[0], velocity_axis_fast[-1]],
+    cmap="viridis",
+)
+ax.axhline(0, color="white", linewidth=0.6, linestyle=":")
+ax.set_xlabel("Range (m)")
+ax.set_ylabel("Velocity (m/s)")
+ax.set_title("Aliasing: 40 m/s target reported as moving the wrong way")
+plt.colorbar(im, ax=ax, label="|Echo power|")
+plt.tight_layout()
+plt.show()
+```
+
+**Executed output:**
+
+```
+True velocity     = 40 m/s  -> Doppler 654 Hz
+Unambiguous limit = +/-30.6 m/s
+Reported velocity = -21.0 m/s
+<Figure size 900x500 with 2 Axes>
+```
+
+![Notebook output](assets/05/fig_cell22_0.png)
+
+**What this cell does — Ambiguity: the 40 m/s target aliases.**
+
+The baseline target moves at 40 m/s, whose Doppler is 654 Hz - beyond the +-500 Hz unambiguous window set by the 1000 Hz PRF. The FFT cannot name 654 Hz, so the energy folds over and the map reports -21.0 m/s: the wrong speed and the wrong direction.
+
+This is the aliasing lesson from sampling in time, just sampled once per PRI. +-30.6 m/s is the hard limit, and real radars manage it by changing the PRF regime.
+
+## Checkpoint
+
+In your own words, what is the difference between fast time and slow time, and which one carries range versus velocity?
+
+Then answer this: if a target's Doppler frequency doubles, what happens to its reported velocity?
+
+## Common mistake
+
+A common mistake is to confuse fast-time sampling with slow-time sampling. Fast time is sampled at fs = 20 MHz inside one PRI and builds the range axis. Slow time is sampled once per PRI at the PRF and builds the velocity axis. The two clocks do not see the same frequencies, and mixing them up hides the velocity story.
+
+Another mistake is to treat the raw pulse stack's magnitude as the Doppler signal. The echo's *magnitude* stays roughly constant across pulses; it is the *phase* that rotates. You must look at the complex value - its real and imaginary parts, or its phase - to see Doppler at all.
+
+## Why the helpers exist
+
+The cells above built the pulse stack, compressed each pulse, and ran the slow-time FFT step by step so you can see where Doppler comes from. Once the idea is clear, the same work collapses into build_pulse_stack and range_doppler_map, so later notebooks can stand up a range-Doppler scene in a few lines instead of two dozen.
+
+Keep the first pass visible for the physics, then use the helpers when the lesson shifts elsewhere.
+
+### Notebook cell 26 · code
+```python
+# The same scene in helper form: build and map in a few lines.
+stack_h = build_pulse_stack(chirp, n_pulses, pri_s, fd_hz, n_delay, attenuation_linear)
+profiles_h = np.array([matched_filter(stack_h[k], chirp) for k in range(n_pulses)])
+_, v_h, rdm_h = range_doppler_map(profiles_h, pri_s, radar_spec.fc_hz)
+
+peak_v_h = v_h[np.unravel_index(np.argmax(rdm_h), rdm_h.shape)[0]]
+print(f"Helper-based velocity estimate = {peak_v_h:.1f} m/s (true {velocity_mps:.0f} m/s)")
+```
+
+**Executed output:**
+
+```
+Helper-based velocity estimate = 20.1 m/s (true 20 m/s)
+```
+
+**What this cell does — The map in helper form.**
+
+build_pulse_stack plus range_doppler_map reproduce the whole scene in three lines. The helper reads a peak velocity of 20.1 m/s against the true 20 m/s - the FFT grid is slightly coarse, nothing more.
+
+Two dozen lines collapse to three. The by-hand version exists so the phase-to-Doppler chain is understood before the helpers take over.
+
+## Stretch: two targets, one range, two velocities
+
+Two targets at the *same range* but different velocities are indistinguishable in a single matched filter - they produce one peak in fast time. Doppler separates them. Add a second target at 1000 m moving at -20 m/s (receding) alongside the 20 m/s one, build the summed stack, and confirm the range-Doppler map shows two distinct blobs split along the velocity axis.
+
+### Notebook cell 28 · code
+```python
+# Two targets at the same range, opposite velocities.
+vel_a = 20.0
+vel_b = -20.0
+
+stack2 = build_pulse_stack(chirp, n_pulses, pri_s, doppler_frequency_hz(vel_a, radar_spec.fc_hz), n_delay, attenuation_linear)
+stack2 += build_pulse_stack(chirp, n_pulses, pri_s, doppler_frequency_hz(vel_b, radar_spec.fc_hz), n_delay, attenuation_linear)
+
+profiles2 = np.array([matched_filter(stack2[k], chirp) for k in range(n_pulses)])
+_, v2, rdm2 = range_doppler_map(profiles2, pri_s, radar_spec.fc_hz)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+im = ax.imshow(
+    rdm2,
+    aspect="auto",
+    origin="lower",
+    extent=[range_axis[0], range_axis[-1], v2[0], v2[-1]],
+    cmap="viridis",
+)
+ax.axhline(0, color="white", linewidth=0.6, linestyle=":")
+ax.set_xlabel("Range (m)")
+ax.set_ylabel("Velocity (m/s)")
+ax.set_title("Two targets at the same range, +20 m/s and -20 m/s")
+plt.colorbar(im, ax=ax, label="|Echo power|")
+plt.tight_layout()
+plt.show()
+```
+
+**Executed output:**
+
+```
+<Figure size 900x500 with 2 Axes>
+```
+
+![Notebook output](assets/05/fig_cell28_0.png)
+
+**What this cell does — Two targets, same range.**
+
+The closing stretch shows why Doppler matters beyond speed: two targets at the same 1000 m range moving at +20 and -20 m/s overlap completely in fast time - a single matched-filter peak. In the range-Doppler map they split into two distinct blobs along the velocity axis.
+
+Same range, different speed: Doppler disentangles what range alone cannot.
+
+## Closing the loop: answers to the opening questions
+
+At the start we listed five things to be able to explain. Here is each answer.
+
+**Fast time versus slow time.** Fast time is the rapid sampling inside one PRI (20 MHz) that resolves range. Slow time is the slower indexing across pulses (one sample per PRI, at the 1000 Hz PRF) that resolves velocity. Range is found in fast time; velocity is found in slow time.
+
+**Why the echo phase advances.** Over one PRI the target moves a little, changing the round-trip distance and hence the carrier phase. Across pulses that phase advances steadily at the Doppler frequency fd = 2v/lambda. Its magnitude stays about constant; only the phase rotates.
+
+**How the FFT turns that into Doppler.** Sampling the complex echo once per pulse (at the PRF) and taking an FFT across pulses produces a peak at fd. For a 20 m/s target at 2.45 GHz that peak sat at about 327 Hz.
+
+**How Doppler maps to velocity.** Inverting fd = 2v/lambda gives v = fd * lambda / 2. The 327 Hz peak became about 20 m/s, matching the true speed.
+
+**Why the 40 m/s target wraps.** Slow time samples at the 1000 Hz PRF, so the highest unambiguous Doppler is +-500 Hz, or +-30.6 m/s. The 40 m/s target wants 654 Hz, beyond the limit, so it folds to a lower frequency and the map reported it at about -21 m/s - the wrong speed and the wrong direction.
+
+If you can retell these five answers, you have measured velocity - the second coordinate a pulse radar can report in addition to range.
+
+## Summary
+
+In this notebook you built on the matched filter to add a second measurement axis: velocity via Doppler. You learned that a pulse radar has two clocks - fast time for range within a PRI, and slow time for velocity across pulses. By building a 64-pulse stack, compressing each pulse, and taking an FFT along slow time, you produced a range-Doppler map with a single blob at the target's true range and velocity.
+
+You also met the limits of that measurement. Velocity resolution is set by the CPI length and wavelength (about 0.96 m/s here), and the highest unambiguous velocity is set by half the PRF (30.6 m/s). The baseline 40 m/s target lives beyond that limit and aliased to a wrong speed - a concrete look at the ambiguity that real radars must manage with pulse repetition regimes.
+
+Range and velocity are now both measurable. The next notebook takes the noisy range and velocity detections this map produces and smooths them over time into a stable track with a Kalman filter.

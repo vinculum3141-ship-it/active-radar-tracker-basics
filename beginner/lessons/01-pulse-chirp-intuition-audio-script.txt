@@ -36,7 +36,7 @@ The difference lives in the chirp's changing phase, and therefore in its changin
 
 The chirp's defining feature is a linear frequency ramp. A plain rectangular pulse has no intentional sweep. The chirp, by contrast, climbs steadily across its entire pulse width. [[slnc 350]]
 
-With the baseline values, the chirp rises from near zero to approximately 5 megahertz during a 20-microsecond pulse. Its chirp rate is 250 billion hertz per second. That sounds enormous, but the sweep lasts for only 20 millionths of a second.
+With the baseline values, the chirp rises from near zero to approximately 5 megahertz during a 20-microsecond pulse. In the notebook's construction, the sweep starts near 6,250 hertz and climbs to about 4.98 megahertz, effectively covering the full 5 megahertz of bandwidth. Its chirp rate is 250 billion hertz per second. That sounds enormous, but the sweep lasts for only 20 millionths of a second.
 
 [[slnc 800]] Why chirps matter: range resolution. [[slnc 600]]
 
@@ -66,7 +66,9 @@ Another mistake is to look at the chirp's time-domain amplitude and see only a s
 
 Pulse compression is what turns the long chirp into a sharp response. The matched filter compares the received signal with a time-reversed, complex-conjugated copy of the transmitted waveform. It effectively asks: where does this known waveform line up with the received data? [[slnc 350]]
 
-For the plain rectangular pulse, the matched-filter output remains wide. For the chirp, the changing frequency pattern aligns strongly at one precise delay, so the long waveform collapses into a narrow peak. The width of that peak is controlled by bandwidth, not by the original pulse length.
+Think of the chirp as labelling each instant with its own frequency. When the template lines up exactly with the echo, the template's frequency matches the echo's frequency at every moment, so all the products add constructively and the sum is large. Slide the template only slightly, and the frequencies no longer match, so positive and negative products begin to cancel and the sum collapses. The wider the bandwidth, the faster those labels diverge as the template slides, and the narrower the resulting peak becomes. The plain rectangular pulse has almost no bandwidth, so it has no such label and cannot compress. [[slnc 350]]
+
+For the plain rectangular pulse, the matched-filter output therefore remains wide. For the chirp, the changing frequency pattern aligns strongly at one precise delay, so the long waveform collapses into a narrow peak. The width of that peak is controlled by bandwidth, not by the original pulse length.
 
 [[slnc 800]] Closing the loop. [[slnc 600]]
 

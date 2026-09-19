@@ -64,7 +64,7 @@ Select the target's range bin and read its complex value down the 64 rows. This 
 
 An F F T asks which rotation rate best explains that sequence. It transforms the slow-time samples from pulse number into Doppler frequency. A steady phase advance becomes a peak in the Doppler spectrum. [[slnc 350]]
 
-Because slow time is sampled at the 1,000-hertz pulse repetition frequency, its spectrum runs from minus 500 hertz to plus 500 hertz. The 20-meter-per-second target produces a peak near 327 hertz, safely inside that interval.
+Because slow time is sampled at the 1,000-hertz pulse repetition frequency, its spectrum runs from minus 500 hertz to plus 500 hertz. The 20-meter-per-second target produces a peak near 327 hertz, safely inside that interval. In the notebook, the detected peak lands at about 326 hertz, which reads back as a velocity of 20.0 meters per second, matching the target exactly.
 
 [[slnc 800]] Convert Doppler into velocity. [[slnc 600]]
 
@@ -100,7 +100,7 @@ At this wavelength, plus or minus 500 hertz corresponds to an unambiguous veloci
 
 Now we switch from the 20-meter-per-second teaching example to the shared baseline target moving at 40 meters per second. Its true Doppler frequency is about 654 hertz. That lies beyond the plus-500-hertz limit. [[slnc 350]]
 
-The sampled data wraps the Doppler frequency into the negative side of the spectrum. The range-Doppler map reports the target at about minus 21 meters per second. The target is shown at the wrong speed and even the wrong direction, although its range remains close to 1,000 meters.
+The sampled data wraps the Doppler frequency into the negative side of the spectrum. A 654-hertz tone folds around the 1,000-hertz sampling grid and is measured as about minus 346 hertz, which reads back through the velocity formula as roughly minus 21 meters per second. The range-Doppler map reports the target at about minus 21 meters per second. The target is shown at the wrong speed and even the wrong direction, although its range remains close to 1,000 meters.
 
 [[slnc 800]] Common mistakes. [[slnc 600]]
 

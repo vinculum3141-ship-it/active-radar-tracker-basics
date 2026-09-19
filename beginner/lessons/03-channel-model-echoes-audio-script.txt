@@ -38,7 +38,9 @@ For the baseline target at 1,000 meters, the round-trip travel time is about 6.6
 
 Before considering attenuation or noise, an echo is simply a copy of the transmitted pulse placed at the correct delay. We create an empty received buffer, move forward by 133 samples, and place the waveform there. [[slnc 350]]
 
-The pulse shape and pulse length do not change. Only the position changes. The delayed copy represents the time the energy spent travelling through space.
+The pulse shape and pulse length do not change. Only the position changes. The delayed copy represents the time the energy spent travelling through space. The received buffer must hold the delayed echo and the full pulse length, so for the baseline target the buffer is at least 533 samples long, and the echo occupies samples 133 through 532. [[slnc 350]]
+
+As a stretch, the notebook adds a second target at 3,000 metres. Its round-trip delay is about 400 samples, so its echo spans samples 400 through 800. The two echoes overlap from sample 400 to 533, so the raw signal looks like one long, blended return. That overlap is exactly the sort of ambiguity the matched filter in the next lesson is built to untangle.
 
 [[slnc 800]] Step three: add attenuation. [[slnc 600]]
 

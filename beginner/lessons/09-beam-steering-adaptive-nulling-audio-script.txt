@@ -72,9 +72,9 @@ The interferer's feature now falls back near the noise floor in its Doppler bin.
 
 [[slnc 800]] Compare the two Doppler bins. [[slnc 600]]
 
-Focus on the one-thousand-metre range bin. Before nulling, the minus-eight-metres-per-second bin is large because it contains leaked interferer energy. After nulling, that bin drops toward the target-only noise reference. [[slnc 350]]
+Focus on the one-thousand-metre range bin. Before nulling, the minus-eight-metres-per-second bin is large, roughly 75,700 in the notebook's fixed-seed scene, because it contains leaked interferer energy while the target bin holds about 20,700. After nulling, the interferer bin drops to about 481, matching the clean target-only noise floor of roughly 480. [[slnc 350]]
 
-The plus-eight-metres-per-second target bin changes little. After nulling, it remains very close to its clean, target-only reference. This before-and-after comparison is stronger evidence than a beam-pattern plot alone. It shows that the null improves the downstream measurement we care about.
+The plus-eight-metres-per-second target bin changes little. After nulling it measures about 20,200, very close to the clean, target-only reference of about 20,200. This before-and-after comparison is stronger evidence than a beam-pattern plot alone. It shows that the null improves the downstream measurement we care about, removing the interferer while preserving the target at its true level.
 
 [[slnc 800]] Common mistakes. [[slnc 600]]
 

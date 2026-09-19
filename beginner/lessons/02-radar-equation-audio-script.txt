@@ -34,7 +34,7 @@ The received power equals transmitted power, multiplied by transmit antenna gain
 
 When the same antenna is used for transmitting and receiving, its gain appears twice. We can therefore describe the antenna contribution as gain squared. [[slnc 350]]
 
-The most important feature is range to the fourth power in the denominator. Doubling the target range does not merely halve the received power. It reduces the power by two to the fourth power, which is a factor of 16.
+The most important feature is range to the fourth power in the denominator. Doubling the target range does not merely halve the received power. It reduces the power by two to the fourth power, which is a factor of 16, or about 12 decibels.
 
 [[slnc 800]] What received and transmitted power mean. [[slnc 600]]
 
@@ -76,7 +76,7 @@ To isolate the geometry and target reflection, we can calculate a round-trip los
 
 The loss factor equals radar cross section multiplied by wavelength squared, divided by four pi cubed and range to the fourth power. It tells us what fraction survives the outward spreading, target reflection, and return spreading in this simplified link. [[slnc 350]]
 
-For the baseline case, the carrier frequency is 2.45 gigahertz, the wavelength is about 12.2 centimetres, the target range is 1,000 metres, and the radar cross section is one square metre. The resulting fraction is extraordinarily small. Real radar design uses transmitter power and antenna gain to compensate for part of this loss, but the receiver still faces a very weak return.
+For the baseline case, the carrier frequency is 2.45 gigahertz, the wavelength is about 12.2 centimetres, the target range is 1,000 metres, and the radar cross section is one square metre. The resulting fraction is extraordinarily small: about seven point five five times ten to the minus eighteen, or minus 171 decibels. Only that tiny fraction of the transmitted power density returns from the target. Real radar design uses transmitter power and antenna gain to compensate for part of this loss, but the receiver still faces a very weak return.
 
 [[slnc 800]] Common mistakes. [[slnc 600]]
 

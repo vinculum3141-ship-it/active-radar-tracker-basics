@@ -22,7 +22,7 @@ The example target begins near 1,000 meters and has a constant radial speed of 2
 
 Every 64 milliseconds, the detector reports a range and a velocity. The simulated range readings have a typical spread of about 5 meters. The velocity readings have a typical spread of about 1.5 meters per second. [[slnc 350]]
 
-Plot the readings through time and they dance around the true path. One measured range can easily be several meters away from the target's actual range. If a tracking system reacted fully to every new point, it would chase noise instead of following the target.
+Plot the readings through time and they dance around the true path. One measured range can easily be several meters away from the target's actual range: in the notebook, a single reading can be off by up to about 15 meters, which is three times the typical 5-meter spread. If a tracking system reacted fully to every new point, it would chase noise instead of following the target.
 
 [[slnc 800]] Truth, measurement, and estimate. [[slnc 600]]
 
@@ -72,7 +72,7 @@ Prediction also expands the uncertainty. Time has passed without a new observati
 
 When the new detection arrives, subtract the prediction from the measurement. This difference is called the innovation. [[slnc 350]]
 
-If the predicted range is 1,010 meters and the sensor reports 1,014 meters, the innovation is plus 4 meters. The measurement is telling the filter that the target may be farther away than expected. [[slnc 350]]
+In the notebook's first step, the filter starts freshly, predicting a range of about one thousand two metres and a velocity of zero. The first detection reports a similar range but a velocity of about 20.5 meters per second. The innovation in velocity is therefore large, and it tells the filter that an approaching target has just entered the scene. [[slnc 350]]
 
 The innovation is not accepted in full automatically. First the filter must decide how trustworthy that difference is.
 
@@ -84,7 +84,7 @@ When the prediction is uncertain and the sensor is reliable, the gain moves clos
 
 When the prediction is precise and the sensor is noisy, the gain moves closer to zero. The estimate remains nearer to the prediction. [[slnc 350]]
 
-The gain can also take intermediate values. A gain of 0.4 means the filter accepts 40 percent of the difference between prediction and measurement. It does not choose between model and sensor. It blends them.
+The gain can also take intermediate values. A gain of 0.4 means the filter accepts 40 percent of the difference between prediction and measurement. It does not choose between model and sensor. It blends them. On the notebook's first step, the range gain is about 0.45 and the velocity gain about 0.9, because the filter is starting cold and leans heavily on the new measurements.
 
 [[slnc 800]] Step two continued: update. [[slnc 600]]
 

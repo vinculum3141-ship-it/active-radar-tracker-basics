@@ -36,7 +36,7 @@ The chirp contains 400 samples at the chosen 20-megahertz sampling rate. With fi
 
 Place a copy of the chirp after a two-way travel delay corresponding to a target near one thousand metres. The matched filter slides the known chirp across the received signal and measures where they align. [[slnc 350]]
 
-Instead of a long echo waveform, we get a compact peak at the target's delay. Converting that delay to distance gives the range estimate. Sampling can place the peak on a nearby discrete range bin, so read the result as approximately one thousand metres, not as an infinitely precise distance. [[slnc 350]]
+Instead of a long echo waveform, we get a compact peak at the target's delay. Converting that delay to distance gives the range estimate. Sampling can place the peak on a nearby discrete range bin, so read the result as approximately one thousand metres, not as an infinitely precise distance. In the notebook, the matched-filter peak reads back as about 997 metres against a true value of 1,000 metres. [[slnc 350]]
 
 This is the range result introduced earlier in the track. It becomes one axis of the range-Doppler map.
 
@@ -44,7 +44,7 @@ This is the range result introduced earlier in the track. It becomes one axis of
 
 Repeat the echo over 64 pulses while the target moves at 20 metres per second. The target's phase advances from pulse to pulse. A slow-time Fourier transform measures the rate of that phase change. [[slnc 350]]
 
-The range-Doppler map now places energy near one thousand metres and positive 20 metres per second. Range came from delay within each pulse. Velocity came from phase evolution across pulses. The two coordinates describe one moving return in this demonstration. [[slnc 350]]
+The range-Doppler map now places energy near one thousand metres and positive 20 metres per second. Range came from delay within each pulse. Velocity came from phase evolution across pulses. The two coordinates describe one moving return in this demonstration; in the notebook, the bin at 1,000 metres and 20 metres per second stands out clearly from the surrounding scene. [[slnc 350]]
 
 The tracker's job is different again: it would combine repeated noisy detections into a smoother estimate over time. That stage is part of the full chain even though it is not one of the final figure's four panels.
 
@@ -60,7 +60,7 @@ In a full radar, the range-Doppler detection and array snapshot would be connect
 
 Steering weights make the array respond fully to the plus-20-degree target. But the steered beam still has sidelobes. The earlier lesson showed why a strong source at minus 30 degrees can leak through. [[slnc 350]]
 
-The constrained weights keep unit response at plus 20 degrees and force zero response at minus 30 degrees in the ideal array model. The beam-pattern overlay shows both curves. Target gain stays at zero decibels relative to unity, while the interferer direction becomes a deep null. [[slnc 350]]
+The constrained weights keep unit response at plus 20 degrees and force zero response at minus 30 degrees in the ideal array model. The beam-pattern overlay shows both curves. Target gain stays at zero decibels relative to unity, while the interferer direction becomes a deep null. In the notebook, the steering-only curve sits about minus 18.6 decibels at the interferer, while the constrained curve drops to about minus 319 decibels, effectively a numerical zero. [[slnc 350]]
 
 That overlay shows the spatial design. It does not claim that this notebook has rerun the interfered range-Doppler scene from notebook 09.
 
@@ -72,7 +72,7 @@ This is a portfolio summary, not a single raw-data output. Its value is that som
 
 [[slnc 800]] Save an artifact that can be shared. [[slnc 600]]
 
-The notebook saves the composite figure as a P N G file named radar portfolio dot P N G. It then checks that the file exists and reports its size. [[slnc 350]]
+The notebook saves the composite figure as a P N G file named radar portfolio dot P N G. It then checks that the file exists and reports its size. In the notebook, the saved figure is roughly 296 kilobytes. [[slnc 350]]
 
 That small export step matters. A plot that appears only in a temporary notebook session is harder to inspect, compare, or present. A saved image can be placed in a report or portfolio. The editable slide deck and narrated video we are making for this lesson provide two further ways to explain the same work.
 

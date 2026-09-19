@@ -62,7 +62,7 @@ The steering vector answers a physical question. If a wave arrives from a chosen
 
 The radar can multiply each element's signal by a chosen complex weight and add the results. This is coherent combining. The result depends on the wave's arrival angle. [[slnc 350]]
 
-Start with equal weights, so we do not deliberately steer the array. A wave from broadside reaches the elements with matching phases. All eight contributions add together. The response is strong. [[slnc 350]]
+Start with equal weights, so we do not deliberately steer the array. A wave from broadside reaches the elements with matching phases. All eight contributions add together, so the response reaches a value equal to the number of elements: eight. The response is strong. [[slnc 350]]
 
 Turn away from broadside and the phase advances across the line. The eight contributions no longer point in the same direction on the complex plane. Some cancel one another, and the response weakens. [[slnc 350]]
 
@@ -72,7 +72,7 @@ The response plotted against angle is called the array factor, or beam pattern. 
 
 The tallest central part of the unsteered pattern is the main lobe. It points at broadside, where the elements add most strongly. [[slnc 350]]
 
-Move away from the centre and the response falls to a first null: a direction where the weighted signals cancel almost completely. Beyond that null, smaller humps appear. These are sidelobes, caused by incomplete cancellation at other angles. [[slnc 350]]
+Move away from the centre and the response falls to a first null: a direction where the weighted signals cancel almost completely. Beyond that null, smaller humps appear. These are sidelobes, caused by incomplete cancellation at other angles. In the notebook, the first sidelobe beside the main lobe sits about 12.8 decibels below the peak. [[slnc 350]]
 
 Sidelobes matter because the array still hears signals arriving outside the main listening direction. A strong unwanted signal entering through a sidelobe can still affect the radar. [[slnc 350]]
 
@@ -82,7 +82,7 @@ The main lobe tells us where the array is most sensitive. The nulls and sidelobe
 
 For eight elements at half-wavelength spacing, the first nulls fall at about minus 14.5 and plus 14.5 degrees from broadside. That makes the main lobe about 29 degrees wide between its first nulls. [[slnc 350]]
 
-Adding more elements extends the physical array. The main lobe narrows, so the radar can distinguish directions that lie closer together. [[slnc 350]]
+Adding more elements extends the physical array. The main lobe narrows, so the radar can distinguish directions that lie closer together. The notebook's stretch compares arrays of 4, 8, and 16 elements. The first null moves from about 30 degrees with 4 elements to 14.5 degrees with 8, and 7.2 degrees with 16, so the main lobe between its first nulls shrinks from about 60 degrees to 29 degrees to roughly 14 degrees. [[slnc 350]]
 
 Wider element spacing also narrows the beam, but that apparent benefit comes with a dangerous tradeoff. The phase pattern may repeat for different visible angles. We will return to that shortly.
 

@@ -12,7 +12,7 @@ By the end, you should be able to explain what pulse radar is, why the radar lis
 
 These introductory lessons use one fixed baseline radar specification. [[slnc 700]]
 
-The carrier frequency is 2.45 gigahertz. This connects the radar to wavelength and, later, Doppler calculations. [[slnc 700]]
+The carrier frequency is 2.45 gigahertz. This connects the radar to wavelength and, later, Doppler calculations. The carrier also fixes a wavelength of about 12.2 centimetres, the physical length of one full cycle of the wave, which later lessons reuse when they study Doppler and antenna arrays. [[slnc 700]]
 
 The bandwidth is 5 megahertz. This sets the range resolution achievable with pulse compression. [[slnc 700]]
 
@@ -34,7 +34,7 @@ The important idea is that the radar is not trying to hear while it is speaking.
 
 [[slnc 800]] Why the radar listens after it transmits. [[slnc 600]]
 
-The radar needs a quiet interval because the echo from a distant target takes time to come back. If the radar kept transmitting, the weak echo would be buried under the outgoing signal. [[slnc 350]]
+The radar needs a quiet interval because the echo from a distant target takes time to come back. In a real radar, that returning echo can be billions of times weaker than the transmitted pulse, because the energy spreads outward in all directions and only a tiny fraction reflects back. If the radar kept transmitting, its own outgoing signal would easily bury that faint return. [[slnc 350]]
 
 That is why we define a pulse repetition interval. The pulse width is the short transmit burst, and the rest of the P R I is the listening window. [[slnc 350]]
 
@@ -54,7 +54,7 @@ Pulse radar is a distance sensor built from careful timing. It transmits a short
 
 Second: why does the radar listen after transmitting? [[slnc 600]]
 
-The echo from a distant target takes time to return. While the transmitter is on, its outgoing signal drowns out everything else. The radar cannot hear a faint echo while it is still speaking. The pulse repetition interval is one cycle of speak, then listen. With the baseline values, the radar transmits for 20 microseconds, then listens for the remaining 980 microseconds of each 1 millisecond interval. The listening window is not idle time. It is when the measurement happens. [[slnc 350]]
+The echo from a distant target takes time to return. While the transmitter is on, its outgoing signal drowns out everything else. The radar cannot hear a faint echo while it is still speaking. The pulse repetition interval is one cycle of speak, then listen. With the baseline values, the radar transmits for 20 microseconds, then listens for the remaining 980 microseconds of each 1 millisecond interval. The listening window is nearly fifty times longer than the transmit burst. The listening window is not idle time. It is when the measurement happens. [[slnc 350]]
 
 Third: how is duty cycle computed? [[slnc 600]]
 

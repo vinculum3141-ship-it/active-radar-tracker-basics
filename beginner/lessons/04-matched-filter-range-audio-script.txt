@@ -34,7 +34,7 @@ The detailed notation matters when implementing the filter, but the intuition re
 
 We begin with a rectangular pulse because its shape makes the correlation easy to picture. The channel places one echo at the baseline target range of 1,000 meters. The echo has 40 decibels of attenuation and sits inside noise corresponding to a 20-decibel signal-to-noise ratio. [[slnc 350]]
 
-In the raw received signal, individual noise samples can be comparable to the attenuated echo. Looking for one large sample is therefore unreliable.
+In the raw received signal, individual noise samples can be comparable to the attenuated echo. In the notebook, the raw-signal peak lands at sample 209 instead of near the echo's true position around sample 133, and a threshold set at half the peak value still leaves about 400 samples above it. Looking for one large sample is therefore unreliable.
 
 [[slnc 800]] Correlation step by step. [[slnc 600]]
 
@@ -76,7 +76,9 @@ Full correlation includes an offset caused by the length of the stored waveform.
 
 Next, divide the sample delay by the sampling rate to obtain delay in seconds. Multiply by the speed of light, and divide by two for the outward and return journeys. The result is the estimated target range. [[slnc 350]]
 
-For the baseline case, the echo delay is approximately 133 samples. At 20 megahertz, this produces a range estimate close to 1,000 meters. Any small difference is caused by the true travel time falling between discrete sample positions.
+For the baseline case, the echo delay is approximately 133 samples. In the notebook, the compressed peak lands at sample 532, which converts to a 133-sample delay and an estimated range of 996.8 metres. At 20 megahertz, this produces a range estimate close to 1,000 meters. Any small difference is caused by the true travel time falling between discrete sample positions. [[slnc 350]]
+
+The two-target stretch shows how this sharpness pays off. Two echoes from targets at 1,000 and 3,000 metres overlap into one long return in the raw signal, but the chirp's matched filter separates them into two distinct peaks. The notebook reads their delays back as about 997 and 2,998 metres, resolving targets that no raw-sample inspection could pull apart.
 
 [[slnc 800]] Common mistakes. [[slnc 600]]
 
